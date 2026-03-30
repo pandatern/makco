@@ -1,0 +1,12 @@
+# Set default behavior to automatically normalize line endings
+* text=auto
+
+# Force gradlew to always use LF line endings
+gradlew text eol=lf
+
+# Ensure binary files
+*.jar binary
+*.png binary
+*.jpg binary
+*.webp binary
+*.apk binary
