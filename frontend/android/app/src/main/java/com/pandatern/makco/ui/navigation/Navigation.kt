@@ -2,6 +2,10 @@ package com.pandatern.makco.ui.navigation
 
 import androidx.compose.runtime.*
 import com.pandatern.makco.data.model.*
+import com.pandatern.makco.ui.screens.BookingScreen
+import com.pandatern.makco.ui.screens.HomeScreen
+import com.pandatern.makco.ui.screens.PaymentScreen
+import com.pandatern.makco.ui.screens.StationPickerScreen
 
 sealed class Screen {
     object Home : Screen()
@@ -25,7 +29,7 @@ fun MakcoNavHost(
     var bookingStatus by remember { mutableStateOf<BookingStatus?>(null) }
 
     when (currentScreen) {
-        Screen.Home -> {
+        is Screen.Home -> {
             HomeScreen(
                 stations = stations,
                 selectedSource = selectedSource,
@@ -34,12 +38,11 @@ fun MakcoNavHost(
                     currentScreen = if (isSource) Screen.SourcePicker else Screen.DestinationPicker
                 },
                 onSearchClick = {
-                    // TODO: Call search API
                     currentScreen = Screen.Booking
                 }
             )
         }
-        Screen.SourcePicker -> {
+        is Screen.SourcePicker -> {
             StationPickerScreen(
                 stations = stations,
                 onStationSelected = { station ->
@@ -49,7 +52,7 @@ fun MakcoNavHost(
                 onBack = { currentScreen = Screen.Home }
             )
         }
-        Screen.DestinationPicker -> {
+        is Screen.DestinationPicker -> {
             StationPickerScreen(
                 stations = stations,
                 onStationSelected = { station ->
@@ -59,20 +62,19 @@ fun MakcoNavHost(
                 onBack = { currentScreen = Screen.Home }
             )
         }
-        Screen.Booking -> {
+        is Screen.Booking -> {
             BookingScreen(
                 quotes = quotes,
                 fromStation = selectedSource,
                 toStation = selectedDestination,
                 onConfirm = { quote ->
                     selectedQuote = quote
-                    // TODO: Call confirm API
                     currentScreen = Screen.Payment
                 },
                 onBack = { currentScreen = Screen.Home }
             )
         }
-        Screen.Payment -> {
+        is Screen.Payment -> {
             PaymentScreen(
                 bookingStatus = bookingStatus,
                 onPayClick = {
