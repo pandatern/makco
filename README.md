@@ -1,4 +1,4 @@
-# MetroGo - Chennai Metro Booking App
+# Makco - Chennai Metro Booking App
 
 A standalone metro ticketing application that integrates with the Chennai Metro (CMRL) infrastructure through the MovingTech/Namma Yatri transport API platform.
 
