@@ -5,14 +5,39 @@ plugins {
 
 android {
     namespace = "com.pandatern.makco"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.pandatern.makco"
         minSdk = 26
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0.0"
+    }
+
+    signingConfigs {
+        create("debug") {
+            storeFile = file("debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+            storeType = "jks"
+        }
+    }
+
+    buildTypes {
+        debug {
+            signingConfig = signingConfigs.getByName("debug")
+            isMinifyEnabled = false
+        }
+        release {
+            signingConfig = signingConfigs.getByName("debug")
+            isMinifyEnabled = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
     }
 
     buildFeatures {
@@ -30,6 +55,12 @@ android {
 
     kotlinOptions {
         jvmTarget = "17"
+    }
+
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
     }
 }
 

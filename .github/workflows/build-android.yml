@@ -36,11 +36,23 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x frontend/android/gradlew
 
+      - name: Generate Debug Keystore
+        working-directory: frontend/android/app
+        run: |
+          keytool -genkeypair \
+            -v -keystore debug.keystore \
+            -alias androiddebugkey \
+            -keyalg RSA -keysize 2048 \
+            -validity 10000 \
+            -storepass android \
+            -keypass android \
+            -dname "CN=Debug, OU=Debug, O=Debug, L=Debug, S=Debug, C=US"
+
       - name: Build Debug APK
         working-directory: frontend/android
         run: ./gradlew assembleDebug
 
-      - name: Upload APK
+      - name: Upload Debug APK
         uses: actions/upload-artifact@v4
         with:
           name: makco-debug-apk

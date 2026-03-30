@@ -1,4 +1,23 @@
+# Generated APK
+*.apk
+*.aab
+
+# Keystore
+*.jks
+*.keystore
+
+# Build
+build/
+.gradle/
+local.properties
+
+# IDE
+.idea/
+*.iml
+.DS_Store
+
+# Nim
+backend/src/makco
+nimcache/
 *.db
 *.exe
-nimcache/
-src/makco
