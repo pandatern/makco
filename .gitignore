@@ -1,0 +1,4 @@
+*.db
+*.exe
+nimcache/
+src/makco
