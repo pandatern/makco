@@ -9,65 +9,72 @@ import androidx.compose.ui.unit.sp
 val MakcoTypography = Typography(
     displayLarge = TextStyle(
         fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Bold,
-        fontSize = 32.sp,
-        lineHeight = 40.sp,
-        color = TextPrimary
+        fontWeight = FontWeight.Black,
+        fontSize = 48.sp,
+        lineHeight = 52.sp,
+        color = White
     ),
     headlineLarge = TextStyle(
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.Bold,
-        fontSize = 24.sp,
-        lineHeight = 32.sp,
-        color = TextPrimary
+        fontSize = 28.sp,
+        lineHeight = 34.sp,
+        color = White
     ),
     headlineMedium = TextStyle(
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.SemiBold,
-        fontSize = 20.sp,
+        fontSize = 22.sp,
         lineHeight = 28.sp,
-        color = TextPrimary
+        color = White
     ),
     titleLarge = TextStyle(
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.SemiBold,
         fontSize = 18.sp,
         lineHeight = 24.sp,
-        color = TextPrimary
+        color = White
     ),
     titleMedium = TextStyle(
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.Medium,
         fontSize = 16.sp,
         lineHeight = 22.sp,
-        color = TextPrimary
+        color = White
     ),
     bodyLarge = TextStyle(
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
         lineHeight = 24.sp,
-        color = TextPrimary
+        color = White
     ),
     bodyMedium = TextStyle(
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.Normal,
         fontSize = 14.sp,
         lineHeight = 20.sp,
-        color = TextSecondary
+        color = Gray600
+    ),
+    bodySmall = TextStyle(
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.Normal,
+        fontSize = 12.sp,
+        lineHeight = 16.sp,
+        color = Gray500
     ),
     labelLarge = TextStyle(
-        fontFamily = FontFamily.Default,
+        fontFamily = FontFamily.Mono,
         fontWeight = FontWeight.Medium,
         fontSize = 14.sp,
         lineHeight = 20.sp,
-        color = TextPrimary
+        color = White
     ),
     labelMedium = TextStyle(
-        fontFamily = FontFamily.Default,
+        fontFamily = FontFamily.Mono,
         fontWeight = FontWeight.Medium,
-        fontSize = 12.sp,
-        lineHeight = 16.sp,
-        color = TextSecondary
+        fontSize = 11.sp,
+        lineHeight = 14.sp,
+        color = Gray600
     )
 )

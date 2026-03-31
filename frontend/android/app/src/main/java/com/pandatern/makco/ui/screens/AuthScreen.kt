@@ -14,7 +14,6 @@ import androidx.compose.ui.unit.dp
 import com.pandatern.makco.data.model.*
 import com.pandatern.makco.data.remote.ApiClient
 import com.pandatern.makco.ui.theme.*
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -34,35 +33,35 @@ fun AuthScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Background)
-            .padding(24.dp),
+            .background(Black)
+            .padding(horizontal = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "Makco",
+            text = "MAKCO",
             style = MaterialTheme.typography.displayLarge.copy(
-                color = Accent,
                 fontWeight = FontWeight.Black
             )
         )
 
         Text(
-            text = "Chennai Metro",
-            style = MaterialTheme.typography.bodyLarge,
-            color = TextSecondary
+            text = "CHENNAI METRO",
+            style = MaterialTheme.typography.labelMedium,
+            color = Gray500
         )
 
-        Spacer(modifier = Modifier.height(64.dp))
+        Spacer(modifier = Modifier.height(80.dp))
 
         if (!otpSent) {
             Text(
-                text = "Enter Phone Number",
-                style = MaterialTheme.typography.titleMedium,
-                color = TextPrimary
+                text = "PHONE NUMBER",
+                style = MaterialTheme.typography.labelMedium,
+                color = Gray500,
+                modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             OutlinedTextField(
                 value = phone,
@@ -73,17 +72,17 @@ fun AuthScreen(
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text("9876543210", color = TextMuted) },
-                prefix = { Text("+91 ", color = TextSecondary) },
+                placeholder = { Text("9876543210", color = Gray400) },
+                prefix = { Text("+91 ", color = Gray600) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Accent,
-                    unfocusedBorderColor = Divider,
-                    focusedTextColor = TextPrimary,
-                    unfocusedTextColor = TextPrimary,
-                    cursorColor = Accent
+                    focusedBorderColor = White,
+                    unfocusedBorderColor = Gray400,
+                    focusedTextColor = White,
+                    unfocusedTextColor = White,
+                    cursorColor = White
                 ),
-                shape = RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(4.dp),
                 singleLine = true,
                 enabled = !isLoading
             )
@@ -93,7 +92,7 @@ fun AuthScreen(
             Button(
                 onClick = {
                     if (phone.length != 10) {
-                        error = "Enter 10 digit phone number"
+                        error = "ENTER 10 DIGITS"
                         return@Button
                     }
                     isLoading = true
@@ -109,10 +108,10 @@ fun AuthScreen(
                                 attemptsLeft = body.attempts
                                 otpSent = true
                             } else {
-                                error = "Auth failed: ${resp.code()}"
+                                error = "AUTH FAILED"
                             }
                         } catch (e: Exception) {
-                            error = "Network error: ${e.message}"
+                            error = "NETWORK ERROR"
                         }
                         isLoading = false
                     }
@@ -120,21 +119,23 @@ fun AuthScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Accent),
-                shape = RoundedCornerShape(16.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = White,
+                    contentColor = Black
+                ),
+                shape = RoundedCornerShape(4.dp),
                 enabled = !isLoading
             ) {
                 if (isLoading) {
                     CircularProgressIndicator(
-                        modifier = Modifier.size(24.dp),
-                        color = Background,
+                        modifier = Modifier.size(20.dp),
+                        color = Black,
                         strokeWidth = 2.dp
                     )
                 } else {
                     Text(
-                        text = "Send OTP",
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            color = Background,
+                        text = "SEND OTP",
+                        style = MaterialTheme.typography.labelLarge.copy(
                             fontWeight = FontWeight.Bold
                         )
                     )
@@ -142,18 +143,22 @@ fun AuthScreen(
             }
         } else {
             Text(
-                text = "Enter OTP",
-                style = MaterialTheme.typography.titleMedium,
-                color = TextPrimary
+                text = "ENTER OTP",
+                style = MaterialTheme.typography.labelMedium,
+                color = Gray500,
+                modifier = Modifier.fillMaxWidth()
             )
+
+            Spacer(modifier = Modifier.height(4.dp))
 
             Text(
-                text = "Sent to +91 $phone ($attemptsLeft attempts left)",
-                style = MaterialTheme.typography.bodyMedium,
-                color = TextSecondary
+                text = "+91 $phone  •  $attemptsLeft ATTEMPTS LEFT",
+                style = MaterialTheme.typography.bodySmall,
+                color = Gray500,
+                modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             OutlinedTextField(
                 value = otp,
@@ -164,16 +169,16 @@ fun AuthScreen(
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text("4-digit OTP", color = TextMuted) },
+                placeholder = { Text("4 DIGITS", color = Gray400) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Accent,
-                    unfocusedBorderColor = Divider,
-                    focusedTextColor = TextPrimary,
-                    unfocusedTextColor = TextPrimary,
-                    cursorColor = Accent
+                    focusedBorderColor = White,
+                    unfocusedBorderColor = Gray400,
+                    focusedTextColor = White,
+                    unfocusedTextColor = White,
+                    cursorColor = White
                 ),
-                shape = RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(4.dp),
                 singleLine = true,
                 enabled = !isLoading
             )
@@ -183,7 +188,7 @@ fun AuthScreen(
             Button(
                 onClick = {
                     if (otp.length != 4) {
-                        error = "OTP must be 4 digits"
+                        error = "OTP MUST BE 4 DIGITS"
                         return@Button
                     }
                     isLoading = true
@@ -198,17 +203,17 @@ fun AuthScreen(
                                 val body = resp.body()!!
                                 onAuthSuccess(body.token)
                             } else {
-                                error = "Wrong OTP"
+                                error = "WRONG OTP"
                                 attemptsLeft--
                                 if (attemptsLeft <= 0) {
                                     otpSent = false
                                     otp = ""
                                     authId = null
-                                    error = "No attempts left. Try again."
+                                    error = "NO ATTEMPTS LEFT"
                                 }
                             }
                         } catch (e: Exception) {
-                            error = "Network error: ${e.message}"
+                            error = "NETWORK ERROR"
                         }
                         isLoading = false
                     }
@@ -216,21 +221,23 @@ fun AuthScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Accent),
-                shape = RoundedCornerShape(16.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = White,
+                    contentColor = Black
+                ),
+                shape = RoundedCornerShape(4.dp),
                 enabled = !isLoading
             ) {
                 if (isLoading) {
                     CircularProgressIndicator(
-                        modifier = Modifier.size(24.dp),
-                        color = Background,
+                        modifier = Modifier.size(20.dp),
+                        color = Black,
                         strokeWidth = 2.dp
                     )
                 } else {
                     Text(
-                        text = "Verify OTP",
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            color = Background,
+                        text = "VERIFY",
+                        style = MaterialTheme.typography.labelLarge.copy(
                             fontWeight = FontWeight.Bold
                         )
                     )
@@ -247,7 +254,7 @@ fun AuthScreen(
                     error = null
                 }
             ) {
-                Text("Change number", color = TextSecondary)
+                Text("CHANGE NUMBER", color = Gray500)
             }
         }
 
@@ -256,7 +263,7 @@ fun AuthScreen(
             Text(
                 text = it,
                 color = Error,
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.labelMedium
             )
         }
     }

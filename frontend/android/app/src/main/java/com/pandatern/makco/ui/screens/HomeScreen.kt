@@ -1,16 +1,15 @@
 package com.pandatern.makco.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.pandatern.makco.data.model.*
@@ -27,67 +26,85 @@ fun HomeScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Background)
-            .padding(16.dp)
+            .background(Black)
+            .padding(horizontal = 20.dp)
     ) {
-        Spacer(modifier = Modifier.height(48.dp))
+        Spacer(modifier = Modifier.height(60.dp))
 
-        // App title
         Text(
-            text = "Makco",
+            text = "MAKCO",
             style = MaterialTheme.typography.displayLarge.copy(
-                color = Accent,
                 fontWeight = FontWeight.Black
             )
         )
 
         Text(
-            text = "Chennai Metro",
-            style = MaterialTheme.typography.bodyLarge,
-            color = TextSecondary
+            text = "CHENNAI METRO",
+            style = MaterialTheme.typography.labelMedium,
+            color = Gray500
+        )
+
+        Spacer(modifier = Modifier.height(48.dp))
+
+        // From
+        StationRow(
+            label = "FROM",
+            station = selectedSource,
+            lineColor = GreenLine,
+            onClick = { onStationClick(true) }
+        )
+
+        // Divider
+        Box(
+            modifier = Modifier
+                .padding(start = 20.dp)
+                .width(1.dp)
+                .height(24.dp)
+                .background(Gray400)
+        )
+
+        // Swap
+        Row(
+            modifier = Modifier
+                .padding(start = 20.dp)
+                .clickable {
+                    // swap handled by parent if needed
+                },
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(6.dp)
+                    .background(Gray500)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = "↕",
+                style = MaterialTheme.typography.bodySmall,
+                color = Gray500
+            )
+        }
+
+        // Divider
+        Box(
+            modifier = Modifier
+                .padding(start = 20.dp)
+                .width(1.dp)
+                .height(24.dp)
+                .background(Gray400)
+        )
+
+        // To
+        StationRow(
+            label = "TO",
+            station = selectedDestination,
+            lineColor = BlueLine,
+            onClick = { onStationClick(false) }
         )
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Station selector card
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = Surface),
-            shape = RoundedCornerShape(20.dp)
-        ) {
-            Column(
-                modifier = Modifier.padding(20.dp)
-            ) {
-                // Source
-                StationSelector(
-                    label = "From",
-                    station = selectedSource,
-                    lineColor = Success,
-                    onClick = { onStationClick(true) }
-                )
-
-                // Divider with swap icon
-                Box(
-                    modifier = Modifier
-                        .padding(start = 5.dp)
-                        .width(2.dp)
-                        .height(32.dp)
-                        .background(Divider)
-                )
-
-                // Destination
-                StationSelector(
-                    label = "To",
-                    station = selectedDestination,
-                    lineColor = Error,
-                    onClick = { onStationClick(false) }
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // Search button
+        // Search
         Button(
             onClick = onSearchClick,
             enabled = selectedSource != null && selectedDestination != null,
@@ -95,39 +112,68 @@ fun HomeScreen(
                 .fillMaxWidth()
                 .height(56.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Accent,
-                disabledContainerColor = Divider
+                containerColor = White,
+                contentColor = Black,
+                disabledContainerColor = Gray300,
+                disabledContentColor = Gray500
             ),
-            shape = RoundedCornerShape(16.dp)
+            shape = RoundedCornerShape(4.dp)
         ) {
             Text(
-                text = "Search Fares",
-                style = MaterialTheme.typography.titleMedium.copy(
-                    color = if (selectedSource != null && selectedDestination != null)
-                        Background
-                    else
-                        TextMuted,
+                text = "SEARCH FARES",
+                style = MaterialTheme.typography.labelLarge.copy(
                     fontWeight = FontWeight.Bold
-                )
+                ),
+                color = if (selectedSource != null && selectedDestination != null) Black else Gray500
             )
         }
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.weight(1f))
 
-        // Quick stats
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
+        // Bottom info
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .border(1.dp, Gray300, RoundedCornerShape(4.dp))
+                .padding(16.dp)
         ) {
-            StatCard("Stations", "${stations.size}", Accent)
-            StatCard("Lines", "2", BlueLine)
-            StatCard("Active", "LIVE", Success)
+            Column {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text("STATIONS", style = MaterialTheme.typography.labelMedium, color = Gray500)
+                    Text("${stations.size}", style = MaterialTheme.typography.labelLarge, color = White)
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text("LINES", style = MaterialTheme.typography.labelMedium, color = Gray500)
+                    Row {
+                        Box(
+                            modifier = Modifier
+                                .size(8.dp)
+                                .background(BlueLine)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Box(
+                            modifier = Modifier
+                                .size(8.dp)
+                                .background(GreenLine)
+                        )
+                    }
+                }
+            }
         }
+
+        Spacer(modifier = Modifier.height(32.dp))
     }
 }
 
 @Composable
-fun StationSelector(
+fun StationRow(
     label: String,
     station: Station?,
     lineColor: androidx.compose.ui.graphics.Color,
@@ -137,13 +183,12 @@ fun StationSelector(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .padding(vertical = 8.dp),
+            .padding(vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
             modifier = Modifier
-                .size(12.dp)
-                .clip(RoundedCornerShape(6.dp))
+                .size(10.dp)
                 .background(lineColor)
         )
 
@@ -153,46 +198,28 @@ fun StationSelector(
             Text(
                 text = label,
                 style = MaterialTheme.typography.labelMedium,
-                color = TextMuted
+                color = Gray500
             )
             Text(
                 text = station?.name ?: "Select station",
-                style = MaterialTheme.typography.titleMedium.copy(
-                    color = if (station != null) TextPrimary else TextSecondary
+                style = MaterialTheme.typography.titleLarge.copy(
+                    fontFamily = if (station != null) FontFamily.Default else FontFamily.Mono,
+                    color = if (station != null) White else Gray400
                 )
             )
+            station?.let {
+                Text(
+                    text = it.code,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = Gray500
+                )
+            }
         }
 
         Text(
             text = "›",
             style = MaterialTheme.typography.headlineMedium,
-            color = TextMuted
+            color = Gray500
         )
-    }
-}
-
-@Composable
-fun StatCard(label: String, value: String, color: androidx.compose.ui.graphics.Color) {
-    Card(
-        colors = CardDefaults.cardColors(containerColor = Surface2),
-        shape = RoundedCornerShape(12.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = value,
-                style = MaterialTheme.typography.titleLarge.copy(
-                    color = color,
-                    fontWeight = FontWeight.Bold
-                )
-            )
-            Text(
-                text = label,
-                style = MaterialTheme.typography.labelMedium,
-                color = TextSecondary
-            )
-        }
     }
 }
