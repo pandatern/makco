@@ -1,15 +1,12 @@
 package com.pandatern.makco.ui.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.pandatern.makco.data.model.*
@@ -27,153 +24,122 @@ fun HomeScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(Black)
-            .padding(horizontal = 20.dp)
+            .padding(horizontal = 24.dp)
     ) {
-        Spacer(modifier = Modifier.height(60.dp))
+        Spacer(modifier = Modifier.height(56.dp))
 
+        // Header
         Text(
             text = "MAKCO",
-            style = MaterialTheme.typography.displayLarge.copy(
-                fontWeight = FontWeight.Black
-            )
-        )
-
-        Text(
-            text = "CHENNAI METRO",
-            style = MaterialTheme.typography.labelMedium,
-            color = Gray500
+            style = MaterialTheme.typography.displayLarge,
+            color = White
         )
 
         Spacer(modifier = Modifier.height(48.dp))
 
-        // From
-        StationRow(
+        // Route selector
+        Text(
+            text = "TRIP",
+            style = MaterialTheme.typography.labelMedium,
+            color = Gray500
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // From station
+        StationSelectorRow(
             label = "FROM",
             station = selectedSource,
             lineColor = GreenLine,
             onClick = { onStationClick(true) }
         )
 
-        // Divider
+        // Vertical line connector
         Box(
             modifier = Modifier
-                .padding(start = 20.dp)
+                .padding(start = 4.dp)
                 .width(1.dp)
-                .height(24.dp)
-                .background(Gray400)
+                .height(16.dp)
+                .background(Gray300)
         )
 
-        // Swap
-        Row(
-            modifier = Modifier
-                .padding(start = 20.dp)
-                .clickable {
-                    // swap handled by parent if needed
-                },
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(6.dp)
-                    .background(Gray500)
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = "↕",
-                style = MaterialTheme.typography.bodySmall,
-                color = Gray500
-            )
-        }
-
-        // Divider
-        Box(
-            modifier = Modifier
-                .padding(start = 20.dp)
-                .width(1.dp)
-                .height(24.dp)
-                .background(Gray400)
-        )
-
-        // To
-        StationRow(
+        // To station
+        StationSelectorRow(
             label = "TO",
             station = selectedDestination,
             lineColor = BlueLine,
             onClick = { onStationClick(false) }
         )
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(36.dp))
 
-        // Search
+        // Search button
         Button(
             onClick = onSearchClick,
             enabled = selectedSource != null && selectedDestination != null,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp),
+                .height(52.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = White,
                 contentColor = Black,
-                disabledContainerColor = Gray300,
-                disabledContentColor = Gray500
-            ),
-            shape = RoundedCornerShape(4.dp)
+                disabledContainerColor = Gray200,
+                disabledContentColor = Gray400
+            )
         ) {
             Text(
                 text = "SEARCH FARES",
                 style = MaterialTheme.typography.labelLarge.copy(
                     fontWeight = FontWeight.Bold
-                ),
-                color = if (selectedSource != null && selectedDestination != null) Black else Gray500
+                )
             )
         }
 
         Spacer(modifier = Modifier.weight(1f))
 
-        // Bottom info
-        Box(
+        // Line indicators
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .border(1.dp, Gray300, RoundedCornerShape(4.dp))
-                .padding(16.dp)
+                .padding(bottom = 32.dp),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Column {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text("STATIONS", style = MaterialTheme.typography.labelMedium, color = Gray500)
-                    Text("${stations.size}", style = MaterialTheme.typography.labelLarge, color = White)
-                }
-                Spacer(modifier = Modifier.height(8.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text("LINES", style = MaterialTheme.typography.labelMedium, color = Gray500)
-                    Row {
-                        Box(
-                            modifier = Modifier
-                                .size(8.dp)
-                                .background(BlueLine)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Box(
-                            modifier = Modifier
-                                .size(8.dp)
-                                .background(GreenLine)
-                        )
-                    }
-                }
-            }
+            Box(
+                modifier = Modifier
+                    .size(6.dp)
+                    .background(BlueLine)
+            )
+            Spacer(modifier = Modifier.width(4.dp))
+            Text(
+                text = "BLUE",
+                style = MaterialTheme.typography.labelMedium,
+                color = Gray500
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            Box(
+                modifier = Modifier
+                    .size(6.dp)
+                    .background(GreenLine)
+            )
+            Spacer(modifier = Modifier.width(4.dp))
+            Text(
+                text = "GREEN",
+                style = MaterialTheme.typography.labelMedium,
+                color = Gray500
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            Text(
+                text = "${stations.size} STATIONS",
+                style = MaterialTheme.typography.labelMedium,
+                color = Gray500
+            )
         }
-
-        Spacer(modifier = Modifier.height(32.dp))
     }
 }
 
 @Composable
-fun StationRow(
+fun StationSelectorRow(
     label: String,
     station: Station?,
     lineColor: androidx.compose.ui.graphics.Color,
@@ -186,9 +152,10 @@ fun StationRow(
             .padding(vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        // Line dot
         Box(
             modifier = Modifier
-                .size(10.dp)
+                .size(8.dp)
                 .background(lineColor)
         )
 
@@ -200,26 +167,20 @@ fun StationRow(
                 style = MaterialTheme.typography.labelMedium,
                 color = Gray500
             )
+            Spacer(modifier = Modifier.height(2.dp))
             Text(
                 text = station?.name ?: "Select station",
-                style = MaterialTheme.typography.titleLarge.copy(
-                    fontFamily = if (station != null) FontFamily.Default else FontFamily.Monospace,
-                    color = if (station != null) White else Gray400
-                )
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = if (station != null) FontWeight.Medium else FontWeight.Normal
+                ),
+                color = if (station != null) White else Gray300
             )
-            station?.let {
-                Text(
-                    text = it.code,
-                    style = MaterialTheme.typography.labelMedium,
-                    color = Gray500
-                )
-            }
         }
 
         Text(
             text = "›",
             style = MaterialTheme.typography.headlineMedium,
-            color = Gray500
+            color = Gray300
         )
     }
 }

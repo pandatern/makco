@@ -1,10 +1,8 @@
 package com.pandatern.makco.ui.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -29,7 +27,7 @@ fun BookingScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(Black)
-            .padding(horizontal = 20.dp)
+            .padding(horizontal = 24.dp)
     ) {
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -37,9 +35,9 @@ fun BookingScreen(
             Text("← BACK", style = MaterialTheme.typography.labelLarge, color = White)
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
-        // Route
+        // Route label
         Text(
             text = "ROUTE",
             style = MaterialTheme.typography.labelMedium,
@@ -49,95 +47,73 @@ fun BookingScreen(
         Spacer(modifier = Modifier.height(12.dp))
 
         // From
-        RouteStationRow(
-            name = fromStation?.name ?: "...",
-            code = fromStation?.code ?: "",
-            dotColor = GreenLine
-        )
+        RouteStation(name = fromStation?.name ?: "...", dotColor = GreenLine)
 
-        // Connector
         Box(
             modifier = Modifier
-                .padding(start = 14.dp)
+                .padding(start = 3.dp)
                 .width(1.dp)
-                .height(20.dp)
-                .background(Gray400)
+                .height(12.dp)
+                .background(Gray300)
         )
 
         // To
-        RouteStationRow(
-            name = toStation?.name ?: "...",
-            code = toStation?.code ?: "",
-            dotColor = BlueLine
-        )
+        RouteStation(name = toStation?.name ?: "...", dotColor = BlueLine)
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Fares
+        // Fares label
         Text(
             text = "FARES",
             style = MaterialTheme.typography.labelMedium,
             color = Gray500
         )
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         when {
             isLoading -> {
                 Box(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 40.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        CircularProgressIndicator(color = White, strokeWidth = 2.dp)
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text(
-                            text = "SEARCHING...",
-                            style = MaterialTheme.typography.labelMedium,
-                            color = Gray500
-                        )
-                    }
+                    CircularProgressIndicator(color = White, strokeWidth = 2.dp)
                 }
             }
             error != null -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .border(1.dp, Error, RoundedCornerShape(4.dp))
-                        .padding(20.dp)
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(
-                            text = "ERROR",
-                            style = MaterialTheme.typography.labelLarge,
-                            color = Error
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = error,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = Gray600
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        TextButton(onClick = onRetry) {
-                            Text("RETRY", color = White)
-                        }
+                    Text(
+                        text = "ERROR",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = Error
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = error,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Gray500
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    TextButton(onClick = onRetry) {
+                        Text("RETRY", color = White)
                     }
                 }
             }
             quotes.isEmpty() -> {
                 Text(
-                    text = "No fares available",
-                    style = MaterialTheme.typography.bodyMedium,
+                    text = "No fares found",
+                    style = MaterialTheme.typography.bodySmall,
                     color = Gray500
                 )
             }
             else -> {
                 quotes.forEach { quote ->
-                    FareCard(
-                        quote = quote,
-                        onClick = { onConfirm(quote) }
-                    )
+                    FareRow(quote = quote, onClick = { onConfirm(quote) })
                     Spacer(modifier = Modifier.height(12.dp))
                 }
             }
@@ -146,90 +122,68 @@ fun BookingScreen(
 }
 
 @Composable
-fun RouteStationRow(
-    name: String,
-    code: String,
-    dotColor: androidx.compose.ui.graphics.Color
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically
-    ) {
+fun RouteStation(name: String, dotColor: androidx.compose.ui.graphics.Color) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
         Box(
             modifier = Modifier
-                .size(10.dp)
+                .size(8.dp)
                 .background(dotColor)
         )
         Spacer(modifier = Modifier.width(12.dp))
-        Column {
-            Text(
-                text = name,
-                style = MaterialTheme.typography.bodyLarge.copy(
-                    color = White,
-                    fontWeight = FontWeight.Medium
-                )
-            )
-            if (code.isNotEmpty()) {
-                Text(
-                    text = code,
-                    style = MaterialTheme.typography.labelMedium,
-                    color = Gray500
-                )
-            }
-        }
+        Text(
+            text = name,
+            style = MaterialTheme.typography.bodyLarge.copy(
+                fontWeight = FontWeight.Medium
+            ),
+            color = White
+        )
     }
 }
 
 @Composable
-fun FareCard(
-    quote: Quote,
-    onClick: () -> Unit
-) {
+fun FareRow(quote: Quote, onClick: () -> Unit) {
     val label = when (quote.type) {
-        "SingleJourney" -> "SINGLE JOURNEY"
-        "ReturnJourney" -> "RETURN JOURNEY"
-        else -> quote.type.uppercase()
+        "SingleJourney" -> "SINGLE"
+        "ReturnJourney" -> "RETURN"
+        else -> quote.type
+    }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(vertical = 16.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelLarge.copy(
+                    fontWeight = FontWeight.Bold
+                ),
+                color = White
+            )
+            Text(
+                text = "ADULT × 1",
+                style = MaterialTheme.typography.bodySmall,
+                color = Gray500
+            )
+        }
+
+        Text(
+            text = "₹${quote.price.toInt()}",
+            style = MaterialTheme.typography.headlineMedium.copy(
+                fontWeight = FontWeight.Bold
+            ),
+            color = White
+        )
     }
 
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .border(1.dp, Gray300, RoundedCornerShape(4.dp))
-            .clickable(onClick = onClick)
-            .padding(20.dp)
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column {
-                Text(
-                    text = label,
-                    style = MaterialTheme.typography.labelLarge,
-                    color = White
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = "ADULT × 1",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Gray500
-                )
-                quote.categories?.firstOrNull()?.let { cat ->
-                    Text(
-                        text = cat.categoryMeta?.description ?: "",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Gray500
-                    )
-                }
-            }
-
-            Text(
-                text = "₹${quote.price.toInt()}",
-                style = MaterialTheme.typography.headlineMedium.copy(
-                    fontWeight = FontWeight.Bold,
-                    color = White
-                )
-            )
-        }
-    }
+            .height(1.dp)
+            .background(Gray200)
+    )
 }
