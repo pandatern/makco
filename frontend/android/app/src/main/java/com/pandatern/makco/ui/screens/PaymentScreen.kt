@@ -17,6 +17,8 @@ import com.pandatern.makco.ui.theme.*
 @Composable
 fun PaymentScreen(
     bookingStatus: BookingStatus?,
+    isLoading: Boolean,
+    error: String?,
     onPayClick: () -> Unit,
     onBack: () -> Unit
 ) {
@@ -27,11 +29,40 @@ fun PaymentScreen(
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Row(modifier = Modifier.fillMaxWidth()) {
+            TextButton(onClick = onBack) {
+                Text("< Back", color = Accent)
+            }
+        }
+
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Status indicator
-        when (bookingStatus?.status) {
-            "PAYMENT_PENDING" -> {
+        when {
+            isLoading -> {
+                CircularProgressIndicator(color = Accent)
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = "Processing booking...",
+                    color = TextSecondary,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+            error != null -> {
+                Text(
+                    text = "Error",
+                    color = Error,
+                    style = MaterialTheme.typography.headlineMedium
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = error,
+                    color = TextSecondary,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+            bookingStatus?.status == "PAYMENT_PENDING" -> {
                 Box(
                     modifier = Modifier
                         .size(80.dp)
@@ -68,7 +99,6 @@ fun PaymentScreen(
 
                 Spacer(modifier = Modifier.height(32.dp))
 
-                // Payment button
                 Button(
                     onClick = onPayClick,
                     modifier = Modifier
@@ -86,7 +116,7 @@ fun PaymentScreen(
                     )
                 }
             }
-            "CONFIRMED" -> {
+            bookingStatus?.status == "CONFIRMED" -> {
                 Box(
                     modifier = Modifier
                         .size(80.dp)
@@ -115,9 +145,15 @@ fun PaymentScreen(
             }
             else -> {
                 Text(
-                    text = "Loading...",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = TextSecondary
+                    text = "Booking Created",
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = TextPrimary
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = bookingStatus?.status ?: "Processing...",
+                    color = TextSecondary,
+                    style = MaterialTheme.typography.bodyMedium
                 )
             }
         }

@@ -11,7 +11,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.pandatern.makco.data.model.*
 import com.pandatern.makco.ui.theme.*
 
@@ -20,7 +19,10 @@ fun BookingScreen(
     quotes: List<Quote>,
     fromStation: Station?,
     toStation: Station?,
+    isLoading: Boolean,
+    error: String?,
     onConfirm: (Quote) -> Unit,
+    onRetry: () -> Unit,
     onBack: () -> Unit
 ) {
     Column(
@@ -29,6 +31,15 @@ fun BookingScreen(
             .background(Background)
             .padding(16.dp)
     ) {
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Back button
+        TextButton(onClick = onBack) {
+            Text("< Back", color = Accent)
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
         // Route display
         RouteCard(fromStation, toStation)
 
@@ -43,12 +54,72 @@ fun BookingScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        quotes.forEach { quote ->
-            QuoteCard(
-                quote = quote,
-                onClick = { onConfirm(quote) }
-            )
-            Spacer(modifier = Modifier.height(12.dp))
+        when {
+            isLoading -> {
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        CircularProgressIndicator(color = Accent)
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = "Searching fares...",
+                            color = TextSecondary,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                }
+            }
+            error != null -> {
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = Surface),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(20.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "Error",
+                            color = Error,
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = error,
+                            color = TextSecondary,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Button(
+                            onClick = onRetry,
+                            colors = ButtonDefaults.buttonColors(containerColor = Accent),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Text("Retry", color = Background, fontWeight = FontWeight.Bold)
+                        }
+                    }
+                }
+            }
+            quotes.isEmpty() -> {
+                Text(
+                    text = "No fares found",
+                    color = TextSecondary,
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
+            else -> {
+                quotes.forEach { quote ->
+                    QuoteCard(
+                        quote = quote,
+                        onClick = { onConfirm(quote) }
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                }
+            }
         }
     }
 }
@@ -63,7 +134,6 @@ fun RouteCard(from: Station?, to: Station?) {
         Column(
             modifier = Modifier.padding(20.dp)
         ) {
-            // From
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(
                     modifier = Modifier
@@ -79,7 +149,6 @@ fun RouteCard(from: Station?, to: Station?) {
                 )
             }
 
-            // Line connector
             Box(
                 modifier = Modifier
                     .padding(start = 5.dp)
@@ -88,7 +157,6 @@ fun RouteCard(from: Station?, to: Station?) {
                     .background(Divider)
             )
 
-            // To
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(
                     modifier = Modifier

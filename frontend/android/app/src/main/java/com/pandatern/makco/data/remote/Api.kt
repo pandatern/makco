@@ -1,32 +1,37 @@
 package com.pandatern.makco.data.remote
 
 import com.pandatern.makco.data.model.*
+import okhttp3.OkHttpClient
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.*
+import java.util.concurrent.TimeUnit
 
 interface MakcoApi {
 
     // Auth
     @POST("auth")
-    suspend fun initiateAuth(@Body request: AuthRequest): AuthResponse
+    suspend fun initiateAuth(@Body request: AuthRequest): Response<AuthResponse>
 
     @POST("auth/{authId}/verify")
     suspend fun verifyAuth(
         @Path("authId") authId: String,
         @Body request: VerifyRequest
-    ): VerifyResponse
+    ): Response<VerifyResponse>
 
     // Metro
     @GET("metro/stations")
     suspend fun getStations(
         @Header("token") token: String,
         @Query("city") city: String = "chennai"
-    ): List<Station>
+    ): Response<List<Station>>
 
     @GET("metro/routes")
     suspend fun getRoutes(
         @Header("token") token: String,
         @Query("city") city: String = "chennai"
-    ): List<Route>
+    ): Response<List<Route>>
 
     // Search
     @POST("metro/search")
@@ -34,14 +39,14 @@ interface MakcoApi {
         @Header("token") token: String,
         @Query("city") city: String = "chennai",
         @Body request: SearchRequest
-    ): SearchResponse
+    ): Response<SearchResponse>
 
     @GET("metro/search/{searchId}/quote")
     suspend fun getQuote(
         @Header("token") token: String,
         @Path("searchId") searchId: String,
         @Query("city") city: String = "chennai"
-    ): List<Quote>
+    ): Response<List<Quote>>
 
     // Booking
     @POST("metro/quote/{quoteId}/confirm")
@@ -50,36 +55,42 @@ interface MakcoApi {
         @Path("quoteId") quoteId: String,
         @Query("city") city: String = "chennai",
         @Body request: ConfirmRequest = ConfirmRequest()
-    ): BookingResponse
+    ): Response<BookingResponse>
 
     @GET("metro/booking/{bookingId}/status")
     suspend fun getBookingStatus(
         @Header("token") token: String,
         @Path("bookingId") bookingId: String,
         @Query("city") city: String = "chennai"
-    ): BookingStatus
+    ): Response<BookingStatus>
 
     // User
     @GET("profile")
     suspend fun getProfile(
         @Header("token") token: String
-    ): UserProfile
+    ): Response<UserProfile>
 
     @GET("tickets")
     suspend fun getTickets(
         @Header("token") token: String,
         @Query("city") city: String = "chennai"
-    ): List<Any>
+    ): Response<List<Any>>
 }
 
 object ApiClient {
-    private const val BASE_URL = "http://10.0.2.2:8080/"  // Emulator -> host
-    // For real device: use your server IP/domain
+    private const val BASE_URL = "http://api.pandatern.tech/"
+
+    private val okHttpClient = OkHttpClient.Builder()
+        .connectTimeout(15, TimeUnit.SECONDS)
+        .readTimeout(15, TimeUnit.SECONDS)
+        .writeTimeout(15, TimeUnit.SECONDS)
+        .build()
 
     val instance: MakcoApi by lazy {
-        retrofit2.Retrofit.Builder()
+        Retrofit.Builder()
             .baseUrl(BASE_URL)
-            .addConverterFactory(retrofit2.converter.gson.GsonConverterFactory.create())
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(MakcoApi::class.java)
     }

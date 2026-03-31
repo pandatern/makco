@@ -1,13 +1,17 @@
 package com.pandatern.makco.ui.navigation
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
 import com.pandatern.makco.data.model.*
-import com.pandatern.makco.ui.screens.BookingScreen
-import com.pandatern.makco.ui.screens.HomeScreen
-import com.pandatern.makco.ui.screens.PaymentScreen
-import com.pandatern.makco.ui.screens.StationPickerScreen
+import com.pandatern.makco.data.remote.ApiClient
+import com.pandatern.makco.ui.screens.*
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 sealed class Screen {
+    object Auth : Screen()
     object Home : Screen()
     object SourcePicker : Screen()
     object DestinationPicker : Screen()
@@ -16,19 +20,108 @@ sealed class Screen {
 }
 
 @Composable
-fun MakcoNavHost(
-    stations: List<Station>,
-    routes: List<Route>
-) {
-    var currentScreen by remember { mutableStateOf<Screen>(Screen.Home) }
+fun MakcoNavHost() {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
+    var currentScreen by remember { mutableStateOf<Screen>(Screen.Auth) }
+    var token by remember { mutableStateOf("") }
+
+    var stations by remember { mutableStateOf<List<Station>>(emptyList()) }
+    var routes by remember { mutableStateOf<List<Route>>(emptyList()) }
+
     var selectedSource by remember { mutableStateOf<Station?>(null) }
     var selectedDestination by remember { mutableStateOf<Station?>(null) }
+
     var quotes by remember { mutableStateOf<List<Quote>>(emptyList()) }
     var selectedQuote by remember { mutableStateOf<Quote?>(null) }
+    var searchId by remember { mutableStateOf<String?>(null) }
+
     var bookingId by remember { mutableStateOf<String?>(null) }
     var bookingStatus by remember { mutableStateOf<BookingStatus?>(null) }
 
+    var isLoading by remember { mutableStateOf(false) }
+    var error by remember { mutableStateOf<String?>(null) }
+
+    fun loadMetroData() {
+        scope.launch {
+            try {
+                val s = ApiClient.instance.getStations(token)
+                if (s.isSuccessful) stations = s.body() ?: emptyList()
+                val r = ApiClient.instance.getRoutes(token)
+                if (r.isSuccessful) routes = r.body() ?: emptyList()
+            } catch (_: Exception) {}
+        }
+    }
+
+    fun startSearch() {
+        if (selectedSource == null || selectedDestination == null) return
+        isLoading = true
+        error = null
+        quotes = emptyList()
+        scope.launch {
+            try {
+                val resp = ApiClient.instance.searchFare(
+                    token = token,
+                    request = SearchRequest(
+                        fromStationCode = selectedSource!!.code,
+                        toStationCode = selectedDestination!!.code
+                    )
+                )
+                if (resp.isSuccessful && resp.body() != null) {
+                    searchId = resp.body()!!.searchId
+                    delay(2500)
+                    val quoteResp = ApiClient.instance.getQuote(token, searchId!!)
+                    if (quoteResp.isSuccessful) {
+                        quotes = quoteResp.body() ?: emptyList()
+                    }
+                } else {
+                    error = "Search failed"
+                }
+            } catch (e: Exception) {
+                error = e.message
+            }
+            isLoading = false
+        }
+    }
+
+    fun confirmBooking(quote: Quote) {
+        isLoading = true
+        error = null
+        scope.launch {
+            try {
+                val resp = ApiClient.instance.confirmBooking(
+                    token = token,
+                    quoteId = quote.quoteId
+                )
+                if (resp.isSuccessful && resp.body() != null) {
+                    bookingId = resp.body()!!.bookingId
+                    delay(1000)
+                    val statusResp = ApiClient.instance.getBookingStatus(token, bookingId!!)
+                    if (statusResp.isSuccessful) {
+                        bookingStatus = statusResp.body()
+                        currentScreen = Screen.Payment
+                    }
+                } else {
+                    error = "Booking failed"
+                }
+            } catch (e: Exception) {
+                error = e.message
+            }
+            isLoading = false
+        }
+    }
+
     when (currentScreen) {
+        is Screen.Auth -> {
+            AuthScreen(
+                onAuthSuccess = { newToken ->
+                    token = newToken
+                    loadMetroData()
+                    currentScreen = Screen.Home
+                }
+            )
+        }
         is Screen.Home -> {
             HomeScreen(
                 stations = stations,
@@ -39,6 +132,7 @@ fun MakcoNavHost(
                 },
                 onSearchClick = {
                     currentScreen = Screen.Booking
+                    startSearch()
                 }
             )
         }
@@ -67,20 +161,40 @@ fun MakcoNavHost(
                 quotes = quotes,
                 fromStation = selectedSource,
                 toStation = selectedDestination,
+                isLoading = isLoading,
+                error = error,
                 onConfirm = { quote ->
                     selectedQuote = quote
-                    currentScreen = Screen.Payment
+                    confirmBooking(quote)
                 },
-                onBack = { currentScreen = Screen.Home }
+                onRetry = { startSearch() },
+                onBack = {
+                    currentScreen = Screen.Home
+                    quotes = emptyList()
+                    error = null
+                }
             )
         }
         is Screen.Payment -> {
             PaymentScreen(
                 bookingStatus = bookingStatus,
+                isLoading = isLoading,
+                error = error,
                 onPayClick = {
-                    // TODO: Open Juspay payment
+                    val url = bookingStatus?.payment?.order?.paymentLinks?.web
+                    if (url != null) {
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                        context.startActivity(intent)
+                    }
                 },
-                onBack = { currentScreen = Screen.Booking }
+                onBack = {
+                    currentScreen = Screen.Home
+                    bookingId = null
+                    bookingStatus = null
+                    selectedSource = null
+                    selectedDestination = null
+                    quotes = emptyList()
+                }
             )
         }
     }
