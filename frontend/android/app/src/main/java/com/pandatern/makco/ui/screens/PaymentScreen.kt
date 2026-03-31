@@ -8,6 +8,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.pandatern.makco.data.model.*
@@ -76,7 +77,7 @@ fun PaymentScreen(
                 Text(
                     text = bookingStatus.bookingId.take(8).uppercase(),
                     style = MaterialTheme.typography.headlineMedium.copy(
-                        fontFamily = androidx.compose.ui.text.font.FontFamily.Mono,
+                        fontFamily = FontFamily.Monospace,
                         fontWeight = FontWeight.Bold
                     ),
                     color = White

@@ -35,7 +35,23 @@ data class Quote(
     @SerializedName("priceWithCurrency") val priceWithCurrency: PriceCurrency,
     @SerializedName("stations") val stations: List<Station>,
     @SerializedName("validTill") val validTill: String,
-    @SerializedName("vehicleType") val vehicleType: String
+    @SerializedName("vehicleType") val vehicleType: String,
+    @SerializedName("categories") val categories: List<QuoteCategory>? = null
+)
+
+data class QuoteCategory(
+    @SerializedName("categoryName") val categoryName: String? = null,
+    @SerializedName("categoryMeta") val categoryMeta: CategoryMeta? = null,
+    @SerializedName("categoryPrice") val categoryPrice: PriceCurrency? = null,
+    @SerializedName("categoryOfferedPrice") val categoryOfferedPrice: PriceCurrency? = null,
+    @SerializedName("categorySelectedQuantity") val categorySelectedQuantity: Int? = null
+)
+
+data class CategoryMeta(
+    @SerializedName("code") val code: String? = null,
+    @SerializedName("title") val title: String? = null,
+    @SerializedName("description") val description: String? = null,
+    @SerializedName("tnc") val tnc: String? = null
 )
 
 data class PriceCurrency(

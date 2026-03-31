@@ -64,14 +64,14 @@ val MakcoTypography = Typography(
         color = Gray500
     ),
     labelLarge = TextStyle(
-        fontFamily = FontFamily.Mono,
+        fontFamily = FontFamily.Monospace,
         fontWeight = FontWeight.Medium,
         fontSize = 14.sp,
         lineHeight = 20.sp,
         color = White
     ),
     labelMedium = TextStyle(
-        fontFamily = FontFamily.Mono,
+        fontFamily = FontFamily.Monospace,
         fontWeight = FontWeight.Medium,
         fontSize = 11.sp,
         lineHeight = 14.sp,

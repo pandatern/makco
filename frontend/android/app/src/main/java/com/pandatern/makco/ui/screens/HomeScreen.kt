@@ -203,7 +203,7 @@ fun StationRow(
             Text(
                 text = station?.name ?: "Select station",
                 style = MaterialTheme.typography.titleLarge.copy(
-                    fontFamily = if (station != null) FontFamily.Default else FontFamily.Mono,
+                    fontFamily = if (station != null) FontFamily.Default else FontFamily.Monospace,
                     color = if (station != null) White else Gray400
                 )
             )
