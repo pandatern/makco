@@ -21,3 +21,13 @@ backend/src/makco
 nimcache/
 *.db
 *.exe
+
+# TLS certs
+certs/
+*.crt
+*.key
+*.pem
+
+# Env
+.env
+.env.*

@@ -1,9 +1,15 @@
 import prologue
 import ./handlers
-
+import ./config
 
 proc main() =
-  let app = newApp()
+  var settings = newSettings(
+    appName = APP_NAME,
+    port = Port(SERVER_PORT),
+    address = SERVER_HOST
+  )
+
+  let app = newApp(settings = settings)
 
   # Health
   app.get("/", health)
@@ -29,7 +35,6 @@ proc main() =
   app.get("/tickets", getTicketBookings)
 
   app.run()
-
 
 when isMainModule:
   main()
