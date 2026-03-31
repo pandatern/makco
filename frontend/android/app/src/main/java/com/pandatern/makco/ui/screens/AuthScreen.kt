@@ -124,7 +124,7 @@ fun AuthScreen(
                                     error = "FAILED"
                                 }
                             } catch (e: Exception) {
-                                error = "NETWORK ERROR"
+                                error = "ERR: ${e.message ?: e.javaClass.simpleName}"
                             }
                             isLoading = false
                         }
@@ -230,7 +230,7 @@ fun AuthScreen(
                                     }
                                 }
                             } catch (e: Exception) {
-                                error = "NETWORK ERROR"
+                                error = "ERR: ${e.message ?: e.javaClass.simpleName}"
                             }
                             isLoading = false
                         }
