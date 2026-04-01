@@ -31,6 +31,7 @@ fun AuthScreen(
     var attemptsLeft by remember { mutableStateOf(3) }
 
     val scope = rememberCoroutineScope()
+    val ctx = androidx.compose.ui.platform.LocalContext.current
 
     Column(
         modifier = Modifier
@@ -93,7 +94,6 @@ fun AuthScreen(
                 onClick = {
                     if (phone.length != 10) { error = "ENTER 10 DIGITS"; return@Button }
                     isLoading = true; error = null
-                    val ctx = androidx.compose.ui.platform.LocalContext.current
                     scope.launch {
                         try {
                             val resp = ApiClient.instance.initiateAuth(AuthRequest(mobileNumber = phone))
