@@ -49,4 +49,9 @@ class ThemeManager(context: Context) {
     // Glassmorphism bar color
     val glass = if (isDark) Color(0x22FFFFFF) else Color(0x22000000)
     val glassSelected = if (isDark) Color(0x33FFFFFF) else Color(0x33000000)
+
+    // Highlight colors - slightly brighter than bg
+    val highlight = if (isDark) Color(0xFF111111) else Color(0xFFE8E8E8)
+    val highlightBorder = if (isDark) Color(0xFF222222) else Color(0xFFDDDDDD)
+    val highlightText = if (isDark) Color(0xFFE0E0E0) else Color(0xFF1A1A1A)
 }
