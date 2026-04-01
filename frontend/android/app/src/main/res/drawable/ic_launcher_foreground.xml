@@ -10,33 +10,60 @@
         android:fillColor="#000000"
         android:pathData="M0,0h108v108H0z" />
 
-    <!-- M letter -->
+    <!-- M formed by metro track lines -->
+    <!-- Left vertical track -->
     <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M22,70 L22,34 L34,34 L34,52 L44,38 L52,38 L54,40 L64,38 L74,38 L74,52 L86,34 L86,70 L74,70 L74,50 L64,62 L54,62 L44,50 L44,70 Z" />
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="6"
+        android:strokeLineCap="square"
+        android:pathData="M24,72 L24,36" />
 
-    <!-- Metro track rail -->
+    <!-- Left diagonal up -->
     <path
         android:strokeColor="#4A9EFF"
-        android:strokeWidth="2"
-        android:pathData="M16,78 L92,78" />
+        android:strokeWidth="6"
+        android:strokeLineCap="square"
+        android:pathData="M24,36 L48,56" />
+
+    <!-- Right diagonal up -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="6"
+        android:strokeLineCap="square"
+        android:pathData="M48,56 L60,36" />
+
+    <!-- Center to right down -->
     <path
         android:strokeColor="#5CD85C"
-        android:strokeWidth="2"
-        android:pathData="M16,84 L92,84" />
+        android:strokeWidth="6"
+        android:strokeLineCap="square"
+        android:pathData="M60,36 L84,56" />
+
+    <!-- Right vertical track -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="6"
+        android:strokeLineCap="square"
+        android:pathData="M84,56 L84,72" />
+
+    <!-- Track rail line -->
+    <path
+        android:strokeColor="#333333"
+        android:strokeWidth="3"
+        android:pathData="M18,72 L90,72" />
 
     <!-- Track ties -->
     <path
         android:strokeColor="#555555"
-        android:strokeWidth="1.5"
-        android:pathData="M28,76 L28,86 M40,76 L40,86 M54,76 L54,86 M68,76 L68,86 M80,76 L80,86" />
+        android:strokeWidth="2"
+        android:pathData="M28,70 L28,74 M40,70 L40,74 M54,70 L54,74 M68,70 L68,74 M80,70 L80,74" />
 
-    <!-- Gold dots -->
+    <!-- Gold station dots -->
     <path
         android:fillColor="#FFD54F"
-        android:pathData="M22,78 A2.5,2.5 0 1,1 22.01,78" />
+        android:pathData="M24,72 A2.5,2.5 0 1,1 24.01,72" />
     <path
         android:fillColor="#FFD54F"
-        android:pathData="M86,78 A2.5,2.5 0 1,1 86.01,78" />
+        android:pathData="M84,72 A2.5,2.5 0 1,1 84.01,72" />
 
 </vector>

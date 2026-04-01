@@ -8,7 +8,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -28,36 +27,37 @@ fun BottomNavBar(
 
     Box(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 32.dp, vertical = 20.dp),
-        contentAlignment = Alignment.Center
+            .fillMaxSize()
+            .padding(bottom = 24.dp),
+        contentAlignment = Alignment.BottomCenter
     ) {
         Row(
             modifier = Modifier
-                .clip(RoundedCornerShape(24.dp))
+                .clip(RoundedCornerShape(28.dp))
                 .background(
-                    if (theme.isDark) Color(0x40FFFFFF) else Color(0x40000000)
+                    // Glass effect - semi-transparent
+                    if (theme.isDark) Color(0x33FFFFFF) else Color(0x33000000)
                 )
-                .padding(horizontal = 6.dp, vertical = 8.dp),
-            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                .padding(horizontal = 6.dp, vertical = 6.dp),
+            horizontalArrangement = Arrangement.spacedBy(2.dp)
         ) {
             BottomTabItem(
                 label = "HOME",
                 isSelected = selectedTab == BottomTab.HOME,
                 onClick = { onTabSelected(BottomTab.HOME) },
-                theme = theme
+                isDark = theme.isDark
             )
             BottomTabItem(
                 label = "TICKETS",
                 isSelected = selectedTab == BottomTab.TICKETS,
                 onClick = { onTabSelected(BottomTab.TICKETS) },
-                theme = theme
+                isDark = theme.isDark
             )
             BottomTabItem(
                 label = "PROFILE",
                 isSelected = selectedTab == BottomTab.PROFILE,
                 onClick = { onTabSelected(BottomTab.PROFILE) },
-                theme = theme
+                isDark = theme.isDark
             )
         }
     }
@@ -68,20 +68,20 @@ fun BottomTabItem(
     label: String,
     isSelected: Boolean,
     onClick: () -> Unit,
-    theme: ThemeManager
+    isDark: Boolean
 ) {
     Box(
         modifier = Modifier
-            .clip(RoundedCornerShape(20.dp))
+            .clip(RoundedCornerShape(22.dp))
             .background(
-                if (isSelected) {
-                    if (theme.isDark) Color(0x60FFFFFF) else Color(0x60000000)
-                } else {
-                    Color.Transparent
+                when {
+                    isSelected && isDark -> Color(0x40FFFFFF)
+                    isSelected && !isDark -> Color(0x40000000)
+                    else -> Color.Transparent
                 }
             )
             .clickable(onClick = onClick)
-            .padding(horizontal = 18.dp, vertical = 10.dp),
+            .padding(horizontal = 20.dp, vertical = 10.dp),
         contentAlignment = Alignment.Center
     ) {
         Text(
@@ -89,10 +89,11 @@ fun BottomTabItem(
             style = MaterialTheme.typography.labelMedium.copy(
                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
             ),
-            color = if (isSelected) {
-                if (theme.isDark) Color.White else Color.Black
-            } else {
-                if (theme.isDark) Color(0xFF888888) else Color(0xFF666666)
+            color = when {
+                isSelected && isDark -> Color.White
+                isSelected && !isDark -> Color.Black
+                isDark -> Color(0xFF888888)
+                else -> Color(0xFF888888)
             }
         )
     }
