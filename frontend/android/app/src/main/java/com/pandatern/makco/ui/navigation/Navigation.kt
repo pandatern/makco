@@ -78,9 +78,21 @@ fun MakcoNavHost() {
                 )
                 if (resp.isSuccessful && resp.body() != null) {
                     searchId = resp.body()!!.searchId
-                    delay(2500)
-                    val quoteResp = ApiClient.instance.getQuote(token, searchId!!)
-                    if (quoteResp.isSuccessful) quotes = quoteResp.body() ?: emptyList()
+                    // Poll for quotes
+                    var attempts = 0
+                    while (attempts < 10) {
+                        delay(2000)
+                        val quoteResp = ApiClient.instance.getQuote(token, searchId!!)
+                        if (quoteResp.isSuccessful) {
+                            val body = quoteResp.body()
+                            if (!body.isNullOrEmpty()) {
+                                quotes = body
+                                break
+                            }
+                        }
+                        attempts++
+                    }
+                    if (quotes.isEmpty()) error = "No quotes found"
                 } else {
                     error = "Search failed"
                 }
@@ -100,7 +112,8 @@ fun MakcoNavHost() {
             try {
                 val resp = ApiClient.instance.confirmBooking(
                     token = token,
-                    quoteId = quote.quoteId
+                    quoteId = quote.quoteId,
+                    request = ConfirmRequest(quantity = quantity)
                 )
                 if (resp.isSuccessful && resp.body() != null) {
                     bookingId = resp.body()!!.bookingId
@@ -110,6 +123,25 @@ fun MakcoNavHost() {
                     if (statusResp.isSuccessful) bookingStatus = statusResp.body()
                 } else {
                     error = "Booking failed"
+                }
+            } catch (e: Exception) {
+                error = e.message
+            }
+            isLoading = false
+        }
+    }
+
+    fun cancelBooking() {
+        val id = bookingId ?: return
+        isLoading = true
+        error = null
+        scope.launch {
+            try {
+                val resp = ApiClient.instance.cancelBooking(token = token, bookingId = id)
+                if (resp.isSuccessful) {
+                    bookingStatus = resp.body()
+                } else {
+                    error = "Cancellation failed"
                 }
             } catch (e: Exception) {
                 error = e.message
@@ -262,6 +294,11 @@ fun MakcoNavHost() {
                 TicketScreen(
                     token = token,
                     bookingId = bookingId ?: "",
+                    onCancel = {
+                        currentScreen = Screen.Main
+                        bookingId = null
+                        bookingStatus = null
+                    },
                     onBack = {
                         currentScreen = Screen.Main
                         bookingId = null

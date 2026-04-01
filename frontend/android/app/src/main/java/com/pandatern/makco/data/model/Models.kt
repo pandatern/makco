@@ -129,6 +129,10 @@ data class ConfirmRequest(
     @SerializedName("quantity") val quantity: Int = 1
 )
 
+data class CancelRequest(
+    @SerializedName("reason") val reason: String? = null
+)
+
 data class ErrorResponse(
     @SerializedName("error") val error: String?
 )

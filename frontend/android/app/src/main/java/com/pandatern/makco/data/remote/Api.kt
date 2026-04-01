@@ -54,6 +54,7 @@ interface MakcoApi {
         @Header("token") token: String,
         @Path("quoteId") quoteId: String,
         @Query("city") city: String = "chennai",
+        @Query("isMockPayment") isMockPayment: Boolean = true,
         @Body request: ConfirmRequest = ConfirmRequest()
     ): Response<BookingResponse>
 
@@ -62,6 +63,14 @@ interface MakcoApi {
         @Header("token") token: String,
         @Path("bookingId") bookingId: String,
         @Query("city") city: String = "chennai"
+    ): Response<BookingStatus>
+
+    @POST("metro/booking/{bookingId}/cancel")
+    suspend fun cancelBooking(
+        @Header("token") token: String,
+        @Path("bookingId") bookingId: String,
+        @Query("city") city: String = "chennai",
+        @Body request: CancelRequest = CancelRequest()
     ): Response<BookingStatus>
 
     // User
@@ -74,7 +83,7 @@ interface MakcoApi {
     suspend fun getTickets(
         @Header("token") token: String,
         @Query("city") city: String = "chennai"
-    ): Response<List<Any>>
+    ): Response<List<BookingStatus>>
 }
 
 object ApiClient {

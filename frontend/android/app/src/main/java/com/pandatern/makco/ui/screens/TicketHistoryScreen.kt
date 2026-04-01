@@ -32,8 +32,7 @@ fun TicketHistoryScreen(
             try {
                 val resp = ApiClient.instance.getTickets(token, "chennai")
                 if (resp.isSuccessful) {
-                    val body = resp.body()
-                    tickets = body?.filterIsInstance<BookingStatus>() ?: emptyList()
+                    tickets = resp.body() ?: emptyList()
                 }
             } catch (_: Exception) {}
             isLoading = false
