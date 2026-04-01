@@ -20,12 +20,10 @@ import kotlinx.coroutines.launch
 @Composable
 fun TicketHistoryScreen(
     token: String,
-    onTicketClick: (bookingId: String) -> Unit,
-    onBack: () -> Unit
+    onTicketClick: (bookingId: String) -> Unit
 ) {
     var tickets by remember { mutableStateOf<List<BookingStatus>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
-    var error by remember { mutableStateOf<String?>(null) }
 
     val scope = rememberCoroutineScope()
 
@@ -35,13 +33,9 @@ fun TicketHistoryScreen(
                 val resp = ApiClient.instance.getTickets(token, "chennai")
                 if (resp.isSuccessful) {
                     val body = resp.body()
-                    // The API returns a list - try to parse as BookingStatus
-                    // If it fails, we'll show empty
                     tickets = body?.filterIsInstance<BookingStatus>() ?: emptyList()
                 }
-            } catch (e: Exception) {
-                error = e.message
-            }
+            } catch (_: Exception) {}
             isLoading = false
         }
     }
@@ -50,25 +44,19 @@ fun TicketHistoryScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(Black)
+            .padding(horizontal = 24.dp)
     ) {
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Row(modifier = Modifier.padding(start = 12.dp)) {
-            TextButton(onClick = onBack) {
-                Text("← BACK", style = MaterialTheme.typography.labelLarge, color = White)
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(56.dp))
 
         Text(
             text = "MY TICKETS",
-            style = MaterialTheme.typography.labelMedium,
-            color = Gray3,
-            modifier = Modifier.padding(horizontal = 24.dp)
+            style = MaterialTheme.typography.headlineLarge.copy(
+                fontWeight = FontWeight.Black
+            ),
+            color = Text1
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
         when {
             isLoading -> {
@@ -79,18 +67,6 @@ fun TicketHistoryScreen(
                     CircularProgressIndicator(color = White, strokeWidth = 2.dp)
                 }
             }
-            error != null -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = error ?: "Error loading tickets",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Error
-                    )
-                }
-            }
             tickets.isEmpty() -> {
                 Box(
                     modifier = Modifier.fillMaxSize(),
@@ -98,15 +74,15 @@ fun TicketHistoryScreen(
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
-                            text = "NO TICKETS",
+                            text = "NO TICKETS YET",
                             style = MaterialTheme.typography.labelMedium,
-                            color = Gray2
+                            color = Text3
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = "Your metro tickets will appear here",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = Gray1
+                            color = Text4
                         )
                     }
                 }
@@ -114,63 +90,50 @@ fun TicketHistoryScreen(
             else -> {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(horizontal = 24.dp)
+                    contentPadding = PaddingValues(bottom = 100.dp)
                 ) {
                     items(tickets) { ticket ->
-                        TicketHistoryItem(
-                            ticket = ticket,
-                            onClick = { onTicketClick(ticket.bookingId) }
-                        )
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { onTicketClick(ticket.bookingId) }
+                                .background(Dark3)
+                                .padding(16.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = ticket.bookingId.take(8).uppercase(),
+                                    style = MaterialTheme.typography.labelLarge.copy(
+                                        fontFamily = FontFamily.Monospace
+                                    ),
+                                    color = Text1
+                                )
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text(
+                                    text = ticket.status,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = when (ticket.status) {
+                                        "CONFIRMED" -> Success
+                                        "PAYMENT_PENDING" -> MetroGold
+                                        "CANCELLED" -> Error
+                                        else -> Text3
+                                    }
+                                )
+                            }
+                            Text(
+                                text = "₹${ticket.price.toInt()}",
+                                style = MaterialTheme.typography.titleMedium.copy(
+                                    fontWeight = FontWeight.Bold
+                                ),
+                                color = Text1
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
                     }
                 }
             }
         }
     }
-}
-
-@Composable
-fun TicketHistoryItem(
-    ticket: BookingStatus,
-    onClick: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .background(Dark3)
-            .padding(16.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = ticket.bookingId.take(8).uppercase(),
-                style = MaterialTheme.typography.labelLarge.copy(
-                    fontFamily = FontFamily.Monospace
-                ),
-                color = White
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = ticket.status,
-                style = MaterialTheme.typography.bodySmall,
-                color = when (ticket.status) {
-                    "CONFIRMED" -> Success
-                    "PAYMENT_PENDING" -> MetroInterchange
-                    "CANCELLED" -> Error
-                    else -> Gray2
-                }
-            )
-        }
-
-        Text(
-            text = "₹${ticket.price.toInt()}",
-            style = MaterialTheme.typography.titleMedium.copy(
-                fontWeight = FontWeight.Bold
-            ),
-            color = White
-        )
-    }
-
-    Spacer(modifier = Modifier.height(8.dp))
 }

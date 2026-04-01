@@ -2,32 +2,23 @@ package com.pandatern.makco.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Base
 val Black = Color(0xFF000000)
 val White = Color(0xFFFFFFFF)
-val Transparent = Color(0x00000000)
 
-// Dark grays - subtle elevation
 val Dark1 = Color(0xFF0A0A0A)
 val Dark2 = Color(0xFF141414)
-val Dark3 = Color(0xFF1E1E1E)
-val Dark4 = Color(0xFF2A2A2A)
-val Dark5 = Color(0xFF383838)
+val Dark3 = Color(0xFF1C1C1C)
+val Dark4 = Color(0xFF282828)
+val Dark5 = Color(0xFF363636)
 
-// Light grays - high contrast for readability
-val Gray1 = Color(0xFF666666)
-val Gray2 = Color(0xFF888888)
-val Gray3 = Color(0xFFAAAAAA)
-val Gray4 = Color(0xFFCCCCCC)
-val Gray5 = Color(0xFFEEEEEE)
+// Almost white - slight weight difference
+val Text1 = Color(0xFFFFFFFF) // Headlines
+val Text2 = Color(0xFFE8E8E8) // Body
+val Text3 = Color(0xFFD0D0D0) // Labels
+val Text4 = Color(0xFFB0B0B0) // Hints
 
-// Metro lines
-val MetroBlue = Color(0xFF2196F3)
-val MetroBlueDark = Color(0xFF1565C0)
-val MetroGreen = Color(0xFF4CAF50)
-val MetroGreenDark = Color(0xFF2E7D32)
-val MetroInterchange = Color(0xFFFFB300)
-
-// Semantic
-val Error = Color(0xFFE53935)
-val Success = Color(0xFF43A047)
+val MetroBlue = Color(0xFF4A9EFF)
+val MetroGreen = Color(0xFF5CD85C)
+val MetroGold = Color(0xFFFFD54F)
+val Error = Color(0xFFFF5252)
+val Success = Color(0xFF69F0AE)

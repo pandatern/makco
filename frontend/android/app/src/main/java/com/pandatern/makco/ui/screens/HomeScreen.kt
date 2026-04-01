@@ -15,216 +15,119 @@ import com.pandatern.makco.ui.theme.*
 @Composable
 fun HomeScreen(
     stations: List<Station>,
-    onStationClick: (isSource: Boolean) -> Unit,
-    onSearchClick: () -> Unit,
-    onProfileClick: () -> Unit,
-    onTicketsClick: () -> Unit,
     selectedSource: Station?,
-    selectedDestination: Station?
+    selectedDestination: Station?,
+    onStationClick: (isSource: Boolean) -> Unit,
+    onSearchClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Black)
+            .padding(horizontal = 24.dp)
     ) {
-        // Header
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp)
-                .padding(top = 56.dp, bottom = 32.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column {
-                Text(
-                    text = "MAKCO",
-                    style = MaterialTheme.typography.headlineLarge.copy(
-                        fontWeight = FontWeight.Black
-                    ),
-                    color = White
-                )
-            }
+        Spacer(modifier = Modifier.height(56.dp))
 
-            // Profile button
-            Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .background(Dark3)
-                    .clickable { onProfileClick() },
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "P",
-                    style = MaterialTheme.typography.labelLarge,
-                    color = White
-                )
-            }
-        }
+        Text(
+            text = "MAKCO",
+            style = MaterialTheme.typography.headlineLarge.copy(
+                fontWeight = FontWeight.Black
+            ),
+            color = Text1
+        )
 
-        // Metro line visualization
+        Spacer(modifier = Modifier.height(4.dp))
+
+        Text(
+            text = "CHENNAI METRO",
+            style = MaterialTheme.typography.labelMedium,
+            color = Text4
+        )
+
+        Spacer(modifier = Modifier.height(40.dp))
+
+        Text(
+            text = "WHERE TO?",
+            style = MaterialTheme.typography.labelMedium,
+            color = Text3
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // From
+        StationSlot(
+            label = "FROM",
+            station = selectedSource,
+            dotColor = MetroGreen,
+            onClick = { onStationClick(true) }
+        )
+
+        // Connector
         Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp)
-                .background(Dark2)
-                .padding(24.dp)
-        ) {
-            Column {
-                // Blue line indicator
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(
-                        modifier = Modifier
-                            .width(40.dp)
-                            .height(4.dp)
-                            .background(MetroBlue)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "BLUE LINE",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MetroBlue
-                    )
-                }
+                .padding(start = 16.dp)
+                .width(2.dp)
+                .height(14.dp)
+                .background(Dark5)
+        )
 
-                Spacer(modifier = Modifier.height(4.dp))
-
-                // Green line indicator
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(
-                        modifier = Modifier
-                            .width(40.dp)
-                            .height(4.dp)
-                            .background(MetroGreen)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "GREEN LINE",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MetroGreen
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Text(
-                    text = "${stations.size} STATIONS",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = Gray3
-                )
-            }
-        }
+        // To
+        StationSlot(
+            label = "TO",
+            station = selectedDestination,
+            dotColor = MetroBlue,
+            onClick = { onStationClick(false) }
+        )
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Trip selector
-        Column(
+        Button(
+            onClick = onSearchClick,
+            enabled = selectedSource != null && selectedDestination != null,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 24.dp)
+                .height(54.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = White,
+                contentColor = Black,
+                disabledContainerColor = Dark4,
+                disabledContentColor = Dark5
+            ),
+            shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp)
         ) {
             Text(
-                text = "PLAN YOUR TRIP",
-                style = MaterialTheme.typography.labelMedium,
-                color = Gray3
-            )
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            // From
-            StationPickerRow(
-                label = "FROM",
-                station = selectedSource,
-                dotColor = MetroGreen,
-                onClick = { onStationClick(true) }
-            )
-
-            // Dashed line
-            Box(
-                modifier = Modifier
-                    .padding(start = 15.dp)
-                    .width(2.dp)
-                    .height(20.dp)
-                    .background(Dark4)
-            )
-
-            // To
-            StationPickerRow(
-                label = "TO",
-                station = selectedDestination,
-                dotColor = MetroBlue,
-                onClick = { onStationClick(false) }
-            )
-
-            Spacer(modifier = Modifier.height(40.dp))
-
-            // Search button
-            Button(
-                onClick = onSearchClick,
-                enabled = selectedSource != null && selectedDestination != null,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = White,
-                    contentColor = Black,
-                    disabledContainerColor = Dark4,
-                    disabledContentColor = Gray1
+                text = "SEARCH FARES",
+                style = MaterialTheme.typography.labelLarge.copy(
+                    fontWeight = FontWeight.Bold
                 )
-            ) {
-                Text(
-                    text = "SEARCH FARES",
-                    style = MaterialTheme.typography.labelLarge.copy(
-                        fontWeight = FontWeight.Bold
-                    )
-                )
-            }
+            )
         }
 
         Spacer(modifier = Modifier.weight(1f))
 
-        // My Tickets
-        Column(
+        // Lines info
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 24.dp)
-                .padding(bottom = 32.dp)
+                .padding(bottom = 100.dp),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = "MY TICKETS",
-                style = MaterialTheme.typography.labelMedium,
-                color = Gray3
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Dark3)
-                    .clickable { onTicketsClick() }
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "View ticket history",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = White
-                )
-
-                Text(
-                    text = "→",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = Gray2
-                )
-            }
+            Box(modifier = Modifier.size(6.dp).background(MetroBlue))
+            Spacer(modifier = Modifier.width(6.dp))
+            Text("BLUE", style = MaterialTheme.typography.labelSmall, color = Text4)
+            Spacer(modifier = Modifier.width(16.dp))
+            Box(modifier = Modifier.size(6.dp).background(MetroGreen))
+            Spacer(modifier = Modifier.width(6.dp))
+            Text("GREEN", style = MaterialTheme.typography.labelSmall, color = Text4)
+            Spacer(modifier = Modifier.width(16.dp))
+            Text("${stations.size} STATIONS", style = MaterialTheme.typography.labelSmall, color = Text4)
         }
     }
 }
 
 @Composable
-fun StationPickerRow(
+fun StationSlot(
     label: String,
     station: Station?,
     dotColor: androidx.compose.ui.graphics.Color,
@@ -235,38 +138,28 @@ fun StationPickerRow(
             .fillMaxWidth()
             .clickable(onClick = onClick)
             .background(Dark3)
-            .padding(20.dp),
+            .padding(18.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Dot
         Box(
-            modifier = Modifier
-                .size(12.dp)
-                .background(dotColor)
+            modifier = Modifier.size(10.dp).background(dotColor)
         )
-
         Spacer(modifier = Modifier.width(16.dp))
-
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = label,
                 style = MaterialTheme.typography.labelSmall,
-                color = Gray2
+                color = Text4
             )
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(2.dp))
             Text(
                 text = station?.name ?: "Select station",
-                style = MaterialTheme.typography.titleMedium.copy(
+                style = MaterialTheme.typography.bodyLarge.copy(
                     fontWeight = if (station != null) FontWeight.SemiBold else FontWeight.Normal
                 ),
-                color = if (station != null) White else Gray1
+                color = if (station != null) Text1 else Text4
             )
         }
-
-        Text(
-            text = "→",
-            style = MaterialTheme.typography.titleLarge,
-            color = Gray1
-        )
+        Text(text = "→", style = MaterialTheme.typography.titleMedium, color = Text4)
     }
 }

@@ -3,20 +3,13 @@ package com.pandatern.makco.ui.theme
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 
-private val DarkColorScheme = darkColorScheme(
+private val DarkScheme = darkColorScheme(
     primary = White,
     onPrimary = Black,
-    primaryContainer = Dark4,
-    onPrimaryContainer = White,
-    secondary = Gray3,
-    onSecondary = Black,
     background = Black,
     onBackground = White,
     surface = Dark2,
     onSurface = White,
-    surfaceVariant = Dark3,
-    onSurfaceVariant = Gray4,
-    outline = Dark5,
     error = Error,
     onError = White
 )
@@ -24,7 +17,7 @@ private val DarkColorScheme = darkColorScheme(
 @Composable
 fun MakcoTheme(content: @Composable () -> Unit) {
     MaterialTheme(
-        colorScheme = DarkColorScheme,
+        colorScheme = DarkScheme,
         typography = MakcoTypography,
         content = content
     )
