@@ -69,7 +69,7 @@ fun AuthScreen(
             Text(
                 text = "CHENNAI METRO",
                 style = MaterialTheme.typography.labelMedium,
-                color = Gray3
+                color = Text3
             )
 
             Spacer(modifier = Modifier.weight(0.2f))
@@ -79,7 +79,7 @@ fun AuthScreen(
                 Text(
                     text = "ENTER YOUR PHONE",
                     style = MaterialTheme.typography.labelMedium,
-                    color = Gray3
+                    color = Text3
                 )
 
                 Spacer(modifier = Modifier.height(20.dp))
@@ -100,7 +100,7 @@ fun AuthScreen(
                             style = MaterialTheme.typography.titleLarge.copy(
                                 fontWeight = FontWeight.Medium
                             ),
-                            color = Gray4
+                            color = Text2
                         )
 
                         Spacer(modifier = Modifier.width(16.dp))
@@ -127,7 +127,7 @@ fun AuthScreen(
                                 unfocusedBorderColor = androidx.compose.ui.graphics.Color.Transparent,
                                 focusedTextColor = White,
                                 unfocusedTextColor = White,
-                                cursorColor = Gray3
+                                cursorColor = Text3
                             ),
                             textStyle = MaterialTheme.typography.titleLarge,
                             singleLine = true,
@@ -193,7 +193,7 @@ fun AuthScreen(
                 Text(
                     text = "ENTER OTP",
                     style = MaterialTheme.typography.labelMedium,
-                    color = Gray3
+                    color = Text3
                 )
 
                 Spacer(modifier = Modifier.height(6.dp))
@@ -201,7 +201,7 @@ fun AuthScreen(
                 Text(
                     text = "Sent to +91 $phone",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Gray2
+                    color = Text3
                 )
 
                 Spacer(modifier = Modifier.height(20.dp))
@@ -234,7 +234,7 @@ fun AuthScreen(
                             unfocusedBorderColor = androidx.compose.ui.graphics.Color.Transparent,
                             focusedTextColor = White,
                             unfocusedTextColor = White,
-                            cursorColor = Gray3
+                            cursorColor = Text3
                         ),
                         textStyle = MaterialTheme.typography.headlineMedium.copy(
                             fontWeight = FontWeight.Bold
@@ -249,7 +249,7 @@ fun AuthScreen(
                 Text(
                     text = "$attemptsLeft ATTEMPTS REMAINING",
                     style = MaterialTheme.typography.labelSmall,
-                    color = if (attemptsLeft <= 1) Error else Gray2
+                    color = if (attemptsLeft <= 1) Error else Text3
                 )
 
                 Spacer(modifier = Modifier.height(32.dp))
@@ -324,7 +324,7 @@ fun AuthScreen(
                     Text(
                         text = "WRONG NUMBER?",
                         style = MaterialTheme.typography.labelMedium,
-                        color = Gray2
+                        color = Text3
                     )
                 }
             }

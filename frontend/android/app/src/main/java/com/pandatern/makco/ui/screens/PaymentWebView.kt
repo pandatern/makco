@@ -45,7 +45,7 @@ fun PaymentWebView(
             Text(
                 text = "PAYMENT",
                 style = MaterialTheme.typography.labelMedium,
-                color = Gray3
+                color = Text3
             )
 
             Spacer(modifier = Modifier.weight(1f))
@@ -174,7 +174,7 @@ fun PaymentWebView(
                     Text(
                         text = it,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = Gray4
+                        color = Text2
                     )
                     Spacer(modifier = Modifier.height(24.dp))
                     TextButton(onClick = onBack) {

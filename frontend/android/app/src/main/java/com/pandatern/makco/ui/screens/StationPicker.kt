@@ -18,7 +18,7 @@ private fun getLineColor(code: String): androidx.compose.ui.graphics.Color {
     return when {
         code.contains("|01") -> MetroBlue
         code.contains("|02") -> MetroGreen
-        else -> Gray3
+        else -> Text3
     }
 }
 
@@ -68,7 +68,7 @@ fun StationPickerScreen(
         Text(
             text = "SELECT STATION",
             style = MaterialTheme.typography.labelMedium,
-            color = Gray3,
+            color = Text3,
             modifier = Modifier.padding(horizontal = 24.dp)
         )
 
@@ -98,7 +98,7 @@ fun StationPickerScreen(
                     unfocusedBorderColor = androidx.compose.ui.graphics.Color.Transparent,
                     focusedTextColor = White,
                     unfocusedTextColor = White,
-                    cursorColor = Gray3
+                    cursorColor = Text3
                 ),
                 textStyle = MaterialTheme.typography.bodyLarge,
                 singleLine = true
@@ -127,7 +127,7 @@ fun StationPickerScreen(
                                     when (line) {
                                         "BLUE" -> MetroBlue
                                         "GREEN" -> MetroGreen
-                                        else -> Gray3
+                                        else -> Text3
                                     }
                                 )
                         )
@@ -140,7 +140,7 @@ fun StationPickerScreen(
                             color = when (line) {
                                 "BLUE" -> MetroBlue
                                 "GREEN" -> MetroGreen
-                                else -> Gray3
+                                else -> Text3
                             }
                         )
                     }
@@ -191,14 +191,14 @@ fun StationItem(
             Text(
                 text = station.code,
                 style = MaterialTheme.typography.labelSmall,
-                color = Gray2
+                color = Text3
             )
         }
 
         Text(
             text = "→",
             style = MaterialTheme.typography.titleMedium,
-            color = Gray1
+            color = Text4
         )
     }
 }

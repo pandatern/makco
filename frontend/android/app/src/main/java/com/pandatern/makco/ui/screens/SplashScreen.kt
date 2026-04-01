@@ -61,7 +61,7 @@ fun SplashScreen(
             Text(
                 text = "CHENNAI METRO",
                 style = MaterialTheme.typography.labelMedium,
-                color = Gray3,
+                color = Text3,
                 modifier = Modifier.alpha(subtitleAlpha)
             )
         }

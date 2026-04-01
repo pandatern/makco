@@ -66,7 +66,7 @@ fun PaymentScreen(
                     Text(
                         text = "BOOKING",
                         style = MaterialTheme.typography.labelMedium,
-                        color = Gray3
+                        color = Text3
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
@@ -85,7 +85,7 @@ fun PaymentScreen(
                         label = "STATUS",
                         value = bookingStatus.status,
                         valueColor = when (bookingStatus.status) {
-                            "PAYMENT_PENDING" -> MetroInterchange
+                            "PAYMENT_PENDING" -> MetroGold
                             "CONFIRMED" -> Success
                             else -> White
                         }
@@ -127,7 +127,7 @@ fun PaymentScreen(
                         Text(
                             text = "OPENS JUSPAY PAYMENT",
                             style = MaterialTheme.typography.labelSmall,
-                            color = Gray2
+                            color = Text3
                         )
                     }
 
@@ -180,7 +180,7 @@ fun PaymentDetailRow(label: String, value: String, valueColor: androidx.compose.
         Text(
             text = label,
             style = MaterialTheme.typography.labelSmall,
-            color = Gray2
+            color = Text3
         )
         Spacer(modifier = Modifier.height(4.dp))
         Text(

@@ -50,7 +50,7 @@ fun BookingScreen(
             Text(
                 text = "ROUTE",
                 style = MaterialTheme.typography.labelMedium,
-                color = Gray3
+                color = Text3
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -79,7 +79,7 @@ fun BookingScreen(
             Text(
                 text = "SELECT TICKET",
                 style = MaterialTheme.typography.labelMedium,
-                color = Gray3
+                color = Text3
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -124,7 +124,7 @@ fun BookingScreen(
                     Text(
                         text = "No fares found",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = Gray2
+                        color = Text3
                     )
                 }
                 else -> {
@@ -152,7 +152,7 @@ fun BookingScreen(
                 Text(
                     text = "QUANTITY",
                     style = MaterialTheme.typography.labelMedium,
-                    color = Gray3
+                    color = Text3
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -171,7 +171,7 @@ fun BookingScreen(
                         Text(
                             text = "−",
                             style = MaterialTheme.typography.headlineMedium,
-                            color = if (quantity > 1) White else Gray1
+                            color = if (quantity > 1) White else Text4
                         )
                     }
 
@@ -198,7 +198,7 @@ fun BookingScreen(
                         Text(
                             text = "+",
                             style = MaterialTheme.typography.headlineMedium,
-                            color = if (quantity < 6) White else Gray1
+                            color = if (quantity < 6) White else Text4
                         )
                     }
 
@@ -209,7 +209,7 @@ fun BookingScreen(
                         Text(
                             text = "TOTAL",
                             style = MaterialTheme.typography.labelSmall,
-                            color = Gray2
+                            color = Text3
                         )
                         Text(
                             text = "₹${(selectedQuote!!.price * quantity).toInt()}",
@@ -301,7 +301,7 @@ fun FareRow(quote: Quote, isSelected: Boolean, onClick: () -> Unit) {
             Text(
                 text = "ADULT",
                 style = MaterialTheme.typography.bodySmall,
-                color = Gray2
+                color = Text3
             )
         }
 

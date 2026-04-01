@@ -90,7 +90,7 @@ fun OnboardingScreen(
                 Text(
                     text = data.description,
                     style = MaterialTheme.typography.bodyLarge,
-                    color = Gray4
+                    color = Text2
                 )
             }
         }

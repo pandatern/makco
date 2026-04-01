@@ -74,14 +74,14 @@ fun TicketScreen(
                         Text(
                             text = "GENERATING TICKET...",
                             style = MaterialTheme.typography.labelMedium,
-                            color = Gray3
+                            color = Text3
                         )
                         if (pollCount > 0) {
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
                                 text = "ATTEMPT $pollCount",
                                 style = MaterialTheme.typography.labelSmall,
-                                color = Gray1
+                                color = Text4
                             )
                         }
                     }
@@ -99,7 +99,7 @@ fun TicketScreen(
                     Text(
                         text = "BOOKING",
                         style = MaterialTheme.typography.labelMedium,
-                        color = Gray3
+                        color = Text3
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
@@ -116,7 +116,7 @@ fun TicketScreen(
                     // Status
                     TicketDetailRow("STATUS", status.status, when (status.status) {
                         "CONFIRMED" -> Success
-                        "PAYMENT_PENDING" -> MetroInterchange
+                        "PAYMENT_PENDING" -> MetroGold
                         "FAILED" -> Error
                         "CANCELLED" -> Error
                         else -> White
@@ -166,7 +166,7 @@ fun TicketScreen(
                                         Text(
                                             text = bookingId.take(8).uppercase(),
                                             style = MaterialTheme.typography.labelSmall,
-                                            color = Gray1
+                                            color = Text4
                                         )
                                     }
                                 }
@@ -176,7 +176,7 @@ fun TicketScreen(
                                 Text(
                                     text = "CHENNAI METRO",
                                     style = MaterialTheme.typography.labelSmall,
-                                    color = Gray2
+                                    color = Text3
                                 )
                             }
                         }
@@ -194,18 +194,18 @@ fun TicketScreen(
                                 Text(
                                     text = "VALIDITY",
                                     style = MaterialTheme.typography.labelSmall,
-                                    color = Gray2
+                                    color = Text3
                                 )
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Text(
                                     text = "Valid for single entry + exit",
                                     style = MaterialTheme.typography.bodyMedium,
-                                    color = Gray4
+                                    color = Text2
                                 )
                                 Text(
                                     text = "Governed by CMRL business rules",
                                     style = MaterialTheme.typography.bodySmall,
-                                    color = Gray2
+                                    color = Text3
                                 )
                             }
                         }
@@ -216,14 +216,14 @@ fun TicketScreen(
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .background(MetroInterchange.copy(alpha = 0.1f))
+                                .background(MetroGold.copy(alpha = 0.1f))
                                 .padding(20.dp),
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
                                 text = "AWAITING PAYMENT",
                                 style = MaterialTheme.typography.labelLarge,
-                                color = MetroInterchange
+                                color = MetroGold
                             )
                         }
                     }
@@ -254,7 +254,7 @@ fun TicketScreen(
                     Text(
                         text = "Could not load ticket",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = Gray2
+                        color = Text3
                     )
                 }
             }
@@ -268,7 +268,7 @@ fun TicketDetailRow(label: String, value: String, valueColor: androidx.compose.u
         Text(
             text = label,
             style = MaterialTheme.typography.labelSmall,
-            color = Gray2
+            color = Text3
         )
         Spacer(modifier = Modifier.height(4.dp))
         Text(
