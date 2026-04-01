@@ -98,8 +98,20 @@ fun AuthScreen(
                             val resp = ApiClient.instance.initiateAuth(AuthRequest(mobileNumber = phone))
                             if (resp.isSuccessful && resp.body() != null) {
                                 authId = resp.body()!!.authId; attemptsLeft = resp.body()!!.attempts; otpSent = true
-                            } else { error = "FAILED" }
-                        } catch (e: Exception) { error = "ERR: ${e.message}" }
+                            } else {
+                                error = when (resp.code()) {
+                                    502, 503, 504 -> "SERVER DOWN"
+                                    429 -> "TOO MANY REQUESTS"
+                                    else -> "FAILED (${resp.code()})"
+                                }
+                            }
+                        } catch (e: Exception) {
+                            error = when {
+                                e.message?.contains("timeout") == true -> "TIMEOUT"
+                                e.message?.contains("Unable to resolve") == true -> "NO INTERNET"
+                                else -> "NETWORK ERROR"
+                            }
+                        }
                         isLoading = false
                     }
                 },
@@ -151,10 +163,22 @@ fun AuthScreen(
                             val resp = ApiClient.instance.verifyAuth(authId!!, VerifyRequest(otp = otp))
                             if (resp.isSuccessful && resp.body() != null) { onAuthSuccess(resp.body()!!.token) }
                             else {
-                                error = "WRONG OTP"; attemptsLeft--
-                                if (attemptsLeft <= 0) { otpSent = false; otp = ""; authId = null; error = "NO ATTEMPTS LEFT" }
+                                when (resp.code()) {
+                                    502, 503, 504 -> { error = "SERVER DOWN" }
+                                    400 -> {
+                                        error = "WRONG OTP"; attemptsLeft--
+                                        if (attemptsLeft <= 0) { otpSent = false; otp = ""; authId = null; error = "NO ATTEMPTS LEFT" }
+                                    }
+                                    else -> { error = "FAILED (${resp.code()})" }
+                                }
                             }
-                        } catch (e: Exception) { error = "ERR: ${e.message}" }
+                        } catch (e: Exception) {
+                            error = when {
+                                e.message?.contains("timeout") == true -> "TIMEOUT"
+                                e.message?.contains("Unable to resolve") == true -> "NO INTERNET"
+                                else -> "NETWORK ERROR"
+                            }
+                        }
                         isLoading = false
                     }
                 },
