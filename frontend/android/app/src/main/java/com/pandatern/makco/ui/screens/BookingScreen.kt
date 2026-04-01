@@ -19,10 +19,13 @@ fun BookingScreen(
     toStation: Station?,
     isLoading: Boolean,
     error: String?,
-    onConfirm: (Quote) -> Unit,
+    onConfirm: (quote: Quote, quantity: Int) -> Unit,
     onRetry: () -> Unit,
     onBack: () -> Unit
 ) {
+    var selectedQuote by remember { mutableStateOf<Quote?>(null) }
+    var quantity by remember { mutableStateOf(1) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -65,7 +68,7 @@ fun BookingScreen(
             RouteStation(name = toStation?.name ?: "...", dotColor = MetroBlue)
         }
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
         // Fares
         Column(
@@ -74,7 +77,7 @@ fun BookingScreen(
                 .padding(horizontal = 24.dp)
         ) {
             Text(
-                text = "FARES",
+                text = "SELECT TICKET",
                 style = MaterialTheme.typography.labelMedium,
                 color = Gray3
             )
@@ -126,11 +129,128 @@ fun BookingScreen(
                 }
                 else -> {
                     quotes.forEach { quote ->
-                        FareRow(quote = quote, onClick = { onConfirm(quote) })
+                        val isSelected = selectedQuote?.quoteId == quote.quoteId
+                        FareRow(
+                            quote = quote,
+                            isSelected = isSelected,
+                            onClick = { selectedQuote = quote }
+                        )
                     }
                 }
             }
         }
+
+        // Quantity selector (only show when quote selected)
+        if (selectedQuote != null && !isLoading) {
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp)
+            ) {
+                Text(
+                    text = "QUANTITY",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = Gray3
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // Minus button
+                    Box(
+                        modifier = Modifier
+                            .size(44.dp)
+                            .background(if (quantity > 1) Dark3 else Dark2)
+                            .clickable { if (quantity > 1) quantity-- },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "−",
+                            style = MaterialTheme.typography.headlineMedium,
+                            color = if (quantity > 1) White else Gray1
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(24.dp))
+
+                    Text(
+                        text = "$quantity",
+                        style = MaterialTheme.typography.headlineLarge.copy(
+                            fontWeight = FontWeight.Bold
+                        ),
+                        color = White
+                    )
+
+                    Spacer(modifier = Modifier.width(24.dp))
+
+                    // Plus button
+                    Box(
+                        modifier = Modifier
+                            .size(44.dp)
+                            .background(if (quantity < 6) Dark3 else Dark2)
+                            .clickable { if (quantity < 6) quantity++ },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "+",
+                            style = MaterialTheme.typography.headlineMedium,
+                            color = if (quantity < 6) White else Gray1
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    // Total
+                    Column(horizontalAlignment = Alignment.End) {
+                        Text(
+                            text = "TOTAL",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Gray2
+                        )
+                        Text(
+                            text = "₹${(selectedQuote!!.price * quantity).toInt()}",
+                            style = MaterialTheme.typography.headlineMedium.copy(
+                                fontWeight = FontWeight.Bold
+                            ),
+                            color = White
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // Confirm button
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp)
+            ) {
+                Button(
+                    onClick = { onConfirm(selectedQuote!!, quantity) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = White,
+                        contentColor = Black
+                    )
+                ) {
+                    Text(
+                        text = "CONFIRM ₹${(selectedQuote!!.price * quantity).toInt()}",
+                        style = MaterialTheme.typography.labelLarge.copy(
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.weight(1f))
     }
 }
 
@@ -154,7 +274,7 @@ fun RouteStation(name: String, dotColor: androidx.compose.ui.graphics.Color) {
 }
 
 @Composable
-fun FareRow(quote: Quote, onClick: () -> Unit) {
+fun FareRow(quote: Quote, isSelected: Boolean, onClick: () -> Unit) {
     val label = when (quote.type) {
         "SingleJourney" -> "SINGLE JOURNEY"
         "ReturnJourney" -> "RETURN JOURNEY"
@@ -165,7 +285,7 @@ fun FareRow(quote: Quote, onClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .background(Dark3)
+            .background(if (isSelected) Dark4 else Dark3)
             .padding(20.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
@@ -179,19 +299,30 @@ fun FareRow(quote: Quote, onClick: () -> Unit) {
                 color = White
             )
             Text(
-                text = "ADULT × 1",
+                text = "ADULT",
                 style = MaterialTheme.typography.bodySmall,
                 color = Gray2
             )
         }
 
-        Text(
-            text = "₹${quote.price.toInt()}",
-            style = MaterialTheme.typography.headlineMedium.copy(
-                fontWeight = FontWeight.Bold
-            ),
-            color = White
-        )
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = "₹${quote.price.toInt()}",
+                style = MaterialTheme.typography.headlineMedium.copy(
+                    fontWeight = FontWeight.Bold
+                ),
+                color = White
+            )
+
+            if (isSelected) {
+                Spacer(modifier = Modifier.width(12.dp))
+                Box(
+                    modifier = Modifier
+                        .size(8.dp)
+                        .background(MetroBlue)
+                )
+            }
+        }
     }
 
     Spacer(modifier = Modifier.height(8.dp))

@@ -10,7 +10,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.pandatern.makco.ui.theme.*
@@ -85,6 +84,16 @@ fun PaymentWebView(
 
                         override fun onPageFinished(view: WebView?, url: String?) {
                             isLoading = false
+
+                            // Check if we're on the return URL
+                            url?.let {
+                                if (it.contains("ticketBookingStatus") ||
+                                    it.contains("payment/success") ||
+                                    it.contains("status=CONFIRMED") ||
+                                    it.contains("status=CHARGED")) {
+                                    onPaymentComplete()
+                                }
+                            }
                         }
 
                         override fun onReceivedError(
@@ -102,18 +111,33 @@ fun PaymentWebView(
                         ): Boolean {
                             val url = request?.url?.toString() ?: return false
 
-                            // Detect payment completion
-                            if (url.contains("ticketBookingStatus") ||
-                                url.contains("payment/success") ||
-                                url.contains("status=CONFIRMED")) {
+                            // Detect payment completion via URL
+                            if (url.contains("ticketBookingStatus")) {
+                                onPaymentComplete()
+                                return true
+                            }
+
+                            // Detect payment success
+                            if (url.contains("payment/success") ||
+                                url.contains("status=CONFIRMED") ||
+                                url.contains("status=CHARGED")) {
                                 onPaymentComplete()
                                 return true
                             }
 
                             // Detect payment failure
                             if (url.contains("payment/failed") ||
-                                url.contains("status=FAILED")) {
+                                url.contains("status=FAILED") ||
+                                url.contains("status=AUTHENTICATION_FAILED") ||
+                                url.contains("status=AUTHORIZATION_FAILED")) {
                                 error = "Payment failed"
+                                return true
+                            }
+
+                            // Detect user cancelled
+                            if (url.contains("payment/cancel") ||
+                                url.contains("status=CANCELLED")) {
+                                onBack()
                                 return true
                             }
 

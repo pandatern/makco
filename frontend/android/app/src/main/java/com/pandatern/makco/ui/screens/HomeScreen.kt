@@ -18,6 +18,7 @@ fun HomeScreen(
     onStationClick: (isSource: Boolean) -> Unit,
     onSearchClick: () -> Unit,
     onProfileClick: () -> Unit,
+    onTicketsClick: () -> Unit,
     selectedSource: Station?,
     selectedDestination: Station?
 ) {
@@ -182,7 +183,7 @@ fun HomeScreen(
 
         Spacer(modifier = Modifier.weight(1f))
 
-        // Recent trips placeholder
+        // My Tickets
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -190,18 +191,34 @@ fun HomeScreen(
                 .padding(bottom = 32.dp)
         ) {
             Text(
-                text = "RECENT TRIPS",
+                text = "MY TICKETS",
                 style = MaterialTheme.typography.labelMedium,
-                color = Gray2
+                color = Gray3
             )
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            Text(
-                text = "No trips yet",
-                style = MaterialTheme.typography.bodyMedium,
-                color = Gray1
-            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Dark3)
+                    .clickable { onTicketsClick() }
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "View ticket history",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = White
+                )
+
+                Text(
+                    text = "→",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = Gray2
+                )
+            }
         }
     }
 }

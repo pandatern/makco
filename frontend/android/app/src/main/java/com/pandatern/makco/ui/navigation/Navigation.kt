@@ -1,7 +1,5 @@
 package com.pandatern.makco.ui.navigation
 
-import android.content.Intent
-import android.net.Uri
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import com.pandatern.makco.data.local.TokenManager
@@ -21,6 +19,8 @@ sealed class Screen {
     object Booking : Screen()
     object Payment : Screen()
     object PaymentWeb : Screen()
+    object Ticket : Screen()
+    object TicketHistory : Screen()
     object Profile : Screen()
 }
 
@@ -40,6 +40,7 @@ fun MakcoNavHost() {
 
     var quotes by remember { mutableStateOf<List<Quote>>(emptyList()) }
     var selectedQuote by remember { mutableStateOf<Quote?>(null) }
+    var selectedQuantity by remember { mutableStateOf(1) }
     var searchId by remember { mutableStateOf<String?>(null) }
 
     var bookingId by remember { mutableStateOf<String?>(null) }
@@ -90,9 +91,11 @@ fun MakcoNavHost() {
         }
     }
 
-    fun confirmBooking(quote: Quote) {
+    fun confirmBooking(quote: Quote, quantity: Int) {
         isLoading = true
         error = null
+        selectedQuote = quote
+        selectedQuantity = quantity
         scope.launch {
             try {
                 val resp = ApiClient.instance.confirmBooking(
@@ -101,11 +104,12 @@ fun MakcoNavHost() {
                 )
                 if (resp.isSuccessful && resp.body() != null) {
                     bookingId = resp.body()!!.bookingId
+                    currentScreen = Screen.Payment
+                    // Fetch payment details
                     delay(1000)
                     val statusResp = ApiClient.instance.getBookingStatus(token, bookingId!!)
                     if (statusResp.isSuccessful) {
                         bookingStatus = statusResp.body()
-                        currentScreen = Screen.Payment
                     }
                 } else {
                     error = "Booking failed"
@@ -123,15 +127,12 @@ fun MakcoNavHost() {
         val onboardingDone = TokenManager.isOnboardingDone(context)
 
         if (savedToken != null && savedToken.isNotEmpty()) {
-            // Returning user with token - go straight to home
             token = savedToken
             loadMetroData()
             currentScreen = Screen.Home
         } else if (onboardingDone) {
-            // Onboarding done but no token - go to auth
             currentScreen = Screen.Auth
         }
-        // else: first time - stays on Splash -> Onboarding -> Auth
     }
 
     when (currentScreen) {
@@ -185,6 +186,9 @@ fun MakcoNavHost() {
                 },
                 onProfileClick = {
                     currentScreen = Screen.Profile
+                },
+                onTicketsClick = {
+                    currentScreen = Screen.TicketHistory
                 }
             )
         }
@@ -215,9 +219,8 @@ fun MakcoNavHost() {
                 toStation = selectedDestination,
                 isLoading = isLoading,
                 error = error,
-                onConfirm = { quote ->
-                    selectedQuote = quote
-                    confirmBooking(quote)
+                onConfirm = { quote, quantity ->
+                    confirmBooking(quote, quantity)
                 },
                 onRetry = { startSearch() },
                 onBack = {
@@ -235,6 +238,9 @@ fun MakcoNavHost() {
                 onPayClick = {
                     currentScreen = Screen.PaymentWeb
                 },
+                onViewTicket = {
+                    currentScreen = Screen.Ticket
+                },
                 onBack = {
                     currentScreen = Screen.Home
                     bookingId = null
@@ -250,20 +256,33 @@ fun MakcoNavHost() {
             PaymentWebView(
                 paymentUrl = payUrl,
                 onPaymentComplete = {
-                    currentScreen = Screen.Payment
-                    // Refresh booking status
-                    scope.launch {
-                        bookingId?.let { id ->
-                            try {
-                                val statusResp = ApiClient.instance.getBookingStatus(token, id)
-                                if (statusResp.isSuccessful) {
-                                    bookingStatus = statusResp.body()
-                                }
-                            } catch (_: Exception) {}
-                        }
-                    }
+                    currentScreen = Screen.Ticket
                 },
                 onBack = { currentScreen = Screen.Payment }
+            )
+        }
+        is Screen.Ticket -> {
+            TicketScreen(
+                token = token,
+                bookingId = bookingId ?: "",
+                onBack = {
+                    currentScreen = Screen.Home
+                    bookingId = null
+                    bookingStatus = null
+                    selectedSource = null
+                    selectedDestination = null
+                    quotes = emptyList()
+                }
+            )
+        }
+        is Screen.TicketHistory -> {
+            TicketHistoryScreen(
+                token = token,
+                onTicketClick = { id ->
+                    bookingId = id
+                    currentScreen = Screen.Ticket
+                },
+                onBack = { currentScreen = Screen.Home }
             )
         }
         is Screen.Profile -> {

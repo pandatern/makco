@@ -18,6 +18,7 @@ fun PaymentScreen(
     isLoading: Boolean,
     error: String?,
     onPayClick: () -> Unit,
+    onViewTicket: () -> Unit,
     onBack: () -> Unit
 ) {
     Column(
@@ -144,6 +145,26 @@ fun PaymentScreen(
                                     fontWeight = FontWeight.Bold
                                 ),
                                 color = Success
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        Button(
+                            onClick = onViewTicket,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(56.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = White,
+                                contentColor = Black
+                            )
+                        ) {
+                            Text(
+                                text = "VIEW TICKET",
+                                style = MaterialTheme.typography.labelLarge.copy(
+                                    fontWeight = FontWeight.Bold
+                                )
                             )
                         }
                     }
