@@ -57,8 +57,15 @@ fun MakcoNavHost() {
         scope.launch {
             try {
                 val s = ApiClient.instance.getStations(token)
-                if (s.isSuccessful) stations = s.body() ?: emptyList()
-            } catch (_: Exception) {}
+                if (s.isSuccessful) {
+                    stations = s.body() ?: emptyList()
+                    com.pandatern.makco.data.local.CacheManager.saveStations(context, stations)
+                }
+            } catch (_: Exception) {
+                // Offline - use cache
+                val cached = com.pandatern.makco.data.local.CacheManager.getStations(context)
+                if (cached != null) stations = cached
+            }
         }
     }
 
@@ -237,6 +244,7 @@ fun MakcoNavHost() {
                     stations = stations,
                     onStationSelected = { station ->
                         selectedSource = station
+                        com.pandatern.makco.data.local.CacheManager.addRecentStation(context, station)
                         currentScreen = Screen.Main
                     },
                     onBack = { currentScreen = Screen.Main }
@@ -247,6 +255,7 @@ fun MakcoNavHost() {
                     stations = stations,
                     onStationSelected = { station ->
                         selectedDestination = station
+                        com.pandatern.makco.data.local.CacheManager.addRecentStation(context, station)
                         currentScreen = Screen.Main
                     },
                     onBack = { currentScreen = Screen.Main }
@@ -275,6 +284,17 @@ fun MakcoNavHost() {
                     error = error,
                     onPayClick = { currentScreen = Screen.PaymentWeb },
                     onViewTicket = { currentScreen = Screen.Ticket },
+                    onRetry = {
+                        // Refresh booking status
+                        scope.launch {
+                            bookingId?.let { id ->
+                                try {
+                                    val statusResp = ApiClient.instance.getBookingStatus(token, id)
+                                    if (statusResp.isSuccessful) bookingStatus = statusResp.body()
+                                } catch (_: Exception) {}
+                            }
+                        }
+                    },
                     onBack = {
                         currentScreen = Screen.Main
                         bookingId = null

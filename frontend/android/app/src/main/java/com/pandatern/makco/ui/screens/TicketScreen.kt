@@ -144,6 +144,28 @@ fun TicketScreen(
 
                         Spacer(modifier = Modifier.height(24.dp))
 
+                        // Share button
+                        val context = androidx.compose.ui.platform.LocalContext.current
+                        Button(
+                            onClick = {
+                                val shareIntent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+                                    type = "text/plain"
+                                    putExtra(android.content.Intent.EXTRA_TEXT,
+                                        "Makco Metro Ticket\nBooking: ${bookingId.take(8).uppercase()}\nAmount: ₹${status.price.toInt()}")
+                                }
+                                context.startActivity(android.content.Intent.createChooser(shareIntent, "Share Ticket"))
+                            },
+                            modifier = Modifier.fillMaxWidth().height(48.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = theme.bg3,
+                                contentColor = theme.t1
+                            )
+                        ) {
+                            Text("SHARE TICKET", style = MaterialTheme.typography.labelMedium)
+                        }
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
                         // Cancel button
                         Button(
                             onClick = {

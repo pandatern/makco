@@ -109,6 +109,32 @@ fun HomeScreen(
             )
         }
 
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Recent stations
+        val recentStations = remember {
+            com.pandatern.makco.data.local.CacheManager.getRecentStations(
+                androidx.compose.ui.platform.LocalContext.current
+            )
+        }
+        if (recentStations.isNotEmpty()) {
+            Text("RECENT", style = MaterialTheme.typography.labelMedium, color = theme.t4)
+            Spacer(modifier = Modifier.height(8.dp))
+            recentStations.take(3).forEach { station ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { onStationClick(true) }
+                        .padding(vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(modifier = Modifier.size(6.dp).background(MetroBlue))
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Text(station.name, style = MaterialTheme.typography.bodyMedium, color = theme.t3)
+                }
+            }
+        }
+
         Spacer(modifier = Modifier.weight(1f))
     }
 }
