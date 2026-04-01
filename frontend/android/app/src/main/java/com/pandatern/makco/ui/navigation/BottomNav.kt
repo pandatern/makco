@@ -25,40 +25,24 @@ fun BottomNavBar(
 ) {
     val theme = LocalThemeManager.current
 
-    Box(
+    Row(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(bottom = 24.dp),
-        contentAlignment = Alignment.BottomCenter
+            .fillMaxWidth()
+            .padding(horizontal = 32.dp, vertical = 12.dp),
+        horizontalArrangement = Arrangement.Center
     ) {
         Row(
             modifier = Modifier
                 .clip(RoundedCornerShape(28.dp))
                 .background(
-                    // Glass effect - semi-transparent
                     if (theme.isDark) Color(0x33FFFFFF) else Color(0x33000000)
                 )
                 .padding(horizontal = 6.dp, vertical = 6.dp),
             horizontalArrangement = Arrangement.spacedBy(2.dp)
         ) {
-            BottomTabItem(
-                label = "HOME",
-                isSelected = selectedTab == BottomTab.HOME,
-                onClick = { onTabSelected(BottomTab.HOME) },
-                isDark = theme.isDark
-            )
-            BottomTabItem(
-                label = "TICKETS",
-                isSelected = selectedTab == BottomTab.TICKETS,
-                onClick = { onTabSelected(BottomTab.TICKETS) },
-                isDark = theme.isDark
-            )
-            BottomTabItem(
-                label = "PROFILE",
-                isSelected = selectedTab == BottomTab.PROFILE,
-                onClick = { onTabSelected(BottomTab.PROFILE) },
-                isDark = theme.isDark
-            )
+            BottomTabItem("HOME", selectedTab == BottomTab.HOME, { onTabSelected(BottomTab.HOME) }, theme.isDark)
+            BottomTabItem("TICKETS", selectedTab == BottomTab.TICKETS, { onTabSelected(BottomTab.TICKETS) }, theme.isDark)
+            BottomTabItem("PROFILE", selectedTab == BottomTab.PROFILE, { onTabSelected(BottomTab.PROFILE) }, theme.isDark)
         }
     }
 }
@@ -92,7 +76,6 @@ fun BottomTabItem(
             color = when {
                 isSelected && isDark -> Color.White
                 isSelected && !isDark -> Color.Black
-                isDark -> Color(0xFF888888)
                 else -> Color(0xFF888888)
             }
         )
