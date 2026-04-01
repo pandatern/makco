@@ -10,9 +10,9 @@
         android:fillColor="#000000"
         android:pathData="M0,0h108v108H0z" />
 
-    <!-- Big bold M - nothing else -->
+    <!-- Big bold M - fills most of the icon -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M20,76 L20,32 L36,32 L36,56 L54,36 L72,56 L72,32 L88,32 L88,76 L72,76 L72,52 L54,68 L36,52 L36,76 Z" />
+        android:pathData="M14,78 L14,30 L30,30 L30,54 L54,30 L78,54 L78,30 L94,30 L94,78 L78,78 L78,50 L54,68 L30,50 L30,78 Z" />
 
 </vector>

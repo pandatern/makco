@@ -175,6 +175,7 @@ fun MakcoNavHost() {
 
     Box(modifier = Modifier.fillMaxSize()) {
         CompositionLocalProvider(LocalThemeManager provides themeManager) {
+            key(themeManager.currentTheme) {
             when (currentScreen) {
             is Screen.Splash -> {
                 SplashScreen {
@@ -329,6 +330,7 @@ fun MakcoNavHost() {
                         bookingStatus = null
                     }
                 )
+            }
             }
             }
         }

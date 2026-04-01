@@ -25,16 +25,16 @@ fun BottomNavBar(selectedTab: BottomTab, onTabSelected: (BottomTab) -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 48.dp, end = 48.dp, bottom = 24.dp),
+            .padding(start = 32.dp, end = 32.dp, bottom = 20.dp),
         contentAlignment = Alignment.Center
     ) {
         // Glassmorphism pill
         Row(
             modifier = Modifier
-                .clip(RoundedCornerShape(24.dp))
+                .clip(RoundedCornerShape(28.dp))
                 .background(theme.glass)
-                .padding(horizontal = 4.dp, vertical = 4.dp),
-            horizontalArrangement = Arrangement.spacedBy(2.dp)
+                .padding(horizontal = 6.dp, vertical = 6.dp),
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             TabItem("HOME", selectedTab == BottomTab.HOME, { onTabSelected(BottomTab.HOME) }, theme)
             TabItem("TICKETS", selectedTab == BottomTab.TICKETS, { onTabSelected(BottomTab.TICKETS) }, theme)
@@ -47,15 +47,15 @@ fun BottomNavBar(selectedTab: BottomTab, onTabSelected: (BottomTab) -> Unit) {
 fun TabItem(label: String, isSelected: Boolean, onClick: () -> Unit, theme: ThemeManager) {
     Box(
         modifier = Modifier
-            .clip(RoundedCornerShape(20.dp))
+            .clip(RoundedCornerShape(22.dp))
             .background(if (isSelected) theme.glassSelected else Color.Transparent)
             .clickable(onClick = onClick)
-            .padding(horizontal = 18.dp, vertical = 8.dp),
+            .padding(horizontal = 22.dp, vertical = 12.dp),
         contentAlignment = Alignment.Center
     ) {
         Text(
             text = label,
-            style = MaterialTheme.typography.labelSmall.copy(
+            style = MaterialTheme.typography.labelMedium.copy(
                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
             ),
             color = if (isSelected) theme.t1 else theme.t4

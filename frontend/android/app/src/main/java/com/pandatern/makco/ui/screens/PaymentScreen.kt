@@ -1,7 +1,6 @@
 package com.pandatern.makco.ui.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -11,7 +10,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.pandatern.makco.data.model.*
 import com.pandatern.makco.ui.theme.*
 
@@ -92,61 +90,68 @@ fun PaymentScreen(
                 // Amount
                 PaymentRow("AMOUNT", "₹${status.price.toInt()}", theme.t1, theme)
 
-                // Expiry warning
-                if (status.status == "PAYMENT_PENDING") {
-                    Spacer(modifier = Modifier.height(24.dp))
-                    Box(modifier = Modifier.fillMaxWidth().background(MetroGold.copy(alpha = 0.1f)).padding(14.dp)) {
-                        Text("Complete payment within 10 minutes or booking will expire",
-                            style = MaterialTheme.typography.bodySmall, color = MetroGold)
-                    }
-                }
-
                 Spacer(modifier = Modifier.height(40.dp))
 
-                // Pay button
-                if (status.status == "PAYMENT_PENDING") {
-                    Button(
-                        onClick = onPayClick,
-                        modifier = Modifier.fillMaxWidth().height(52.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = if (theme.isDark) Color.White else Color.Black,
-                            contentColor = if (theme.isDark) Color.Black else Color.White
-                        )
-                    ) {
-                        Text("PAY ₹${status.price.toInt()}",
-                            style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold))
+                // Always show a button based on status
+                when (status.status) {
+                    "PAYMENT_PENDING" -> {
+                        Button(
+                            onClick = onPayClick,
+                            modifier = Modifier.fillMaxWidth().height(52.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = if (theme.isDark) Color.White else Color.Black,
+                                contentColor = if (theme.isDark) Color.Black else Color.White
+                            )
+                        ) {
+                            Text("PAY ₹${status.price.toInt()}",
+                                style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold))
+                        }
+                    }
+                    "CONFIRMED" -> {
+                        Button(
+                            onClick = onViewTicket,
+                            modifier = Modifier.fillMaxWidth().height(52.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = if (theme.isDark) Color.White else Color.Black,
+                                contentColor = if (theme.isDark) Color.Black else Color.White
+                            )
+                        ) {
+                            Text("VIEW TICKET",
+                                style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold))
+                        }
+                    }
+                    "FAILED", "CANCELLED" -> {
+                        Button(
+                            onClick = onRetry,
+                            modifier = Modifier.fillMaxWidth().height(52.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Error,
+                                contentColor = Color.White
+                            )
+                        ) {
+                            Text("TRY AGAIN",
+                                style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold))
+                        }
+                    }
+                    else -> {
+                        // Any other status - show view ticket
+                        Button(
+                            onClick = onViewTicket,
+                            modifier = Modifier.fillMaxWidth().height(52.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = if (theme.isDark) Color.White else Color.Black,
+                                contentColor = if (theme.isDark) Color.Black else Color.White
+                            )
+                        ) {
+                            Text("VIEW TICKET",
+                                style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold))
+                        }
                     }
                 }
-
-                // Confirmed
-                if (status.status == "CONFIRMED") {
-                    Button(
-                        onClick = onViewTicket,
-                        modifier = Modifier.fillMaxWidth().height(52.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = if (theme.isDark) Color.White else Color.Black,
-                            contentColor = if (theme.isDark) Color.Black else Color.White
-                        )
-                    ) {
-                        Text("VIEW TICKET",
-                            style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold))
-                    }
-                }
-
-                // Failed - retry booking
-                if (status.status == "FAILED" || status.status == "CANCELLED") {
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Button(
-                        onClick = onRetry,
-                        modifier = Modifier.fillMaxWidth().height(52.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = if (theme.isDark) Color.White else Color.Black,
-                            contentColor = if (theme.isDark) Color.Black else Color.White
-                        )
-                    ) {
-                        Text("TRY AGAIN",
-                            style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold))
-                    }
+            }
+            else -> {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(color = theme.t1, strokeWidth = 2.dp)
                 }
             }
         }
