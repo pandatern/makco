@@ -112,11 +112,8 @@ fun HomeScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         // Recent stations
-        val recentStations = remember {
-            com.pandatern.makco.data.local.CacheManager.getRecentStations(
-                androidx.compose.ui.platform.LocalContext.current
-            )
-        }
+        val ctx = androidx.compose.ui.platform.LocalContext.current
+        val recentStations = remember { com.pandatern.makco.data.local.CacheManager.getRecentStations(ctx) }
         if (recentStations.isNotEmpty()) {
             Text("RECENT", style = MaterialTheme.typography.labelMedium, color = theme.t4)
             Spacer(modifier = Modifier.height(8.dp))
