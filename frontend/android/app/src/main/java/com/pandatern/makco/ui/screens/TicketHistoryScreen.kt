@@ -32,7 +32,7 @@ fun TicketHistoryScreen(
     LaunchedEffect(Unit) {
         scope.launch {
             try {
-                val resp = ApiClient.instance.getTicketBookings(token, "chennai")
+                val resp = ApiClient.instance.getTickets(token, "chennai")
                 if (resp.isSuccessful) {
                     val body = resp.body()
                     // The API returns a list - try to parse as BookingStatus

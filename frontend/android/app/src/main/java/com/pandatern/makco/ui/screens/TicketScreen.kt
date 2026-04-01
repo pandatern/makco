@@ -127,16 +127,6 @@ fun TicketScreen(
                     // Amount
                     TicketDetailRow("AMOUNT", "₹${status.price.toInt()}", White)
 
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    // Quantity
-                    TicketDetailRow("QUANTITY", "${status.quantity ?: 1}", White)
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    // Type
-                    TicketDetailRow("TYPE", status.type ?: "SINGLE", White)
-
                     Spacer(modifier = Modifier.height(32.dp))
 
                     // QR Code area (only if CONFIRMED)
