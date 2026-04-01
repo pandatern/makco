@@ -74,7 +74,6 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
     implementation("io.coil-kt:coil-compose:2.5.0")
-    implementation("in.juspay:hypersdk:2.1.24")
     implementation("androidx.webkit:webkit:1.9.0")
     debugImplementation("androidx.compose.ui:ui-tooling")
 }

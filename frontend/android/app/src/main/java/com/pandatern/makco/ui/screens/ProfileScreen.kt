@@ -1,6 +1,7 @@
 package com.pandatern.makco.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -19,6 +20,7 @@ fun ProfileScreen(
     token: String,
     onLogout: () -> Unit
 ) {
+    val theme = LocalThemeManager.current
     var profile by remember { mutableStateOf<UserProfile?>(null) }
     var isLoading by remember { mutableStateOf(true) }
     val scope = rememberCoroutineScope()
@@ -36,7 +38,7 @@ fun ProfileScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Black)
+            .background(theme.bg)
             .padding(horizontal = 24.dp)
     ) {
         Spacer(modifier = Modifier.height(56.dp))
@@ -46,7 +48,7 @@ fun ProfileScreen(
             style = MaterialTheme.typography.headlineLarge.copy(
                 fontWeight = FontWeight.Black
             ),
-            color = Text1
+            color = theme.t1
         )
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -56,7 +58,7 @@ fun ProfileScreen(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator(color = White, strokeWidth = 2.dp)
+                CircularProgressIndicator(color = theme.t1, strokeWidth = 2.dp)
             }
         } else {
             // Phone
@@ -66,7 +68,7 @@ fun ProfileScreen(
                     style = MaterialTheme.typography.headlineMedium.copy(
                         fontWeight = FontWeight.Bold
                     ),
-                    color = Text1
+                    color = theme.t1
                 )
 
                 if (p.firstName != null) {
@@ -74,34 +76,83 @@ fun ProfileScreen(
                     Text(
                         text = p.firstName,
                         style = MaterialTheme.typography.bodyLarge,
-                        color = Text2
+                        color = theme.t2
                     )
                 }
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text(
-                    text = if (p.hasTakenRide) "HAS TRAVELLED" : "NO RIDES YET",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = if (p.hasTakenRide) Success else Text4
-                )
             }
 
-            Spacer(modifier = Modifier.height(40.dp))
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // Theme toggle
+            Text(
+                text = "APPEARANCE",
+                style = MaterialTheme.typography.labelMedium,
+                color = theme.t4
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { theme.toggle() }
+                    .background(theme.bg2)
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "THEME",
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        fontWeight = FontWeight.Medium
+                    ),
+                    color = theme.t2
+                )
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = if (theme.isDark) "DARK" else "LIGHT",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = theme.t3
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Box(
+                        modifier = Modifier
+                            .width(40.dp)
+                            .height(22.dp)
+                            .background(
+                                if (theme.isDark) MetroBlue else theme.bg4,
+                                shape = androidx.compose.foundation.shape.RoundedCornerShape(11.dp)
+                            ),
+                        contentAlignment = if (theme.isDark) Alignment.CenterEnd else Alignment.CenterStart
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .padding(3.dp)
+                                .size(16.dp)
+                                .background(
+                                    if (theme.isDark) MaterialTheme.colorScheme.background else theme.t1,
+                                    shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp)
+                                )
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
 
             // Info
             Text(
                 text = "INFO",
                 style = MaterialTheme.typography.labelMedium,
-                color = Text4
+                color = theme.t4
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
-            ProfileItem("VERSION", "1.0.0")
-            ProfileItem("NETWORK", "CHENNAI METRO")
-            ProfileItem("LINES", "BLUE & GREEN")
-            ProfileItem("STATIONS", "41")
+            ProfileItem("VERSION", "1.0.0", theme)
+            ProfileItem("NETWORK", "CHENNAI METRO", theme)
+            ProfileItem("LINES", "BLUE & GREEN", theme)
 
             Spacer(modifier = Modifier.weight(1f))
 
@@ -129,24 +180,17 @@ fun ProfileScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "MAKCO",
-                    style = MaterialTheme.typography.labelLarge.copy(
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp
+                    text = "MAKCO v1.0.0",
+                    style = MaterialTheme.typography.labelMedium.copy(
+                        fontWeight = FontWeight.Bold
                     ),
-                    color = Text3
+                    color = theme.t4
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = "BUILT BY PANDATERN",
                     style = MaterialTheme.typography.labelSmall,
-                    color = Text4
-                )
-                Spacer(modifier = Modifier.height(2.dp))
-                Text(
-                    text = "MADE FOR CMRL",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = Text4
+                    color = theme.t4
                 )
             }
         }
@@ -154,7 +198,7 @@ fun ProfileScreen(
 }
 
 @Composable
-fun ProfileItem(label: String, value: String) {
+fun ProfileItem(label: String, value: String, theme: ThemeManager) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -165,14 +209,14 @@ fun ProfileItem(label: String, value: String) {
         Text(
             text = label,
             style = MaterialTheme.typography.labelMedium,
-            color = Text4
+            color = theme.t4
         )
         Text(
             text = value,
             style = MaterialTheme.typography.bodyLarge.copy(
                 fontWeight = FontWeight.Medium
             ),
-            color = Text2
+            color = theme.t2
         )
     }
 
@@ -180,6 +224,6 @@ fun ProfileItem(label: String, value: String) {
         modifier = Modifier
             .fillMaxWidth()
             .height(1.dp)
-            .background(Dark4)
+            .background(theme.divider)
     )
 }

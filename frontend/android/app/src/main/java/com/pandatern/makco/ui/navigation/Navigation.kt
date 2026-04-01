@@ -32,6 +32,8 @@ fun MakcoNavHost() {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
+    val themeManager = remember { ThemeManager(context) }
+
     var currentScreen by remember { mutableStateOf<Screen>(Screen.Splash) }
     var token by remember { mutableStateOf("") }
     var selectedTab by remember { mutableStateOf(BottomTab.HOME) }
@@ -129,7 +131,8 @@ fun MakcoNavHost() {
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        when (currentScreen) {
+        CompositionLocalProvider(LocalThemeManager provides themeManager) {
+            when (currentScreen) {
             is Screen.Splash -> {
                 SplashScreen {
                     val savedToken = TokenManager.getToken(context)
@@ -263,6 +266,8 @@ fun MakcoNavHost() {
                     }
                 )
             }
+        }
+    }
         }
     }
 }
