@@ -8,6 +8,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -20,22 +21,20 @@ enum class BottomTab { HOME, TICKETS, PROFILE }
 fun BottomNavBar(selectedTab: BottomTab, onTabSelected: (BottomTab) -> Unit) {
     val theme = LocalThemeManager.current
 
-    // Outer padding to float above bottom
+    // Footer centered with padding
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 24.dp, end = 24.dp, bottom = 16.dp),
+            .padding(start = 48.dp, end = 48.dp, bottom = 24.dp),
         contentAlignment = Alignment.Center
     ) {
+        // Glassmorphism pill
         Row(
             modifier = Modifier
-                .clip(RoundedCornerShape(28.dp))
-                .background(
-                    // Always visible glass - works in both themes
-                    if (theme.isDark) Color(0x44FFFFFF) else Color(0x99FFFFFF)
-                )
-                .padding(horizontal = 6.dp, vertical = 6.dp),
-            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                .clip(RoundedCornerShape(24.dp))
+                .background(theme.glass)
+                .padding(horizontal = 4.dp, vertical = 4.dp),
+            horizontalArrangement = Arrangement.spacedBy(2.dp)
         ) {
             TabItem("HOME", selectedTab == BottomTab.HOME, { onTabSelected(BottomTab.HOME) }, theme)
             TabItem("TICKETS", selectedTab == BottomTab.TICKETS, { onTabSelected(BottomTab.TICKETS) }, theme)
@@ -48,29 +47,18 @@ fun BottomNavBar(selectedTab: BottomTab, onTabSelected: (BottomTab) -> Unit) {
 fun TabItem(label: String, isSelected: Boolean, onClick: () -> Unit, theme: ThemeManager) {
     Box(
         modifier = Modifier
-            .clip(RoundedCornerShape(22.dp))
-            .background(
-                if (isSelected) {
-                    if (theme.isDark) Color(0x60FFFFFF) else Color(0x60000000)
-                } else {
-                    Color.Transparent
-                }
-            )
+            .clip(RoundedCornerShape(20.dp))
+            .background(if (isSelected) theme.glassSelected else Color.Transparent)
             .clickable(onClick = onClick)
-            .padding(horizontal = 20.dp, vertical = 10.dp),
+            .padding(horizontal = 18.dp, vertical = 8.dp),
         contentAlignment = Alignment.Center
     ) {
         Text(
             text = label,
-            style = MaterialTheme.typography.labelMedium.copy(
+            style = MaterialTheme.typography.labelSmall.copy(
                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
             ),
-            color = when {
-                isSelected && theme.isDark -> Color.White
-                isSelected && !theme.isDark -> Color.Black
-                theme.isDark -> Color(0xFF888888)
-                else -> Color(0xFF666666)
-            }
+            color = if (isSelected) theme.t1 else theme.t4
         )
     }
 }

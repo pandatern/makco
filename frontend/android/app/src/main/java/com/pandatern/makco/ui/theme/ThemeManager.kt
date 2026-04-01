@@ -33,15 +33,20 @@ class ThemeManager(context: Context) {
 
     val isDark get() = currentTheme == AppTheme.DARK
 
-    val bg get() = if (isDark) Color.Black else Color(0xFFF5F5F5)
-    val bg2 get() = if (isDark) Color(0xFF141414) else Color(0xFFEBEBEB)
-    val bg3 get() = if (isDark) Color(0xFF1C1C1C) else Color(0xFFE0E0E0)
-    val bg4 get() = if (isDark) Color(0xFF282828) else Color(0xFFD0D0D0)
+    // Pure black for dark, pure white for light
+    val bg = if (isDark) Color(0xFF000000) else Color(0xFFFFFFFF)
+    val bg2 = if (isDark) Color(0xFF0A0A0A) else Color(0xFFF5F5F5)
+    val bg3 = if (isDark) Color(0xFF111111) else Color(0xFFEBEBEB)
+    val bg4 = if (isDark) Color(0xFF1A1A1A) else Color(0xFFDDDDDD)
 
-    val t1 get() = if (isDark) Color.White else Color.Black
-    val t2 get() = if (isDark) Color(0xFFE8E8E8) else Color(0xFF1A1A1A)
-    val t3 get() = if (isDark) Color(0xFFD0D0D0) else Color(0xFF333333)
-    val t4 get() = if (isDark) Color(0xFFB0B0B0) else Color(0xFF666666)
+    val t1 = if (isDark) Color(0xFFFFFFFF) else Color(0xFF000000)
+    val t2 = if (isDark) Color(0xFFE0E0E0) else Color(0xFF1A1A1A)
+    val t3 = if (isDark) Color(0xFFAAAAAA) else Color(0xFF444444)
+    val t4 = if (isDark) Color(0xFF666666) else Color(0xFF888888)
 
-    val divider get() = if (isDark) Color(0xFF282828) else Color(0xFFD0D0D0)
+    val divider = if (isDark) Color(0xFF1A1A1A) else Color(0xFFE0E0E0)
+
+    // Glassmorphism bar color
+    val glass = if (isDark) Color(0x22FFFFFF) else Color(0x22000000)
+    val glassSelected = if (isDark) Color(0x33FFFFFF) else Color(0x33000000)
 }
