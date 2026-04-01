@@ -32,248 +32,156 @@ fun AuthScreen(
 
     val scope = rememberCoroutineScope()
 
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxSize()
             .background(theme.bg)
+            .padding(horizontal = 28.dp),
+        horizontalAlignment = Alignment.Start
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 28.dp),
-            horizontalAlignment = Alignment.Start
-        ) {
-            Spacer(modifier = Modifier.weight(0.3f))
+        Spacer(modifier = Modifier.height(160.dp))
 
-            Text(
-                text = "MAKCO",
-                style = MaterialTheme.typography.displayLarge.copy(
-                    fontWeight = FontWeight.Black
+        // Logo
+        Text(
+            text = "MAKCO",
+            style = MaterialTheme.typography.displayLarge.copy(fontWeight = FontWeight.Black),
+            color = theme.t1
+        )
+
+        Spacer(modifier = Modifier.height(4.dp))
+
+        Text(
+            text = "CHENNAI METRO",
+            style = MaterialTheme.typography.labelMedium,
+            color = theme.t4
+        )
+
+        Spacer(modifier = Modifier.height(64.dp))
+
+        if (!otpSent) {
+            Text("ENTER YOUR PHONE", style = MaterialTheme.typography.labelMedium, color = theme.t3)
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(theme.bg2)
+                    .padding(horizontal = 20.dp, vertical = 12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text("+91", style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Medium), color = theme.t3)
+                Spacer(modifier = Modifier.width(16.dp))
+                OutlinedTextField(
+                    value = phone,
+                    onValueChange = { if (it.length <= 10 && it.all { c -> c.isDigit() }) { phone = it; error = null } },
+                    modifier = Modifier.fillMaxWidth(),
+                    placeholder = { Text("9876543210", color = theme.t4) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color.Transparent, unfocusedBorderColor = Color.Transparent,
+                        focusedTextColor = theme.t1, unfocusedTextColor = theme.t1, cursorColor = theme.t3
+                    ),
+                    textStyle = MaterialTheme.typography.titleLarge,
+                    singleLine = true, enabled = !isLoading
+                )
+            }
+
+            Spacer(modifier = Modifier.height(28.dp))
+
+            Button(
+                onClick = {
+                    if (phone.length != 10) { error = "ENTER 10 DIGITS"; return@Button }
+                    isLoading = true; error = null
+                    scope.launch {
+                        try {
+                            val resp = ApiClient.instance.initiateAuth(AuthRequest(mobileNumber = phone))
+                            if (resp.isSuccessful && resp.body() != null) {
+                                authId = resp.body()!!.authId; attemptsLeft = resp.body()!!.attempts; otpSent = true
+                            } else { error = "FAILED" }
+                        } catch (e: Exception) { error = "ERR: ${e.message}" }
+                        isLoading = false
+                    }
+                },
+                modifier = Modifier.fillMaxWidth().height(52.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (theme.isDark) Color.White else Color.Black,
+                    contentColor = if (theme.isDark) Color.Black else Color.White
                 ),
-                color = theme.t1
-            )
+                enabled = !isLoading
+            ) {
+                if (isLoading) CircularProgressIndicator(modifier = Modifier.size(20.dp), color = theme.bg, strokeWidth = 2.dp)
+                else Text("CONTINUE", style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold))
+            }
+        } else {
+            Text("ENTER OTP", style = MaterialTheme.typography.labelMedium, color = theme.t3)
+            Spacer(modifier = Modifier.height(4.dp))
+            Text("Sent to +91 $phone", style = MaterialTheme.typography.bodyMedium, color = theme.t4)
+            Spacer(modifier = Modifier.height(16.dp))
 
-            Spacer(modifier = Modifier.height(6.dp))
-
-            Text(
-                text = "CHENNAI METRO",
-                style = MaterialTheme.typography.labelMedium,
-                color = theme.t4
-            )
-
-            Spacer(modifier = Modifier.weight(0.2f))
-
-            if (!otpSent) {
-                Text(
-                    text = "ENTER YOUR PHONE",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = theme.t3
-                )
-
-                Spacer(modifier = Modifier.height(20.dp))
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(theme.bg2)
-                        .padding(horizontal = 20.dp, vertical = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "+91",
-                        style = MaterialTheme.typography.titleLarge.copy(
-                            fontWeight = FontWeight.Medium
-                        ),
-                        color = theme.t3
-                    )
-
-                    Spacer(modifier = Modifier.width(16.dp))
-
-                    OutlinedTextField(
-                        value = phone,
-                        onValueChange = {
-                            if (it.length <= 10 && it.all { c -> c.isDigit() }) {
-                                phone = it
-                                error = null
-                            }
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                        placeholder = { Text("9876543210", color = theme.t4) },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = Color.Transparent,
-                            unfocusedBorderColor = Color.Transparent,
-                            focusedTextColor = theme.t1,
-                            unfocusedTextColor = theme.t1,
-                            cursorColor = theme.t3
-                        ),
-                        textStyle = MaterialTheme.typography.titleLarge,
-                        singleLine = true,
-                        enabled = !isLoading
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(32.dp))
-
-                Button(
-                    onClick = {
-                        if (phone.length != 10) {
-                            error = "ENTER 10 DIGITS"
-                            return@Button
-                        }
-                        isLoading = true
-                        error = null
-                        scope.launch {
-                            try {
-                                val resp = ApiClient.instance.initiateAuth(
-                                    AuthRequest(mobileNumber = phone)
-                                )
-                                if (resp.isSuccessful && resp.body() != null) {
-                                    authId = resp.body()!!.authId
-                                    attemptsLeft = resp.body()!!.attempts
-                                    otpSent = true
-                                } else {
-                                    error = "FAILED"
-                                }
-                            } catch (e: Exception) {
-                                error = "ERR: ${e.message}"
-                            }
-                            isLoading = false
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth().height(56.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = if (theme.isDark) Color.White else Color.Black,
-                        contentColor = if (theme.isDark) Color.Black else Color.White
+            Box(modifier = Modifier.fillMaxWidth().background(theme.bg2).padding(horizontal = 20.dp, vertical = 4.dp)) {
+                OutlinedTextField(
+                    value = otp,
+                    onValueChange = { if (it.length <= 4 && it.all { c -> c.isDigit() }) { otp = it; error = null } },
+                    modifier = Modifier.fillMaxWidth(),
+                    placeholder = { Text("4 DIGITS", color = theme.t4) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color.Transparent, unfocusedBorderColor = Color.Transparent,
+                        focusedTextColor = theme.t1, unfocusedTextColor = theme.t1, cursorColor = theme.t3
                     ),
-                    enabled = !isLoading
-                ) {
-                    if (isLoading) {
-                        CircularProgressIndicator(modifier = Modifier.size(22.dp), color = theme.bg, strokeWidth = 2.dp)
-                    } else {
-                        Text("CONTINUE", style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold))
-                    }
-                }
-            } else {
-                Text(
-                    text = "ENTER OTP",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = theme.t3
+                    textStyle = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
+                    singleLine = true, enabled = !isLoading
                 )
-
-                Spacer(modifier = Modifier.height(6.dp))
-
-                Text(
-                    text = "Sent to +91 $phone",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = theme.t4
-                )
-
-                Spacer(modifier = Modifier.height(20.dp))
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(theme.bg2)
-                        .padding(horizontal = 20.dp, vertical = 4.dp)
-                ) {
-                    OutlinedTextField(
-                        value = otp,
-                        onValueChange = {
-                            if (it.length <= 4 && it.all { c -> c.isDigit() }) {
-                                otp = it
-                                error = null
-                            }
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                        placeholder = { Text("4 DIGITS", color = theme.t4) },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = Color.Transparent,
-                            unfocusedBorderColor = Color.Transparent,
-                            focusedTextColor = theme.t1,
-                            unfocusedTextColor = theme.t1,
-                            cursorColor = theme.t3
-                        ),
-                        textStyle = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
-                        singleLine = true,
-                        enabled = !isLoading
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                Text(
-                    text = "$attemptsLeft ATTEMPTS REMAINING",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = if (attemptsLeft <= 1) Error else theme.t4
-                )
-
-                Spacer(modifier = Modifier.height(32.dp))
-
-                Button(
-                    onClick = {
-                        if (otp.length != 4) {
-                            error = "OTP MUST BE 4 DIGITS"
-                            return@Button
-                        }
-                        isLoading = true
-                        error = null
-                        scope.launch {
-                            try {
-                                val resp = ApiClient.instance.verifyAuth(
-                                    authId!!,
-                                    VerifyRequest(otp = otp)
-                                )
-                                if (resp.isSuccessful && resp.body() != null) {
-                                    onAuthSuccess(resp.body()!!.token)
-                                } else {
-                                    error = "WRONG OTP"
-                                    attemptsLeft--
-                                    if (attemptsLeft <= 0) {
-                                        otpSent = false
-                                        otp = ""
-                                        authId = null
-                                        error = "NO ATTEMPTS LEFT"
-                                    }
-                                }
-                            } catch (e: Exception) {
-                                error = "ERR: ${e.message}"
-                            }
-                            isLoading = false
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth().height(56.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = if (theme.isDark) Color.White else Color.Black,
-                        contentColor = if (theme.isDark) Color.Black else Color.White
-                    ),
-                    enabled = !isLoading
-                ) {
-                    if (isLoading) {
-                        CircularProgressIndicator(modifier = Modifier.size(22.dp), color = theme.bg, strokeWidth = 2.dp)
-                    } else {
-                        Text("VERIFY", style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold))
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(20.dp))
-
-                TextButton(onClick = { otpSent = false; otp = ""; authId = null; error = null }) {
-                    Text("WRONG NUMBER?", style = MaterialTheme.typography.labelMedium, color = theme.t4)
-                }
             }
 
-            error?.let {
-                Spacer(modifier = Modifier.height(16.dp))
-                Box(
-                    modifier = Modifier.fillMaxWidth().background(Error.copy(alpha = 0.1f)).padding(16.dp)
-                ) {
-                    Text(it, color = Error, style = MaterialTheme.typography.labelMedium)
-                }
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Text("$attemptsLeft ATTEMPTS REMAINING", style = MaterialTheme.typography.labelSmall,
+                color = if (attemptsLeft <= 1) Error else theme.t4)
+
+            Spacer(modifier = Modifier.height(28.dp))
+
+            Button(
+                onClick = {
+                    if (otp.length != 4) { error = "OTP MUST BE 4 DIGITS"; return@Button }
+                    isLoading = true; error = null
+                    scope.launch {
+                        try {
+                            val resp = ApiClient.instance.verifyAuth(authId!!, VerifyRequest(otp = otp))
+                            if (resp.isSuccessful && resp.body() != null) { onAuthSuccess(resp.body()!!.token) }
+                            else {
+                                error = "WRONG OTP"; attemptsLeft--
+                                if (attemptsLeft <= 0) { otpSent = false; otp = ""; authId = null; error = "NO ATTEMPTS LEFT" }
+                            }
+                        } catch (e: Exception) { error = "ERR: ${e.message}" }
+                        isLoading = false
+                    }
+                },
+                modifier = Modifier.fillMaxWidth().height(52.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (theme.isDark) Color.White else Color.Black,
+                    contentColor = if (theme.isDark) Color.Black else Color.White
+                ),
+                enabled = !isLoading
+            ) {
+                if (isLoading) CircularProgressIndicator(modifier = Modifier.size(20.dp), color = theme.bg, strokeWidth = 2.dp)
+                else Text("VERIFY", style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold))
             }
 
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.height(16.dp))
+
+            TextButton(onClick = { otpSent = false; otp = ""; authId = null; error = null }) {
+                Text("WRONG NUMBER?", style = MaterialTheme.typography.labelMedium, color = theme.t4)
+            }
+        }
+
+        // Error
+        error?.let {
+            Spacer(modifier = Modifier.height(12.dp))
+            Box(modifier = Modifier.fillMaxWidth().background(Error.copy(alpha = 0.1f)).padding(14.dp)) {
+                Text(it, color = Error, style = MaterialTheme.typography.labelMedium)
+            }
         }
     }
 }
