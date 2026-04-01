@@ -88,13 +88,6 @@ fun MakcoNavHost() {
             } catch (_: Exception) {}
         }
     }
-            } catch (_: Exception) {
-                // Offline - use cache
-                val cached = com.pandatern.makco.data.local.CacheManager.getStations(context)
-                if (cached != null) stations = cached
-            }
-        }
-    }
 
     fun startSearch() {
         if (selectedSource == null || selectedDestination == null) return
