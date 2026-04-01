@@ -266,8 +266,7 @@ fun MakcoNavHost() {
                     }
                 )
             }
-        }
-    }
+            }
         }
     }
 }
