@@ -61,31 +61,15 @@ fun MakcoNavHost() {
                     stations = s.body() ?: emptyList()
                     com.pandatern.makco.data.local.CacheManager.saveStations(context, stations)
                 } else if (s.code() == 401) {
-                    // Token expired - try refresh
-                    refreshToken()
+                    // Token expired - clear and go to auth
+                    token = ""
+                    com.pandatern.makco.data.local.TokenManager.clearToken(context)
+                    currentScreen = Screen.Auth
                 }
             } catch (_: Exception) {
                 val cached = com.pandatern.makco.data.local.CacheManager.getStations(context)
                 if (cached != null) stations = cached
             }
-        }
-    }
-
-    suspend fun refreshToken() {
-        val phone = com.pandatern.makco.data.local.TokenManager.getPhone(context)
-        if (phone != null) {
-            try {
-                val authResp = ApiClient.instance.initiateAuth(
-                    com.pandatern.makco.data.model.AuthRequest(mobileNumber = phone)
-                )
-                if (authResp.isSuccessful && authResp.body() != null) {
-                    // Token refreshed - user needs to re-enter OTP
-                    // For now, clear token and go to auth
-                    token = ""
-                    com.pandatern.makco.data.local.TokenManager.clearToken(context)
-                    currentScreen = com.pandatern.makco.ui.navigation.Screen.Auth
-                }
-            } catch (_: Exception) {}
         }
     }
 
