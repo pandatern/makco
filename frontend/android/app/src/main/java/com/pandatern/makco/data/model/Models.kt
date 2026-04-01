@@ -72,27 +72,21 @@ data class BookingStatus(
     @SerializedName("bookingId") val bookingId: String,
     @SerializedName("status") val status: String,
     @SerializedName("price") val price: Double,
-    @SerializedName("payment") val payment: PaymentOrder?,
-    @SerializedName("tickets") val tickets: List<Any>
+    @SerializedName("payment") val payment: PaymentOrder?
 )
 
 data class PaymentOrder(
-    @SerializedName("paymentOrder") val order: JuspayOrder,
-    @SerializedName("status") val status: String
+    @SerializedName("paymentOrder") val order: JuspayOrder?,
+    @SerializedName("status") val status: String?
 )
 
 data class JuspayOrder(
-    @SerializedName("order_id") val orderId: String,
-    @SerializedName("payment_links") val paymentLinks: PaymentLinks,
-    @SerializedName("sdk_payload") val sdkPayload: SdkPayload?
+    @SerializedName("order_id") val orderId: String?,
+    @SerializedName("payment_links") val paymentLinks: PaymentLinks?
 )
 
 data class PaymentLinks(
     @SerializedName("web") val web: String?
-)
-
-data class SdkPayload(
-    @SerializedName("payload") val payload: Map<String, Any>?
 )
 
 data class UserProfile(
