@@ -113,7 +113,13 @@ fun HomeScreen(
 
         // Recent stations
         val ctx = androidx.compose.ui.platform.LocalContext.current
-        val recentStations = remember { com.pandatern.makco.data.local.CacheManager.getRecentStations(ctx) }
+        var recentStations by remember { mutableStateOf(com.pandatern.makco.data.local.CacheManager.getRecentStations(ctx)) }
+
+        // Reload recent stations every time screen is shown
+        LaunchedEffect(selectedSource, selectedDestination) {
+            recentStations = com.pandatern.makco.data.local.CacheManager.getRecentStations(ctx)
+        }
+
         if (recentStations.isNotEmpty()) {
             Text("RECENT", style = MaterialTheme.typography.labelMedium, color = theme.t4)
             Spacer(modifier = Modifier.height(8.dp))

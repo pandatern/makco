@@ -9,16 +9,17 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.pandatern.makco.data.model.Station
 import com.pandatern.makco.ui.theme.*
 
-private fun getLineColor(code: String): androidx.compose.ui.graphics.Color {
+private fun getLineColor(code: String): Color {
     return when {
         code.contains("|01") -> MetroBlue
         code.contains("|02") -> MetroGreen
-        else -> Text3
+        else -> Color.Gray
     }
 }
 
@@ -36,6 +37,7 @@ fun StationPickerScreen(
     onStationSelected: (Station) -> Unit,
     onBack: () -> Unit
 ) {
+    val theme = LocalThemeManager.current
     var searchQuery by remember { mutableStateOf("") }
 
     val filteredStations = remember(stations, searchQuery) {
@@ -53,14 +55,12 @@ fun StationPickerScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Black)
+            .background(theme.bg)
     ) {
         Spacer(modifier = Modifier.height(16.dp))
 
-        Row(modifier = Modifier.padding(start = 12.dp)) {
-            TextButton(onClick = onBack) {
-                Text("← BACK", style = MaterialTheme.typography.labelLarge, color = White)
-            }
+        TextButton(onClick = onBack, modifier = Modifier.padding(start = 12.dp)) {
+            Text("← BACK", style = MaterialTheme.typography.labelLarge, color = theme.t1)
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -68,7 +68,7 @@ fun StationPickerScreen(
         Text(
             text = "SELECT STATION",
             style = MaterialTheme.typography.labelMedium,
-            color = Text3,
+            color = theme.t3,
             modifier = Modifier.padding(horizontal = 24.dp)
         )
 
@@ -79,28 +79,21 @@ fun StationPickerScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 24.dp)
-                .background(Dark3)
+                .background(theme.bg2)
                 .padding(horizontal = 20.dp, vertical = 4.dp)
         ) {
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
                 modifier = Modifier.fillMaxWidth(),
-                placeholder = {
-                    Text(
-                        "Search stations...",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = Dark5
-                    )
-                },
+                placeholder = { Text("Search stations...", color = theme.t4) },
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = androidx.compose.ui.graphics.Color.Transparent,
-                    unfocusedBorderColor = androidx.compose.ui.graphics.Color.Transparent,
-                    focusedTextColor = White,
-                    unfocusedTextColor = White,
-                    cursorColor = Text3
+                    focusedBorderColor = Color.Transparent,
+                    unfocusedBorderColor = Color.Transparent,
+                    focusedTextColor = theme.t1,
+                    unfocusedTextColor = theme.t1,
+                    cursorColor = theme.t3
                 ),
-                textStyle = MaterialTheme.typography.bodyLarge,
                 singleLine = true
             )
         }
@@ -110,14 +103,14 @@ fun StationPickerScreen(
         // List
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(horizontal = 24.dp)
+            contentPadding = PaddingValues(horizontal = 24.dp, bottom = 100.dp)
         ) {
             grouped.forEach { (line, lineStations) ->
                 // Line header
                 item {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(vertical = 20.dp)
+                        modifier = Modifier.padding(vertical = 16.dp)
                     ) {
                         Box(
                             modifier = Modifier
@@ -127,78 +120,53 @@ fun StationPickerScreen(
                                     when (line) {
                                         "BLUE" -> MetroBlue
                                         "GREEN" -> MetroGreen
-                                        else -> Text3
+                                        else -> Color.Gray
                                     }
                                 )
                         )
                         Spacer(modifier = Modifier.width(12.dp))
                         Text(
                             text = "$line LINE",
-                            style = MaterialTheme.typography.labelSmall.copy(
-                                fontWeight = FontWeight.Bold
-                            ),
+                            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
                             color = when (line) {
                                 "BLUE" -> MetroBlue
                                 "GREEN" -> MetroGreen
-                                else -> Text3
+                                else -> theme.t3
                             }
                         )
                     }
                 }
 
                 items(lineStations) { station ->
-                    StationItem(
-                        station = station,
-                        lineColor = getLineColor(station.code),
-                        onClick = { onStationSelected(station) }
-                    )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { onStationSelected(station) }
+                            .padding(vertical = 14.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(8.dp)
+                                .background(getLineColor(station.code))
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = station.name,
+                                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
+                                color = theme.t1
+                            )
+                            Text(
+                                text = station.code,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = theme.t4
+                            )
+                        }
+                        Text(text = "→", style = MaterialTheme.typography.titleMedium, color = theme.t4)
+                    }
                 }
             }
         }
-    }
-}
-
-@Composable
-fun StationItem(
-    station: Station,
-    lineColor: androidx.compose.ui.graphics.Color,
-    onClick: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(vertical = 14.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        // Line dot
-        Box(
-            modifier = Modifier
-                .size(8.dp)
-                .background(lineColor)
-        )
-
-        Spacer(modifier = Modifier.width(16.dp))
-
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = station.name,
-                style = MaterialTheme.typography.bodyLarge.copy(
-                    fontWeight = FontWeight.Medium
-                ),
-                color = White
-            )
-            Text(
-                text = station.code,
-                style = MaterialTheme.typography.labelSmall,
-                color = Text3
-            )
-        }
-
-        Text(
-            text = "→",
-            style = MaterialTheme.typography.titleMedium,
-            color = Text4
-        )
     }
 }

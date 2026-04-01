@@ -10,52 +10,65 @@
         android:fillColor="#000000"
         android:pathData="M0,0h108v108H0z" />
 
-    <!-- Panda ears -->
+    <!-- Left track line (white) -->
     <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M26,46 A14,14 0 1,1 26.01,46" />
-    <path
-        android:fillColor="#333333"
-        android:pathData="M26,46 A8,8 0 1,1 26.01,46" />
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M82,46 A14,14 0 1,1 82.01,46" />
-    <path
-        android:fillColor="#333333"
-        android:pathData="M82,46 A8,8 0 1,1 82.01,46" />
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="6"
+        android:strokeLineCap="butt"
+        android:pathData="M20,30 L20,78" />
 
-    <!-- Panda face - white circle -->
+    <!-- Right track line (white) -->
     <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M54,58 A30,28 0 1,1 54.01,58" />
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="6"
+        android:strokeLineCap="butt"
+        android:pathData="M88,30 L88,78" />
 
-    <!-- M letter inside face -->
+    <!-- M connector - left diagonal -->
     <path
-        android:fillColor="#000000"
-        android:pathData="M38,72 L38,46 L46,46 L46,60 L54,48 L62,48 L62,60 L70,46 L70,46 L70,72 L62,72 L62,56 L54,66 L46,66 L46,56 L46,72 Z" />
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="6"
+        android:strokeLineCap="butt"
+        android:pathData="M20,30 L54,60" />
 
-    <!-- Panda eyes -->
+    <!-- M connector - right diagonal -->
     <path
-        android:fillColor="#000000"
-        android:pathData="M42,52 A5,5 0 1,1 42.01,52" />
-    <path
-        android:fillColor="#000000"
-        android:pathData="M66,52 A5,5 0 1,1 66.01,52" />
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="6"
+        android:strokeLineCap="butt"
+        android:pathData="M88,30 L54,60" />
 
-    <!-- Metro track line -->
+    <!-- M center connector -->
+    <path
+        android:strokeColor="#4A9EFF"
+        android:strokeWidth="4"
+        android:strokeLineCap="round"
+        android:pathData="M54,60 L54,78" />
+
+    <!-- Blue accent line -->
     <path
         android:strokeColor="#4A9EFF"
         android:strokeWidth="3"
-        android:pathData="M14,88 L94,88" />
+        android:pathData="M20,30 L54,60 L88,30" />
+
+    <!-- Green accent line at bottom -->
     <path
         android:strokeColor="#5CD85C"
         android:strokeWidth="3"
-        android:pathData="M14,94 L94,94" />
+        android:pathData="M14,84 L94,84" />
 
     <!-- Track ties -->
     <path
         android:strokeColor="#444444"
-        android:strokeWidth="1.5"
-        android:pathData="M24,86 L24,96 M38,86 L38,96 M54,86 L54,96 M70,86 L70,96 M84,86 L84,96" />
+        android:strokeWidth="2"
+        android:pathData="M28,82 L28,86 M42,82 L42,86 M54,82 L54,86 M66,82 L66,86 M80,82 L80,86" />
+
+    <!-- Gold dots -->
+    <path
+        android:fillColor="#FFD54F"
+        android:pathData="M20,84 A3,3 0 1,1 20.01,84" />
+    <path
+        android:fillColor="#FFD54F"
+        android:pathData="M88,84 A3,3 0 1,1 88.01,84" />
 
 </vector>

@@ -14,54 +14,46 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.pandatern.makco.ui.theme.*
 
-enum class BottomTab {
-    HOME, TICKETS, PROFILE
-}
+enum class BottomTab { HOME, TICKETS, PROFILE }
 
 @Composable
-fun BottomNavBar(
-    selectedTab: BottomTab,
-    onTabSelected: (BottomTab) -> Unit
-) {
+fun BottomNavBar(selectedTab: BottomTab, onTabSelected: (BottomTab) -> Unit) {
     val theme = LocalThemeManager.current
 
-    Row(
+    // Outer padding to float above bottom
+    Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 32.dp, vertical = 12.dp),
-        horizontalArrangement = Arrangement.Center
+            .padding(start = 24.dp, end = 24.dp, bottom = 16.dp),
+        contentAlignment = Alignment.Center
     ) {
         Row(
             modifier = Modifier
                 .clip(RoundedCornerShape(28.dp))
                 .background(
-                    if (theme.isDark) Color(0x33FFFFFF) else Color(0x55FFFFFF)
+                    // Always visible glass - works in both themes
+                    if (theme.isDark) Color(0x44FFFFFF) else Color(0x99FFFFFF)
                 )
                 .padding(horizontal = 6.dp, vertical = 6.dp),
-            horizontalArrangement = Arrangement.spacedBy(2.dp)
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            BottomTabItem("HOME", selectedTab == BottomTab.HOME, { onTabSelected(BottomTab.HOME) }, theme.isDark)
-            BottomTabItem("TICKETS", selectedTab == BottomTab.TICKETS, { onTabSelected(BottomTab.TICKETS) }, theme.isDark)
-            BottomTabItem("PROFILE", selectedTab == BottomTab.PROFILE, { onTabSelected(BottomTab.PROFILE) }, theme.isDark)
+            TabItem("HOME", selectedTab == BottomTab.HOME, { onTabSelected(BottomTab.HOME) }, theme)
+            TabItem("TICKETS", selectedTab == BottomTab.TICKETS, { onTabSelected(BottomTab.TICKETS) }, theme)
+            TabItem("PROFILE", selectedTab == BottomTab.PROFILE, { onTabSelected(BottomTab.PROFILE) }, theme)
         }
     }
 }
 
 @Composable
-fun BottomTabItem(
-    label: String,
-    isSelected: Boolean,
-    onClick: () -> Unit,
-    isDark: Boolean
-) {
+fun TabItem(label: String, isSelected: Boolean, onClick: () -> Unit, theme: ThemeManager) {
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(22.dp))
             .background(
-                when {
-                    isSelected && isDark -> Color(0x40FFFFFF)
-                    isSelected && !isDark -> Color(0x40000000)
-                    else -> Color.Transparent
+                if (isSelected) {
+                    if (theme.isDark) Color(0x60FFFFFF) else Color(0x60000000)
+                } else {
+                    Color.Transparent
                 }
             )
             .clickable(onClick = onClick)
@@ -74,9 +66,10 @@ fun BottomTabItem(
                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
             ),
             color = when {
-                isSelected && isDark -> Color.White
-                isSelected && !isDark -> Color.Black
-                else -> Color(0xFF888888)
+                isSelected && theme.isDark -> Color.White
+                isSelected && !theme.isDark -> Color.Black
+                theme.isDark -> Color(0xFF888888)
+                else -> Color(0xFF666666)
             }
         )
     }

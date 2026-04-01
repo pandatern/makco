@@ -18,6 +18,7 @@ import kotlinx.coroutines.delay
 fun SplashScreen(
     onFinished: () -> Unit
 ) {
+    val theme = LocalThemeManager.current
     var startAnim by remember { mutableStateOf(false) }
 
     val logoAlpha by animateFloatAsState(
@@ -41,27 +42,21 @@ fun SplashScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Black),
+            .background(theme.bg),
         contentAlignment = Alignment.Center
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = "MAKCO",
-                style = MaterialTheme.typography.displayLarge.copy(
-                    fontWeight = FontWeight.Black
-                ),
-                color = White,
+                style = MaterialTheme.typography.displayLarge.copy(fontWeight = FontWeight.Black),
+                color = theme.t1,
                 modifier = Modifier.alpha(logoAlpha)
             )
-
             Spacer(modifier = Modifier.height(8.dp))
-
             Text(
                 text = "CHENNAI METRO",
                 style = MaterialTheme.typography.labelMedium,
-                color = Text3,
+                color = theme.t4,
                 modifier = Modifier.alpha(subtitleAlpha)
             )
         }
