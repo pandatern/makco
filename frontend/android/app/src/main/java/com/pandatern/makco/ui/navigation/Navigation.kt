@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
+import com.pandatern.makco.data.local.TokenManager
 import com.pandatern.makco.data.model.*
 import com.pandatern.makco.data.remote.ApiClient
 import com.pandatern.makco.ui.screens.*
@@ -115,21 +116,55 @@ fun MakcoNavHost() {
         }
     }
 
+    // Determine start screen from saved state
+    LaunchedEffect(Unit) {
+        val savedToken = TokenManager.getToken(context)
+        val onboardingDone = TokenManager.isOnboardingDone(context)
+
+        if (savedToken != null && savedToken.isNotEmpty()) {
+            // Returning user with token - go straight to home
+            token = savedToken
+            loadMetroData()
+            currentScreen = Screen.Home
+        } else if (onboardingDone) {
+            // Onboarding done but no token - go to auth
+            currentScreen = Screen.Auth
+        }
+        // else: first time - stays on Splash -> Onboarding -> Auth
+    }
+
     when (currentScreen) {
         is Screen.Splash -> {
             SplashScreen(
-                onFinished = { currentScreen = Screen.Onboarding }
+                onFinished = {
+                    val onboardingDone = TokenManager.isOnboardingDone(context)
+                    val savedToken = TokenManager.getToken(context)
+
+                    if (savedToken != null && savedToken.isNotEmpty()) {
+                        token = savedToken
+                        loadMetroData()
+                        currentScreen = Screen.Home
+                    } else if (onboardingDone) {
+                        currentScreen = Screen.Auth
+                    } else {
+                        currentScreen = Screen.Onboarding
+                    }
+                }
             )
         }
         is Screen.Onboarding -> {
             OnboardingScreen(
-                onFinished = { currentScreen = Screen.Auth }
+                onFinished = {
+                    TokenManager.setOnboardingDone(context)
+                    currentScreen = Screen.Auth
+                }
             )
         }
         is Screen.Auth -> {
             AuthScreen(
                 onAuthSuccess = { newToken ->
                     token = newToken
+                    TokenManager.saveToken(context, newToken)
                     loadMetroData()
                     currentScreen = Screen.Home
                 }
@@ -219,6 +254,7 @@ fun MakcoNavHost() {
                 onBack = { currentScreen = Screen.Home },
                 onLogout = {
                     token = ""
+                    TokenManager.clearToken(context)
                     currentScreen = Screen.Auth
                 }
             )

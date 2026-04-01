@@ -12,10 +12,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.pandatern.makco.ui.theme.*
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 data class OnboardingPage(
     val title: String,
@@ -47,6 +46,7 @@ fun OnboardingScreen(
     onFinished: () -> Unit
 ) {
     val pagerState = rememberPagerState(pageCount = { pages.size })
+    val scope = rememberCoroutineScope()
 
     Column(
         modifier = Modifier
@@ -62,19 +62,6 @@ fun OnboardingScreen(
         ) { page ->
             val data = pages[page]
 
-            var visible by remember { mutableStateOf(false) }
-            val alpha by animateFloatAsState(
-                targetValue = if (visible) 1f else 0f,
-                animationSpec = tween(500),
-                label = "pageAlpha"
-            )
-
-            LaunchedEffect(page) {
-                visible = false
-                delay(100)
-                visible = true
-            }
-
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -87,8 +74,7 @@ fun OnboardingScreen(
                     style = MaterialTheme.typography.displayLarge.copy(
                         fontWeight = FontWeight.Black
                     ),
-                    color = White,
-                    modifier = Modifier.alpha(alpha)
+                    color = White
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -96,8 +82,7 @@ fun OnboardingScreen(
                 Text(
                     text = data.subtitle,
                     style = MaterialTheme.typography.labelLarge,
-                    color = MetroBlue,
-                    modifier = Modifier.alpha(alpha)
+                    color = MetroBlue
                 )
 
                 Spacer(modifier = Modifier.height(32.dp))
@@ -105,8 +90,7 @@ fun OnboardingScreen(
                 Text(
                     text = data.description,
                     style = MaterialTheme.typography.bodyLarge,
-                    color = Gray4,
-                    modifier = Modifier.alpha(alpha)
+                    color = Gray4
                 )
             }
         }
@@ -136,7 +120,9 @@ fun OnboardingScreen(
             // Next/Get Started button
             TextButton(onClick = {
                 if (pagerState.currentPage < pages.size - 1) {
-                    // Scroll to next page handled by pager
+                    scope.launch {
+                        pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                    }
                 } else {
                     onFinished()
                 }

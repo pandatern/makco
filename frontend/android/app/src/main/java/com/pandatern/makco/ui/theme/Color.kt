@@ -9,17 +9,17 @@ val Transparent = Color(0x00000000)
 
 // Dark grays - subtle elevation
 val Dark1 = Color(0xFF0A0A0A)
-val Dark2 = Color(0xFF111111)
-val Dark3 = Color(0xFF1A1A1A)
-val Dark4 = Color(0xFF242424)
-val Dark5 = Color(0xFF2E2E2E)
+val Dark2 = Color(0xFF141414)
+val Dark3 = Color(0xFF1E1E1E)
+val Dark4 = Color(0xFF2A2A2A)
+val Dark5 = Color(0xFF383838)
 
-// Light grays
-val Gray1 = Color(0xFF444444)
-val Gray2 = Color(0xFF666666)
-val Gray3 = Color(0xFF888888)
-val Gray4 = Color(0xFFAAAAAA)
-val Gray5 = Color(0xFFCCCCCC)
+// Light grays - high contrast for readability
+val Gray1 = Color(0xFF666666)
+val Gray2 = Color(0xFF888888)
+val Gray3 = Color(0xFFAAAAAA)
+val Gray4 = Color(0xFFCCCCCC)
+val Gray5 = Color(0xFFEEEEEE)
 
 // Metro lines
 val MetroBlue = Color(0xFF2196F3)
