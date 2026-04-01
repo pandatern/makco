@@ -20,6 +20,7 @@ sealed class Screen {
     object DestinationPicker : Screen()
     object Booking : Screen()
     object Payment : Screen()
+    object PaymentWeb : Screen()
     object Profile : Screen()
 }
 
@@ -232,11 +233,7 @@ fun MakcoNavHost() {
                 isLoading = isLoading,
                 error = error,
                 onPayClick = {
-                    val url = bookingStatus?.payment?.order?.paymentLinks?.web
-                    if (url != null) {
-                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-                        context.startActivity(intent)
-                    }
+                    currentScreen = Screen.PaymentWeb
                 },
                 onBack = {
                     currentScreen = Screen.Home
@@ -246,6 +243,27 @@ fun MakcoNavHost() {
                     selectedDestination = null
                     quotes = emptyList()
                 }
+            )
+        }
+        is Screen.PaymentWeb -> {
+            val payUrl = bookingStatus?.payment?.order?.paymentLinks?.web ?: ""
+            PaymentWebView(
+                paymentUrl = payUrl,
+                onPaymentComplete = {
+                    currentScreen = Screen.Payment
+                    // Refresh booking status
+                    scope.launch {
+                        bookingId?.let { id ->
+                            try {
+                                val statusResp = ApiClient.instance.getBookingStatus(token, id)
+                                if (statusResp.isSuccessful) {
+                                    bookingStatus = statusResp.body()
+                                }
+                            } catch (_: Exception) {}
+                        }
+                    }
+                },
+                onBack = { currentScreen = Screen.Payment }
             )
         }
         is Screen.Profile -> {
