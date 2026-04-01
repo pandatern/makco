@@ -119,7 +119,7 @@ fun ProfileScreen(
 
                     ProfileStatRow("RIDES", if (p.hasTakenRide) "YES" else "NONE")
                     ProfileStatRow("STATUS", if (p.isBlocked) "BLOCKED" else "ACTIVE")
-                    ProfileStatRow("REFERRAL", p.customerReferralCode)
+                    ProfileStatRow("REFERRAL", p.customerReferralCode ?: "N/A")
                 }
 
                 Spacer(modifier = Modifier.height(48.dp))
