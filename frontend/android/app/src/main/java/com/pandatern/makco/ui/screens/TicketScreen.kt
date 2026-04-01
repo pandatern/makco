@@ -139,6 +139,42 @@ fun TicketScreen(
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text("Valid for single entry + exit",
                                     style = MaterialTheme.typography.bodySmall, color = theme.t4)
+
+                                Spacer(modifier = Modifier.height(12.dp))
+
+                                // Platform info
+                                Box(modifier = Modifier.fillMaxWidth().background(theme.bg).padding(12.dp)) {
+                                    Column {
+                                        Text("PLATFORM INFO", style = MaterialTheme.typography.labelSmall, color = theme.t4)
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Text("Blue Line: Platform 1", style = MaterialTheme.typography.bodySmall, color = theme.t3)
+                                        Text("Green Line: Platform 2", style = MaterialTheme.typography.bodySmall, color = theme.t3)
+                                    }
+                                }
+
+                                Spacer(modifier = Modifier.height(8.dp))
+
+                                // Timetable
+                                Box(modifier = Modifier.fillMaxWidth().background(theme.bg).padding(12.dp)) {
+                                    Column {
+                                        Text("FIRST / LAST TRAIN", style = MaterialTheme.typography.labelSmall, color = theme.t4)
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Text("First: 05:30 AM", style = MaterialTheme.typography.bodySmall, color = theme.t3)
+                                        Text("Last: 11:00 PM", style = MaterialTheme.typography.bodySmall, color = theme.t3)
+                                    }
+                                }
+
+                                Spacer(modifier = Modifier.height(8.dp))
+
+                                // Walking directions
+                                Box(modifier = Modifier.fillMaxWidth().background(theme.bg).padding(12.dp)) {
+                                    Column {
+                                        Text("AFTER EXIT", style = MaterialTheme.typography.labelSmall, color = theme.t4)
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Text("Follow signs to nearest exit gate", style = MaterialTheme.typography.bodySmall, color = theme.t3)
+                                        Text("Show QR at exit scanner", style = MaterialTheme.typography.bodySmall, color = theme.t3)
+                                    }
+                                }
                             }
                         }
 

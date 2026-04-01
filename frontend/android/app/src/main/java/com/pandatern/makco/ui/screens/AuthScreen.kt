@@ -98,6 +98,8 @@ fun AuthScreen(
                             val resp = ApiClient.instance.initiateAuth(AuthRequest(mobileNumber = phone))
                             if (resp.isSuccessful && resp.body() != null) {
                                 authId = resp.body()!!.authId; attemptsLeft = resp.body()!!.attempts; otpSent = true
+                                com.pandatern.makco.data.local.TokenManager.savePhone(
+                                    androidx.compose.ui.platform.LocalContext.current, phone)
                             } else {
                                 error = when (resp.code()) {
                                     502, 503, 504 -> "SERVER DOWN"
