@@ -27,94 +27,107 @@ fun BookingScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(Black)
-            .padding(horizontal = 24.dp)
     ) {
         Spacer(modifier = Modifier.height(16.dp))
 
-        TextButton(onClick = onBack) {
-            Text("← BACK", style = MaterialTheme.typography.labelLarge, color = White)
+        Row(modifier = Modifier.padding(start = 12.dp)) {
+            TextButton(onClick = onBack) {
+                Text("← BACK", style = MaterialTheme.typography.labelLarge, color = White)
+            }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Route label
-        Text(
-            text = "ROUTE",
-            style = MaterialTheme.typography.labelMedium,
-            color = Gray500
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // From
-        RouteStation(name = fromStation?.name ?: "...", dotColor = GreenLine)
-
-        Box(
+        // Route
+        Column(
             modifier = Modifier
-                .padding(start = 3.dp)
-                .width(1.dp)
-                .height(12.dp)
-                .background(Gray300)
-        )
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp)
+        ) {
+            Text(
+                text = "ROUTE",
+                style = MaterialTheme.typography.labelMedium,
+                color = Gray3
+            )
 
-        // To
-        RouteStation(name = toStation?.name ?: "...", dotColor = BlueLine)
+            Spacer(modifier = Modifier.height(16.dp))
+
+            RouteStation(name = fromStation?.name ?: "...", dotColor = MetroGreen)
+
+            Box(
+                modifier = Modifier
+                    .padding(start = 5.dp)
+                    .width(2.dp)
+                    .height(16.dp)
+                    .background(Dark4)
+            )
+
+            RouteStation(name = toStation?.name ?: "...", dotColor = MetroBlue)
+        }
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Fares label
-        Text(
-            text = "FARES",
-            style = MaterialTheme.typography.labelMedium,
-            color = Gray500
-        )
+        // Fares
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp)
+        ) {
+            Text(
+                text = "FARES",
+                style = MaterialTheme.typography.labelMedium,
+                color = Gray3
+            )
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-        when {
-            isLoading -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 40.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator(color = White, strokeWidth = 2.dp)
-                }
-            }
-            error != null -> {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = "ERROR",
-                        style = MaterialTheme.typography.labelMedium,
-                        color = Error
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = error,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Gray500
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    TextButton(onClick = onRetry) {
-                        Text("RETRY", color = White)
+            when {
+                isLoading -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 40.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(color = White, strokeWidth = 2.dp)
                     }
                 }
-            }
-            quotes.isEmpty() -> {
-                Text(
-                    text = "No fares found",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Gray500
-                )
-            }
-            else -> {
-                quotes.forEach { quote ->
-                    FareRow(quote = quote, onClick = { onConfirm(quote) })
-                    Spacer(modifier = Modifier.height(12.dp))
+                error != null -> {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(Error.copy(alpha = 0.1f))
+                                .padding(16.dp)
+                        ) {
+                            Text(
+                                text = error,
+                                color = Error,
+                                style = MaterialTheme.typography.labelMedium
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        TextButton(onClick = onRetry) {
+                            Text("RETRY", color = White)
+                        }
+                    }
+                }
+                quotes.isEmpty() -> {
+                    Text(
+                        text = "No fares found",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Gray2
+                    )
+                }
+                else -> {
+                    quotes.forEach { quote ->
+                        FareRow(quote = quote, onClick = { onConfirm(quote) })
+                    }
                 }
             }
         }
@@ -126,14 +139,14 @@ fun RouteStation(name: String, dotColor: androidx.compose.ui.graphics.Color) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Box(
             modifier = Modifier
-                .size(8.dp)
+                .size(12.dp)
                 .background(dotColor)
         )
-        Spacer(modifier = Modifier.width(12.dp))
+        Spacer(modifier = Modifier.width(14.dp))
         Text(
             text = name,
-            style = MaterialTheme.typography.bodyLarge.copy(
-                fontWeight = FontWeight.Medium
+            style = MaterialTheme.typography.titleMedium.copy(
+                fontWeight = FontWeight.SemiBold
             ),
             color = White
         )
@@ -143,8 +156,8 @@ fun RouteStation(name: String, dotColor: androidx.compose.ui.graphics.Color) {
 @Composable
 fun FareRow(quote: Quote, onClick: () -> Unit) {
     val label = when (quote.type) {
-        "SingleJourney" -> "SINGLE"
-        "ReturnJourney" -> "RETURN"
+        "SingleJourney" -> "SINGLE JOURNEY"
+        "ReturnJourney" -> "RETURN JOURNEY"
         else -> quote.type
     }
 
@@ -152,7 +165,8 @@ fun FareRow(quote: Quote, onClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .padding(vertical = 16.dp),
+            .background(Dark3)
+            .padding(20.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -167,7 +181,7 @@ fun FareRow(quote: Quote, onClick: () -> Unit) {
             Text(
                 text = "ADULT × 1",
                 style = MaterialTheme.typography.bodySmall,
-                color = Gray500
+                color = Gray2
             )
         }
 
@@ -180,10 +194,5 @@ fun FareRow(quote: Quote, onClick: () -> Unit) {
         )
     }
 
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(1.dp)
-            .background(Gray200)
-    )
+    Spacer(modifier = Modifier.height(8.dp))
 }

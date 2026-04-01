@@ -11,12 +11,15 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 sealed class Screen {
+    object Splash : Screen()
+    object Onboarding : Screen()
     object Auth : Screen()
     object Home : Screen()
     object SourcePicker : Screen()
     object DestinationPicker : Screen()
     object Booking : Screen()
     object Payment : Screen()
+    object Profile : Screen()
 }
 
 @Composable
@@ -24,7 +27,7 @@ fun MakcoNavHost() {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
-    var currentScreen by remember { mutableStateOf<Screen>(Screen.Auth) }
+    var currentScreen by remember { mutableStateOf<Screen>(Screen.Splash) }
     var token by remember { mutableStateOf("") }
 
     var stations by remember { mutableStateOf<List<Station>>(emptyList()) }
@@ -113,6 +116,16 @@ fun MakcoNavHost() {
     }
 
     when (currentScreen) {
+        is Screen.Splash -> {
+            SplashScreen(
+                onFinished = { currentScreen = Screen.Onboarding }
+            )
+        }
+        is Screen.Onboarding -> {
+            OnboardingScreen(
+                onFinished = { currentScreen = Screen.Auth }
+            )
+        }
         is Screen.Auth -> {
             AuthScreen(
                 onAuthSuccess = { newToken ->
@@ -133,6 +146,9 @@ fun MakcoNavHost() {
                 onSearchClick = {
                     currentScreen = Screen.Booking
                     startSearch()
+                },
+                onProfileClick = {
+                    currentScreen = Screen.Profile
                 }
             )
         }
@@ -194,6 +210,16 @@ fun MakcoNavHost() {
                     selectedSource = null
                     selectedDestination = null
                     quotes = emptyList()
+                }
+            )
+        }
+        is Screen.Profile -> {
+            ProfileScreen(
+                token = token,
+                onBack = { currentScreen = Screen.Home },
+                onLogout = {
+                    token = ""
+                    currentScreen = Screen.Auth
                 }
             )
         }

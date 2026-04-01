@@ -24,15 +24,16 @@ fun PaymentScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(Black)
-            .padding(horizontal = 24.dp)
     ) {
         Spacer(modifier = Modifier.height(16.dp))
 
-        TextButton(onClick = onBack) {
-            Text("← BACK", style = MaterialTheme.typography.labelLarge, color = White)
+        Row(modifier = Modifier.padding(start = 12.dp)) {
+            TextButton(onClick = onBack) {
+                Text("← BACK", style = MaterialTheme.typography.labelLarge, color = White)
+            }
         }
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
         when {
             isLoading -> {
@@ -44,132 +45,129 @@ fun PaymentScreen(
                 }
             }
             error != null -> {
-                Text(text = "ERROR", style = MaterialTheme.typography.labelMedium, color = Error)
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(text = error, style = MaterialTheme.typography.bodySmall, color = Gray500)
-            }
-            bookingStatus != null -> {
-                // Booking ID
-                Text(
-                    text = "BOOKING",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = Gray500
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = bookingStatus.bookingId.take(8).uppercase(),
-                    style = MaterialTheme.typography.headlineMedium.copy(
-                        fontFamily = FontFamily.Monospace,
-                        fontWeight = FontWeight.Bold
-                    ),
-                    color = White
-                )
-
-                Spacer(modifier = Modifier.height(32.dp))
-
-                // Status
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 12.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "STATUS",
-                        style = MaterialTheme.typography.labelMedium,
-                        color = Gray500
-                    )
-                    Text(
-                        text = bookingStatus.status,
-                        style = MaterialTheme.typography.labelLarge.copy(
-                            fontWeight = FontWeight.Bold
-                        ),
-                        color = when (bookingStatus.status) {
-                            "PAYMENT_PENDING" -> White
-                            "CONFIRMED" -> GreenLine
-                            else -> Gray500
-                        }
-                    )
-                }
-
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(1.dp)
-                        .background(Gray200)
-                )
-
-                // Amount
-                Row(
+                        .padding(horizontal = 24.dp)
+                        .background(Error.copy(alpha = 0.1f))
+                        .padding(16.dp)
+                ) {
+                    Text(text = error, color = Error, style = MaterialTheme.typography.labelMedium)
+                }
+            }
+            bookingStatus != null -> {
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 12.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                        .padding(horizontal = 24.dp)
                 ) {
+                    // Booking ID
                     Text(
-                        text = "AMOUNT",
+                        text = "BOOKING",
                         style = MaterialTheme.typography.labelMedium,
-                        color = Gray500
+                        color = Gray3
                     )
+                    Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "₹${bookingStatus.price.toInt()}",
-                        style = MaterialTheme.typography.headlineMedium.copy(
+                        text = bookingStatus.bookingId.take(8).uppercase(),
+                        style = MaterialTheme.typography.headlineLarge.copy(
+                            fontFamily = FontFamily.Monospace,
                             fontWeight = FontWeight.Bold
                         ),
                         color = White
                     )
-                }
 
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(1.dp)
-                        .background(Gray200)
-                )
+                    Spacer(modifier = Modifier.height(40.dp))
 
-                Spacer(modifier = Modifier.height(40.dp))
-
-                // Pay button or confirmed state
-                if (bookingStatus.status == "PAYMENT_PENDING") {
-                    Button(
-                        onClick = onPayClick,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(52.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = White,
-                            contentColor = Black
-                        )
-                    ) {
-                        Text(
-                            text = "PAY ₹${bookingStatus.price.toInt()}",
-                            style = MaterialTheme.typography.labelLarge.copy(
-                                fontWeight = FontWeight.Bold
-                            )
-                        )
-                    }
+                    // Status
+                    PaymentDetailRow(
+                        label = "STATUS",
+                        value = bookingStatus.status,
+                        valueColor = when (bookingStatus.status) {
+                            "PAYMENT_PENDING" -> MetroInterchange
+                            "CONFIRMED" -> Success
+                            else -> White
+                        }
+                    )
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    Text(
-                        text = "OPENS JUSPAY",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Gray500
+                    // Amount
+                    PaymentDetailRow(
+                        label = "AMOUNT",
+                        value = "₹${bookingStatus.price.toInt()}",
+                        valueColor = White
                     )
-                }
 
-                if (bookingStatus.status == "CONFIRMED") {
-                    Text(
-                        text = "✓ PAID",
-                        style = MaterialTheme.typography.headlineMedium.copy(
-                            fontWeight = FontWeight.Bold
-                        ),
-                        color = GreenLine
-                    )
+                    Spacer(modifier = Modifier.height(48.dp))
+
+                    // Pay button
+                    if (bookingStatus.status == "PAYMENT_PENDING") {
+                        Button(
+                            onClick = onPayClick,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(56.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = White,
+                                contentColor = Black
+                            )
+                        ) {
+                            Text(
+                                text = "PAY ₹${bookingStatus.price.toInt()}",
+                                style = MaterialTheme.typography.labelLarge.copy(
+                                    fontWeight = FontWeight.Bold
+                                )
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        Text(
+                            text = "OPENS JUSPAY PAYMENT",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Gray2
+                        )
+                    }
+
+                    if (bookingStatus.status == "CONFIRMED") {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(Success.copy(alpha = 0.1f))
+                                .padding(20.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "✓ PAID",
+                                style = MaterialTheme.typography.headlineMedium.copy(
+                                    fontWeight = FontWeight.Bold
+                                ),
+                                color = Success
+                            )
+                        }
+                    }
                 }
             }
         }
+    }
+}
+
+@Composable
+fun PaymentDetailRow(label: String, value: String, valueColor: androidx.compose.ui.graphics.Color) {
+    Column {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelSmall,
+            color = Gray2
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = value,
+            style = MaterialTheme.typography.titleLarge.copy(
+                fontWeight = FontWeight.SemiBold
+            ),
+            color = valueColor
+        )
     }
 }

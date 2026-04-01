@@ -2,22 +2,21 @@ package com.pandatern.makco.ui.theme
 
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
 
 private val DarkColorScheme = darkColorScheme(
     primary = White,
     onPrimary = Black,
-    primaryContainer = Gray300,
+    primaryContainer = Dark4,
     onPrimaryContainer = White,
-    secondary = Gray600,
+    secondary = Gray3,
     onSecondary = Black,
     background = Black,
     onBackground = White,
-    surface = Gray100,
+    surface = Dark2,
     onSurface = White,
-    surfaceVariant = Gray200,
-    onSurfaceVariant = Gray700,
-    outline = Gray400,
+    surfaceVariant = Dark3,
+    onSurfaceVariant = Gray4,
+    outline = Dark5,
     error = Error,
     onError = White
 )
