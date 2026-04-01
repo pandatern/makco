@@ -1,3 +1,4 @@
+import androidx.compose.ui.graphics.Color
 package com.pandatern.makco.ui.screens
 
 import android.annotation.SuppressLint
