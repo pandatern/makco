@@ -99,7 +99,9 @@ data class UserProfile(
     @SerializedName("id") val id: String,
     @SerializedName("maskedMobileNumber") val maskedMobileNumber: String,
     @SerializedName("firstName") val firstName: String?,
-    @SerializedName("hasTakenRide") val hasTakenRide: Boolean
+    @SerializedName("hasTakenRide") val hasTakenRide: Boolean,
+    @SerializedName("isBlocked") val isBlocked: Boolean = false,
+    @SerializedName("customerReferralCode") val customerReferralCode: String? = null
 )
 
 data class AuthRequest(
