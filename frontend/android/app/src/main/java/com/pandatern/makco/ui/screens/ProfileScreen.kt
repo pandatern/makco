@@ -1,17 +1,14 @@
 package com.pandatern.makco.ui.screens
 
-import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.pandatern.makco.data.model.*
 import com.pandatern.makco.data.remote.ApiClient
 import com.pandatern.makco.ui.theme.*
@@ -24,7 +21,6 @@ fun ProfileScreen(
 ) {
     var profile by remember { mutableStateOf<UserProfile?>(null) }
     var isLoading by remember { mutableStateOf(true) }
-    val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
@@ -81,39 +77,31 @@ fun ProfileScreen(
                         color = Text2
                     )
                 }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = if (p.hasTakenRide) "HAS TRAVELLED" : "NO RIDES YET",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = if (p.hasTakenRide) Success else Text4
+                )
             }
 
             Spacer(modifier = Modifier.height(40.dp))
 
-            // Menu items
-            ProfileMenuItem(
-                label = "My Tickets",
-                onClick = { /* handled by nav */ }
+            // Info
+            Text(
+                text = "INFO",
+                style = MaterialTheme.typography.labelMedium,
+                color = Text4
             )
 
-            ProfileMenuItem(
-                label = "Support",
-                onClick = {
-                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://pandatern.tech"))
-                    context.startActivity(intent)
-                }
-            )
+            Spacer(modifier = Modifier.height(16.dp))
 
-            ProfileMenuItem(
-                label = "Terms & Conditions",
-                onClick = {
-                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://pandatern.tech/terms"))
-                    context.startActivity(intent)
-                }
-            )
-
-            ProfileMenuItem(
-                label = "Privacy Policy",
-                onClick = {
-                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://pandatern.tech/privacy"))
-                    context.startActivity(intent)
-                }
-            )
+            ProfileItem("VERSION", "1.0.0")
+            ProfileItem("NETWORK", "CHENNAI METRO")
+            ProfileItem("LINES", "BLUE & GREEN")
+            ProfileItem("STATIONS", "41")
 
             Spacer(modifier = Modifier.weight(1f))
 
@@ -121,46 +109,70 @@ fun ProfileScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { onLogout() }
                     .padding(vertical = 16.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = "LOGOUT",
-                    style = MaterialTheme.typography.labelLarge,
-                    color = Error
-                )
+                TextButton(onClick = onLogout) {
+                    Text(
+                        text = "LOGOUT",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = Error
+                    )
+                }
             }
 
-            Spacer(modifier = Modifier.height(100.dp))
+            // Footer
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 100.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "MAKCO",
+                    style = MaterialTheme.typography.labelLarge.copy(
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp
+                    ),
+                    color = Text3
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "BUILT BY PANDATERN",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Text4
+                )
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = "MADE FOR CMRL",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Text4
+                )
+            }
         }
     }
 }
 
 @Composable
-fun ProfileMenuItem(
-    label: String,
-    onClick: () -> Unit
-) {
+fun ProfileItem(label: String, value: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(vertical = 18.dp),
+            .padding(vertical = 12.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
             text = label,
+            style = MaterialTheme.typography.labelMedium,
+            color = Text4
+        )
+        Text(
+            text = value,
             style = MaterialTheme.typography.bodyLarge.copy(
                 fontWeight = FontWeight.Medium
             ),
             color = Text2
-        )
-        Text(
-            text = "→",
-            style = MaterialTheme.typography.titleMedium,
-            color = Text4
         )
     }
 

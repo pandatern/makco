@@ -3,6 +3,7 @@ package com.pandatern.makco.ui.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -93,7 +94,7 @@ fun HomeScreen(
                 disabledContainerColor = Dark4,
                 disabledContentColor = Dark5
             ),
-            shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp)
+            shape = RoundedCornerShape(12.dp)
         ) {
             Text(
                 text = "SEARCH FARES",
@@ -102,6 +103,47 @@ fun HomeScreen(
                 )
             )
         }
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        // Quick info cards
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            InfoCard(
+                modifier = Modifier.weight(1f),
+                label = "STATIONS",
+                value = "${stations.size}"
+            )
+            InfoCard(
+                modifier = Modifier.weight(1f),
+                label = "LINES",
+                value = "2"
+            )
+            InfoCard(
+                modifier = Modifier.weight(1f),
+                label = "MAX FARE",
+                value = "₹60"
+            )
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Popular routes
+        Text(
+            text = "POPULAR ROUTES",
+            style = MaterialTheme.typography.labelMedium,
+            color = Text4
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        PopularRoute("CHENNAI CENTRAL", "AIRPORT", "32")
+        Spacer(modifier = Modifier.height(8.dp))
+        PopularRoute("GOVINDAPURAM", "ST. THOMAS MOUNT", "40")
+        Spacer(modifier = Modifier.height(8.dp))
+        PopularRoute("AG-DMS", "VADAPALANI", "20")
 
         Spacer(modifier = Modifier.weight(1f))
 
@@ -120,9 +162,68 @@ fun HomeScreen(
             Box(modifier = Modifier.size(6.dp).background(MetroGreen))
             Spacer(modifier = Modifier.width(6.dp))
             Text("GREEN", style = MaterialTheme.typography.labelSmall, color = Text4)
-            Spacer(modifier = Modifier.width(16.dp))
-            Text("${stations.size} STATIONS", style = MaterialTheme.typography.labelSmall, color = Text4)
         }
+    }
+}
+
+@Composable
+fun InfoCard(
+    modifier: Modifier = Modifier,
+    label: String,
+    value: String
+) {
+    Column(
+        modifier = modifier
+            .background(Dark3)
+            .padding(16.dp)
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelSmall,
+            color = Text4
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = value,
+            style = MaterialTheme.typography.headlineMedium.copy(
+                fontWeight = FontWeight.Bold
+            ),
+            color = Text1
+        )
+    }
+}
+
+@Composable
+fun PopularRoute(from: String, to: String, fare: String) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Dark3)
+            .padding(14.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = from,
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    fontWeight = FontWeight.Medium
+                ),
+                color = Text2
+            )
+            Text(
+                text = "→ $to",
+                style = MaterialTheme.typography.bodyMedium,
+                color = Text3
+            )
+        }
+        Text(
+            text = fare,
+            style = MaterialTheme.typography.titleMedium.copy(
+                fontWeight = FontWeight.Bold
+            ),
+            color = Text1
+        )
     }
 }
 
