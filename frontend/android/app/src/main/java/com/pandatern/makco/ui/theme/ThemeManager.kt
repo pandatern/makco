@@ -2,9 +2,9 @@ package com.pandatern.makco.ui.theme
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.content.res.Configuration
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 
 enum class AppTheme { DARK, LIGHT }
 
@@ -12,12 +12,18 @@ val LocalThemeManager = compositionLocalOf<ThemeManager> { error("No ThemeManage
 
 class ThemeManager(context: Context) {
     private val prefs: SharedPreferences = context.getSharedPreferences("makco_prefs", Context.MODE_PRIVATE)
+    private val deviceDark = (context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
 
     var currentTheme by mutableStateOf(loadTheme())
         private set
 
     private fun loadTheme(): AppTheme {
-        return if (prefs.getString("app_theme", null) == "LIGHT") AppTheme.LIGHT else AppTheme.DARK
+        val saved = prefs.getString("app_theme", null)
+        return when (saved) {
+            "LIGHT" -> AppTheme.LIGHT
+            "DARK" -> AppTheme.DARK
+            else -> if (deviceDark) AppTheme.DARK else AppTheme.LIGHT
+        }
     }
 
     fun toggle() {
@@ -27,7 +33,7 @@ class ThemeManager(context: Context) {
 
     val isDark get() = currentTheme == AppTheme.DARK
 
-    val bg get() = if (isDark) Color(0xFF000000) else Color(0xFFF5F5F5)
+    val bg get() = if (isDark) Color.Black else Color(0xFFF5F5F5)
     val bg2 get() = if (isDark) Color(0xFF141414) else Color(0xFFEBEBEB)
     val bg3 get() = if (isDark) Color(0xFF1C1C1C) else Color(0xFFE0E0E0)
     val bg4 get() = if (isDark) Color(0xFF282828) else Color(0xFFD0D0D0)

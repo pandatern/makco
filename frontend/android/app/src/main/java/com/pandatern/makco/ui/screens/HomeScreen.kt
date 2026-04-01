@@ -21,10 +21,12 @@ fun HomeScreen(
     onStationClick: (isSource: Boolean) -> Unit,
     onSearchClick: () -> Unit
 ) {
+    val theme = LocalThemeManager.current
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Black)
+            .background(theme.bg)
             .padding(horizontal = 24.dp)
     ) {
         Spacer(modifier = Modifier.height(56.dp))
@@ -34,7 +36,7 @@ fun HomeScreen(
             style = MaterialTheme.typography.headlineLarge.copy(
                 fontWeight = FontWeight.Black
             ),
-            color = Text1
+            color = theme.t1
         )
 
         Spacer(modifier = Modifier.height(4.dp))
@@ -42,15 +44,15 @@ fun HomeScreen(
         Text(
             text = "CHENNAI METRO",
             style = MaterialTheme.typography.labelMedium,
-            color = Text4
+            color = theme.t4
         )
 
-        Spacer(modifier = Modifier.height(40.dp))
+        Spacer(modifier = Modifier.height(48.dp))
 
         Text(
             text = "WHERE TO?",
             style = MaterialTheme.typography.labelMedium,
-            color = Text3
+            color = theme.t3
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -60,7 +62,8 @@ fun HomeScreen(
             label = "FROM",
             station = selectedSource,
             dotColor = MetroGreen,
-            onClick = { onStationClick(true) }
+            onClick = { onStationClick(true) },
+            theme = theme
         )
 
         // Connector
@@ -69,7 +72,7 @@ fun HomeScreen(
                 .padding(start = 16.dp)
                 .width(2.dp)
                 .height(14.dp)
-                .background(Dark5)
+                .background(theme.divider)
         )
 
         // To
@@ -77,7 +80,8 @@ fun HomeScreen(
             label = "TO",
             station = selectedDestination,
             dotColor = MetroBlue,
-            onClick = { onStationClick(false) }
+            onClick = { onStationClick(false) },
+            theme = theme
         )
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -89,10 +93,10 @@ fun HomeScreen(
                 .fillMaxWidth()
                 .height(54.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = White,
-                contentColor = Black,
-                disabledContainerColor = Dark4,
-                disabledContentColor = Dark5
+                containerColor = if (theme.isDark) Color.White else Color.Black,
+                contentColor = if (theme.isDark) Color.Black else Color.White,
+                disabledContainerColor = theme.bg3,
+                disabledContentColor = theme.t4
             ),
             shape = RoundedCornerShape(12.dp)
         ) {
@@ -104,126 +108,7 @@ fun HomeScreen(
             )
         }
 
-        Spacer(modifier = Modifier.height(32.dp))
-
-        // Quick info cards
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            InfoCard(
-                modifier = Modifier.weight(1f),
-                label = "STATIONS",
-                value = "${stations.size}"
-            )
-            InfoCard(
-                modifier = Modifier.weight(1f),
-                label = "LINES",
-                value = "2"
-            )
-            InfoCard(
-                modifier = Modifier.weight(1f),
-                label = "MAX FARE",
-                value = "₹60"
-            )
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // Popular routes
-        Text(
-            text = "POPULAR ROUTES",
-            style = MaterialTheme.typography.labelMedium,
-            color = Text4
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        PopularRoute("CHENNAI CENTRAL", "AIRPORT", "32")
-        Spacer(modifier = Modifier.height(8.dp))
-        PopularRoute("GOVINDAPURAM", "ST. THOMAS MOUNT", "40")
-        Spacer(modifier = Modifier.height(8.dp))
-        PopularRoute("AG-DMS", "VADAPALANI", "20")
-
         Spacer(modifier = Modifier.weight(1f))
-
-        // Lines info
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 100.dp),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(modifier = Modifier.size(6.dp).background(MetroBlue))
-            Spacer(modifier = Modifier.width(6.dp))
-            Text("BLUE", style = MaterialTheme.typography.labelSmall, color = Text4)
-            Spacer(modifier = Modifier.width(16.dp))
-            Box(modifier = Modifier.size(6.dp).background(MetroGreen))
-            Spacer(modifier = Modifier.width(6.dp))
-            Text("GREEN", style = MaterialTheme.typography.labelSmall, color = Text4)
-        }
-    }
-}
-
-@Composable
-fun InfoCard(
-    modifier: Modifier = Modifier,
-    label: String,
-    value: String
-) {
-    Column(
-        modifier = modifier
-            .background(Dark3)
-            .padding(16.dp)
-    ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelSmall,
-            color = Text4
-        )
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(
-            text = value,
-            style = MaterialTheme.typography.headlineMedium.copy(
-                fontWeight = FontWeight.Bold
-            ),
-            color = Text1
-        )
-    }
-}
-
-@Composable
-fun PopularRoute(from: String, to: String, fare: String) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Dark3)
-            .padding(14.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = from,
-                style = MaterialTheme.typography.bodyLarge.copy(
-                    fontWeight = FontWeight.Medium
-                ),
-                color = Text2
-            )
-            Text(
-                text = "→ $to",
-                style = MaterialTheme.typography.bodyMedium,
-                color = Text3
-            )
-        }
-        Text(
-            text = fare,
-            style = MaterialTheme.typography.titleMedium.copy(
-                fontWeight = FontWeight.Bold
-            ),
-            color = Text1
-        )
     }
 }
 
@@ -232,13 +117,14 @@ fun StationSlot(
     label: String,
     station: Station?,
     dotColor: androidx.compose.ui.graphics.Color,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    theme: ThemeManager
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .background(Dark3)
+            .background(theme.bg2)
             .padding(18.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -250,7 +136,7 @@ fun StationSlot(
             Text(
                 text = label,
                 style = MaterialTheme.typography.labelSmall,
-                color = Text4
+                color = theme.t4
             )
             Spacer(modifier = Modifier.height(2.dp))
             Text(
@@ -258,9 +144,9 @@ fun StationSlot(
                 style = MaterialTheme.typography.bodyLarge.copy(
                     fontWeight = if (station != null) FontWeight.SemiBold else FontWeight.Normal
                 ),
-                color = if (station != null) Text1 else Text4
+                color = if (station != null) theme.t1 else theme.t4
             )
         }
-        Text(text = "→", style = MaterialTheme.typography.titleMedium, color = Text4)
+        Text(text = "→", style = MaterialTheme.typography.titleMedium, color = theme.t4)
     }
 }
