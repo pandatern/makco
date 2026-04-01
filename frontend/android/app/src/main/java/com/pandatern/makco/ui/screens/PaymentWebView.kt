@@ -14,7 +14,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.compose.ui.viewinterop.AndroidView
 import com.pandatern.makco.ui.theme.*
 
 enum class PaymentState {
@@ -31,7 +30,6 @@ fun PaymentWebView(
     var state by remember { mutableStateOf(PaymentState.LOADING) }
     var errorMsg by remember { mutableStateOf<String?>(null) }
     var webViewRef by remember { mutableStateOf<WebView?>(null) }
-    val theme = LocalThemeManager.current
 
     Column(
         modifier = Modifier

@@ -1,6 +1,5 @@
 package com.pandatern.makco.ui.screens
 
-import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
@@ -8,7 +7,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -21,6 +20,8 @@ import kotlinx.coroutines.launch
 fun AuthScreen(
     onAuthSuccess: (token: String) -> Unit
 ) {
+    val theme = LocalThemeManager.current
+
     var phone by remember { mutableStateOf("") }
     var otp by remember { mutableStateOf("") }
     var authId by remember { mutableStateOf<String?>(null) }
@@ -31,37 +32,25 @@ fun AuthScreen(
 
     val scope = rememberCoroutineScope()
 
-    // Subtle breathing animation for the logo
-    val infiniteTransition = rememberInfiniteTransition(label = "breath")
-    val logoGlow by infiniteTransition.animateFloat(
-        initialValue = 0.7f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(2000, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "logoGlow"
-    )
-
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Black)
+            .background(theme.bg)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 28.dp)
-                .padding(bottom = 48.dp),
+                .padding(horizontal = 28.dp),
             horizontalAlignment = Alignment.Start
         ) {
             Spacer(modifier = Modifier.weight(0.3f))
 
-            // Logo with subtle glow
             Text(
                 text = "MAKCO",
-                style = MaterialTheme.typography.displayLarge,
-                color = White.copy(alpha = logoGlow)
+                style = MaterialTheme.typography.displayLarge.copy(
+                    fontWeight = FontWeight.Black
+                ),
+                color = theme.t1
             )
 
             Spacer(modifier = Modifier.height(6.dp))
@@ -69,71 +58,59 @@ fun AuthScreen(
             Text(
                 text = "CHENNAI METRO",
                 style = MaterialTheme.typography.labelMedium,
-                color = Text3
+                color = theme.t4
             )
 
             Spacer(modifier = Modifier.weight(0.2f))
 
             if (!otpSent) {
-                // Phone step
                 Text(
                     text = "ENTER YOUR PHONE",
                     style = MaterialTheme.typography.labelMedium,
-                    color = Text3
+                    color = theme.t3
                 )
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                // Phone field with country code integrated
-                Box(
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(Dark3)
-                        .padding(horizontal = 20.dp, vertical = 4.dp)
+                        .background(theme.bg2)
+                        .padding(horizontal = 20.dp, vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(
-                            text = "+91",
-                            style = MaterialTheme.typography.titleLarge.copy(
-                                fontWeight = FontWeight.Medium
-                            ),
-                            color = Text2
-                        )
+                    Text(
+                        text = "+91",
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            fontWeight = FontWeight.Medium
+                        ),
+                        color = theme.t3
+                    )
 
-                        Spacer(modifier = Modifier.width(16.dp))
+                    Spacer(modifier = Modifier.width(16.dp))
 
-                        OutlinedTextField(
-                            value = phone,
-                            onValueChange = {
-                                if (it.length <= 10 && it.all { c -> c.isDigit() }) {
-                                    phone = it
-                                    error = null
-                                }
-                            },
-                            modifier = Modifier.fillMaxWidth(),
-                            placeholder = {
-                                Text(
-                                    "9876543210",
-                                    style = MaterialTheme.typography.titleLarge,
-                                    color = Dark5
-                                )
-                            },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = androidx.compose.ui.graphics.Color.Transparent,
-                                unfocusedBorderColor = androidx.compose.ui.graphics.Color.Transparent,
-                                focusedTextColor = White,
-                                unfocusedTextColor = White,
-                                cursorColor = Text3
-                            ),
-                            textStyle = MaterialTheme.typography.titleLarge,
-                            singleLine = true,
-                            enabled = !isLoading
-                        )
-                    }
+                    OutlinedTextField(
+                        value = phone,
+                        onValueChange = {
+                            if (it.length <= 10 && it.all { c -> c.isDigit() }) {
+                                phone = it
+                                error = null
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        placeholder = { Text("9876543210", color = theme.t4) },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Color.Transparent,
+                            unfocusedBorderColor = Color.Transparent,
+                            focusedTextColor = theme.t1,
+                            unfocusedTextColor = theme.t1,
+                            cursorColor = theme.t3
+                        ),
+                        textStyle = MaterialTheme.typography.titleLarge,
+                        singleLine = true,
+                        enabled = !isLoading
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(32.dp))
@@ -159,41 +136,29 @@ fun AuthScreen(
                                     error = "FAILED"
                                 }
                             } catch (e: Exception) {
-                                error = "ERR: ${e.message ?: e.javaClass.simpleName}"
+                                error = "ERR: ${e.message}"
                             }
                             isLoading = false
                         }
                     },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp),
+                    modifier = Modifier.fillMaxWidth().height(56.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = White,
-                        contentColor = Black
+                        containerColor = if (theme.isDark) Color.White else Color.Black,
+                        contentColor = if (theme.isDark) Color.Black else Color.White
                     ),
                     enabled = !isLoading
                 ) {
                     if (isLoading) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(22.dp),
-                            color = Black,
-                            strokeWidth = 2.dp
-                        )
+                        CircularProgressIndicator(modifier = Modifier.size(22.dp), color = theme.bg, strokeWidth = 2.dp)
                     } else {
-                        Text(
-                            text = "CONTINUE",
-                            style = MaterialTheme.typography.labelLarge.copy(
-                                fontWeight = FontWeight.Bold
-                            )
-                        )
+                        Text("CONTINUE", style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold))
                     }
                 }
             } else {
-                // OTP step
                 Text(
                     text = "ENTER OTP",
                     style = MaterialTheme.typography.labelMedium,
-                    color = Text3
+                    color = theme.t3
                 )
 
                 Spacer(modifier = Modifier.height(6.dp))
@@ -201,7 +166,7 @@ fun AuthScreen(
                 Text(
                     text = "Sent to +91 $phone",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Text3
+                    color = theme.t4
                 )
 
                 Spacer(modifier = Modifier.height(20.dp))
@@ -209,7 +174,7 @@ fun AuthScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(Dark3)
+                        .background(theme.bg2)
                         .padding(horizontal = 20.dp, vertical = 4.dp)
                 ) {
                     OutlinedTextField(
@@ -221,24 +186,16 @@ fun AuthScreen(
                             }
                         },
                         modifier = Modifier.fillMaxWidth(),
-                        placeholder = {
-                            Text(
-                                "4 DIGITS",
-                                style = MaterialTheme.typography.headlineMedium,
-                                color = Dark5
-                            )
-                        },
+                        placeholder = { Text("4 DIGITS", color = theme.t4) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = androidx.compose.ui.graphics.Color.Transparent,
-                            unfocusedBorderColor = androidx.compose.ui.graphics.Color.Transparent,
-                            focusedTextColor = White,
-                            unfocusedTextColor = White,
-                            cursorColor = Text3
+                            focusedBorderColor = Color.Transparent,
+                            unfocusedBorderColor = Color.Transparent,
+                            focusedTextColor = theme.t1,
+                            unfocusedTextColor = theme.t1,
+                            cursorColor = theme.t3
                         ),
-                        textStyle = MaterialTheme.typography.headlineMedium.copy(
-                            fontWeight = FontWeight.Bold
-                        ),
+                        textStyle = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
                         singleLine = true,
                         enabled = !isLoading
                     )
@@ -249,7 +206,7 @@ fun AuthScreen(
                 Text(
                     text = "$attemptsLeft ATTEMPTS REMAINING",
                     style = MaterialTheme.typography.labelSmall,
-                    color = if (attemptsLeft <= 1) Error else Text3
+                    color = if (attemptsLeft <= 1) Error else theme.t4
                 )
 
                 Spacer(modifier = Modifier.height(32.dp))
@@ -281,68 +238,38 @@ fun AuthScreen(
                                     }
                                 }
                             } catch (e: Exception) {
-                                error = "ERR: ${e.message ?: e.javaClass.simpleName}"
+                                error = "ERR: ${e.message}"
                             }
                             isLoading = false
                         }
                     },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp),
+                    modifier = Modifier.fillMaxWidth().height(56.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = White,
-                        contentColor = Black
+                        containerColor = if (theme.isDark) Color.White else Color.Black,
+                        contentColor = if (theme.isDark) Color.Black else Color.White
                     ),
                     enabled = !isLoading
                 ) {
                     if (isLoading) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(22.dp),
-                            color = Black,
-                            strokeWidth = 2.dp
-                        )
+                        CircularProgressIndicator(modifier = Modifier.size(22.dp), color = theme.bg, strokeWidth = 2.dp)
                     } else {
-                        Text(
-                            text = "VERIFY",
-                            style = MaterialTheme.typography.labelLarge.copy(
-                                fontWeight = FontWeight.Bold
-                            )
-                        )
+                        Text("VERIFY", style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold))
                     }
                 }
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                TextButton(
-                    onClick = {
-                        otpSent = false
-                        otp = ""
-                        authId = null
-                        error = null
-                    }
-                ) {
-                    Text(
-                        text = "WRONG NUMBER?",
-                        style = MaterialTheme.typography.labelMedium,
-                        color = Text3
-                    )
+                TextButton(onClick = { otpSent = false; otp = ""; authId = null; error = null }) {
+                    Text("WRONG NUMBER?", style = MaterialTheme.typography.labelMedium, color = theme.t4)
                 }
             }
 
-            // Error
             error?.let {
                 Spacer(modifier = Modifier.height(16.dp))
                 Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Error.copy(alpha = 0.1f))
-                        .padding(16.dp)
+                    modifier = Modifier.fillMaxWidth().background(Error.copy(alpha = 0.1f)).padding(16.dp)
                 ) {
-                    Text(
-                        text = it,
-                        color = Error,
-                        style = MaterialTheme.typography.labelMedium
-                    )
+                    Text(it, color = Error, style = MaterialTheme.typography.labelMedium)
                 }
             }
 
