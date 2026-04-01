@@ -35,7 +35,7 @@ fun BottomNavBar(
             modifier = Modifier
                 .clip(RoundedCornerShape(28.dp))
                 .background(
-                    if (theme.isDark) Color(0x33FFFFFF) else Color(0x33000000)
+                    if (theme.isDark) Color(0x33FFFFFF) else Color(0x55FFFFFF)
                 )
                 .padding(horizontal = 6.dp, vertical = 6.dp),
             horizontalArrangement = Arrangement.spacedBy(2.dp)

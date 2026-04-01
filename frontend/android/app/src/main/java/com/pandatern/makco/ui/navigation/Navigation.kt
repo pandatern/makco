@@ -162,39 +162,42 @@ fun MakcoNavHost() {
                 }
             }
             is Screen.Main -> {
-                Column(modifier = Modifier.fillMaxSize()) {
-                    Box(modifier = Modifier.weight(1f)) {
-                        when (selectedTab) {
-                            BottomTab.HOME -> HomeScreen(
-                                stations = stations,
-                                selectedSource = selectedSource,
-                                selectedDestination = selectedDestination,
-                                onStationClick = { isSource ->
-                                    currentScreen = if (isSource) Screen.SourcePicker else Screen.DestinationPicker
-                                },
-                                onSearchClick = {
-                                    currentScreen = Screen.Booking
-                                    startSearch()
-                                }
-                            )
-                            BottomTab.TICKETS -> TicketHistoryScreen(
-                                token = token,
-                                onTicketClick = { id ->
-                                    bookingId = id
-                                    currentScreen = Screen.Ticket
-                                }
-                            )
-                            BottomTab.PROFILE -> ProfileScreen(
-                                token = token,
-                                onLogout = {
-                                    token = ""
-                                    TokenManager.clearToken(context)
-                                    currentScreen = Screen.Auth
-                                }
-                            )
-                        }
+                Box(modifier = Modifier.fillMaxSize()) {
+                    // Content fills full screen
+                    when (selectedTab) {
+                        BottomTab.HOME -> HomeScreen(
+                            stations = stations,
+                            selectedSource = selectedSource,
+                            selectedDestination = selectedDestination,
+                            onStationClick = { isSource ->
+                                currentScreen = if (isSource) Screen.SourcePicker else Screen.DestinationPicker
+                            },
+                            onSearchClick = {
+                                currentScreen = Screen.Booking
+                                startSearch()
+                            }
+                        )
+                        BottomTab.TICKETS -> TicketHistoryScreen(
+                            token = token,
+                            onTicketClick = { id ->
+                                bookingId = id
+                                currentScreen = Screen.Ticket
+                            }
+                        )
+                        BottomTab.PROFILE -> ProfileScreen(
+                            token = token,
+                            onLogout = {
+                                token = ""
+                                TokenManager.clearToken(context)
+                                currentScreen = Screen.Auth
+                            }
+                        )
                     }
-                    BottomNavBar(selectedTab = selectedTab, onTabSelected = { selectedTab = it })
+
+                    // Nav floats on top of content
+                    Box(modifier = Modifier.align(Alignment.BottomCenter)) {
+                        BottomNavBar(selectedTab = selectedTab, onTabSelected = { selectedTab = it })
+                    }
                 }
             }
             is Screen.SourcePicker -> {
