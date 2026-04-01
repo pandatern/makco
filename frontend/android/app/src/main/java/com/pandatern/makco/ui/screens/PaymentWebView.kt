@@ -30,6 +30,7 @@ fun PaymentWebView(
     var state by remember { mutableStateOf(PaymentState.LOADING) }
     var errorMsg by remember { mutableStateOf<String?>(null) }
     var webViewRef by remember { mutableStateOf<WebView?>(null) }
+    val theme = LocalThemeManager.current
 
     Column(
         modifier = Modifier
