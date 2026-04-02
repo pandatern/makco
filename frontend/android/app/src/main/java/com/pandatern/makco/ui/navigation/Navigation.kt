@@ -128,10 +128,24 @@ fun MakcoNavHost() {
                 )
                 if (resp.isSuccessful && resp.body() != null) {
                     bookingId = resp.body()!!.bookingId
-                    currentScreen = Screen.Payment
-                    delay(1000)
+                    // Fetch status immediately
+                    delay(500)
                     val statusResp = ApiClient.instance.getBookingStatus(token, bookingId!!)
-                    if (statusResp.isSuccessful) bookingStatus = statusResp.body()
+                    if (statusResp.isSuccessful) {
+                        bookingStatus = statusResp.body()
+                        // If mock payment - skip to ticket
+                        if (bookingStatus?.status == "CONFIRMED") {
+                            currentScreen = Screen.Ticket
+                        } else {
+                            currentScreen = Screen.Payment
+                        }
+                    } else {
+                        currentScreen = Screen.Payment
+                    }
+                    // Save booking to history
+                    bookingStatus?.let {
+                        com.pandatern.makco.data.local.CacheManager.addBookingHistory(context, it)
+                    }
                 } else {
                     error = "Booking failed"
                 }
@@ -167,6 +181,9 @@ fun MakcoNavHost() {
         if (savedToken != null && savedToken.isNotEmpty()) {
             token = savedToken
             loadMetroData()
+            // Load cached stations
+            val cached = com.pandatern.makco.data.local.CacheManager.getStations(context)
+            if (cached != null) stations = cached
             currentScreen = Screen.Main
         } else if (onboardingDone) {
             currentScreen = Screen.Auth
@@ -206,6 +223,7 @@ fun MakcoNavHost() {
                 }
             }
             is Screen.Main -> {
+                key(themeManager.currentTheme, selectedTab) {
                 Box(modifier = Modifier.fillMaxSize()) {
                     // Content fills full screen
                     when (selectedTab) {
@@ -242,6 +260,7 @@ fun MakcoNavHost() {
                     Box(modifier = Modifier.align(Alignment.BottomCenter)) {
                         BottomNavBar(selectedTab = selectedTab, onTabSelected = { selectedTab = it })
                     }
+                }
                 }
             }
             is Screen.SourcePicker -> {
