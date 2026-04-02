@@ -109,29 +109,38 @@ fun MakcoNavHost() {
         quotes = emptyList()
         scope.launch {
             try {
+                val src = selectedSource
+                val dst = selectedDestination
+                if (src == null || dst == null) {
+                    error = "Select stations"
+                    isLoading = false
+                    return@launch
+                }
                 val resp = ApiClient.instance.searchFare(
                     token = token,
                     request = SearchRequest(
-                        fromStationCode = selectedSource!!.code,
-                        toStationCode = selectedDestination!!.code
+                        fromStationCode = src.code,
+                        toStationCode = dst.code
                     )
                 )
                 if (resp.isSuccessful && resp.body() != null) {
-                    searchId = resp.body()!!.searchId
-                    var attempts = 0
-                    while (attempts < 5) {
-                        delay(1500)
-                        val quoteResp = ApiClient.instance.getQuote(token, searchId!!)
-                        if (quoteResp.isSuccessful) {
-                            val body = quoteResp.body()
-                            if (!body.isNullOrEmpty()) {
-                                quotes = body
-                                break
+                    searchId = resp.body()?.searchId
+                    if (searchId != null) {
+                        var attempts = 0
+                        while (attempts < 5) {
+                            delay(1500)
+                            val quoteResp = ApiClient.instance.getQuote(token, searchId!!)
+                            if (quoteResp.isSuccessful) {
+                                val body = quoteResp.body()
+                                if (!body.isNullOrEmpty()) {
+                                    quotes = body
+                                    break
+                                }
                             }
+                            attempts++
                         }
-                        attempts++
+                        if (quotes.isEmpty()) error = "No quotes found"
                     }
-                    if (quotes.isEmpty()) error = "No quotes found"
                 } else {
                     error = "Search failed"
                 }
@@ -155,7 +164,7 @@ fun MakcoNavHost() {
                     request = ConfirmRequest(quantity = quantity)
                 )
                 if (resp.isSuccessful && resp.body() != null) {
-                    bookingId = resp.body()!!.bookingId
+                    bookingId = resp.body()?.bookingId
                     // Mock payment - skip to ticket immediately
                     currentScreen = Screen.Ticket
                 } else {
