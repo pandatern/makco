@@ -8,7 +8,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,7 +21,6 @@ import com.pandatern.makco.data.remote.ApiClient
 import com.pandatern.makco.ui.theme.*
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TicketHistoryScreen(
     token: String,
@@ -62,77 +60,93 @@ fun TicketHistoryScreen(
     ) {
         Spacer(modifier = Modifier.height(56.dp))
 
-        Text(
-            text = "MY TICKETS",
-            style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Black),
-            color = theme.t1
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "MY TICKETS",
+                style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Black),
+                color = theme.t1
+            )
+
+            // Refresh button
+            if (!isLoading) {
+                TextButton(
+                    onClick = { refresh() },
+                    enabled = !isRefreshing
+                ) {
+                    if (isRefreshing) {
+                        CircularProgressIndicator(modifier = Modifier.size(16.dp), color = theme.t4, strokeWidth = 2.dp)
+                    } else {
+                        Text("REFRESH", style = MaterialTheme.typography.labelSmall, color = theme.t4)
+                    }
+                }
+            }
+        }
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        PullToRefreshBox(
-            isRefreshing = isRefreshing,
-            onRefresh = { refresh() },
-            modifier = Modifier.fillMaxSize()
-        ) {
-            when {
-                isLoading -> {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator(color = theme.t1, strokeWidth = 2.dp)
-                    }
+        when {
+            isLoading -> {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(color = theme.t1, strokeWidth = 2.dp)
                 }
-                tickets.isEmpty() -> {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text("NO TICKETS YET", style = MaterialTheme.typography.labelMedium, color = theme.t3)
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text("Pull down to refresh", style = MaterialTheme.typography.bodySmall, color = theme.t4)
+            }
+            tickets.isEmpty() -> {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text("NO TICKETS YET", style = MaterialTheme.typography.labelMedium, color = theme.t3)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        TextButton(onClick = { refresh() }) {
+                            Text("REFRESH", style = MaterialTheme.typography.labelMedium, color = theme.t1)
                         }
                     }
                 }
-                else -> {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(bottom = 100.dp)
-                    ) {
-                        items(tickets) { ticket ->
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clip(RoundedCornerShape(8.dp))
-                                    .border(1.dp, outline, RoundedCornerShape(8.dp))
-                                    .clickable { onTicketClick(ticket.bookingId) }
-                                    .background(theme.bg)
-                                    .padding(16.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Text(
-                                        text = ticket.bookingId.take(8).uppercase(),
-                                        style = MaterialTheme.typography.labelLarge.copy(fontFamily = FontFamily.Monospace),
-                                        color = theme.t1
-                                    )
-                                    Spacer(modifier = Modifier.height(4.dp))
-                                    Text(
-                                        text = ticket.status,
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = when (ticket.status) {
-                                            "CONFIRMED" -> Success
-                                            "PAYMENT_PENDING" -> MetroGold
-                                            "CANCELLED" -> Error
-                                            else -> theme.t3
-                                        }
-                                    )
-                                }
+            }
+            else -> {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(bottom = 100.dp)
+                ) {
+                    items(tickets) { ticket ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(8.dp))
+                                .border(1.dp, outline, RoundedCornerShape(8.dp))
+                                .clickable { onTicketClick(ticket.bookingId) }
+                                .background(theme.bg)
+                                .padding(16.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
                                 Text(
-                                    text = "₹${ticket.price.toInt()}",
-                                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                                    text = ticket.bookingId.take(8).uppercase(),
+                                    style = MaterialTheme.typography.labelLarge.copy(fontFamily = FontFamily.Monospace),
                                     color = theme.t1
                                 )
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text(
+                                    text = ticket.status,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = when (ticket.status) {
+                                        "CONFIRMED" -> Success
+                                        "PAYMENT_PENDING" -> MetroGold
+                                        "CANCELLED" -> Error
+                                        else -> theme.t3
+                                    }
+                                )
                             }
-                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = "₹${ticket.price.toInt()}",
+                                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                                color = theme.t1
+                            )
                         }
+                        Spacer(modifier = Modifier.height(8.dp))
                     }
                 }
             }
