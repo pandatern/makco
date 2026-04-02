@@ -16,24 +16,20 @@
     
     <!-- Rail tracks (two parallel horizontal lines) -->
     <path
-        android:fillColor="none"
         android:strokeColor="#1E88E5"
         android:strokeWidth="1.2"
         android:strokeLineCap="round"
         android:pathData="M2,21 L22,21"/>
     
     <path
-        android:fillColor="none"
         android:strokeColor="#1E88E5"
         android:strokeWidth="1.2"
         android:strokeLineCap="round"
         android:pathData="M2,19 L22,19"/>
     
     <!-- Accent circle (station token) - Green line accent -->
-    <circle
+    <path
         android:fillColor="#43A047"
-        android:cx="20"
-        android:cy="5"
-        android:r="2.5"/>
+        android:pathData="M20,5 A2.5,2.5 0 1,1 20.01,5"/>
         
 </vector>
