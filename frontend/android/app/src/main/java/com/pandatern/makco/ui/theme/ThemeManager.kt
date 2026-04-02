@@ -39,10 +39,11 @@ class ThemeManager(context: Context) {
     val bg3 = if (isDark) Color(0xFF111111) else Color(0xFFEBEBEB)
     val bg4 = if (isDark) Color(0xFF1A1A1A) else Color(0xFFDDDDDD)
 
+    // Text colors - MORE WHITE, less grey
     val t1 = if (isDark) Color(0xFFFFFFFF) else Color(0xFF000000)
-    val t2 = if (isDark) Color(0xFFE0E0E0) else Color(0xFF1A1A1A)
-    val t3 = if (isDark) Color(0xFFAAAAAA) else Color(0xFF444444)
-    val t4 = if (isDark) Color(0xFF666666) else Color(0xFF888888)
+    val t2 = if (isDark) Color(0xFFF0F0F0) else Color(0xFF111111)
+    val t3 = if (isDark) Color(0xFFD0D0D0) else Color(0xFF333333)
+    val t4 = if (isDark) Color(0xFFAAAAAA) else Color(0xFF666666)
 
     val divider = if (isDark) Color(0xFF1A1A1A) else Color(0xFFE0E0E0)
 
@@ -50,8 +51,12 @@ class ThemeManager(context: Context) {
     val glass = if (isDark) Color(0x22FFFFFF) else Color(0x22000000)
     val glassSelected = if (isDark) Color(0x33FFFFFF) else Color(0x33000000)
 
-    // Highlight colors - slightly brighter than bg
+    // Highlight colors
     val highlight = if (isDark) Color(0xFF111111) else Color(0xFFE8E8E8)
     val highlightBorder = if (isDark) Color(0xFF222222) else Color(0xFFDDDDDD)
     val highlightText = if (isDark) Color(0xFFE0E0E0) else Color(0xFF1A1A1A)
+
+    // Outline colors
+    val outline = if (isDark) Color(0xFF2A2A2A) else Color(0xFFD0D0D0)
+    val outlineHighlight = if (isDark) Color(0xFF444444) else Color(0xFFAAAAAA)
 }
