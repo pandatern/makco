@@ -89,7 +89,7 @@ fun MakcoNavHost() {
         quotes = emptyList()
         scope.launch {
             try {
-                val resp = ApiClient.instance.searchFare(token, SearchRequest(src.code, dst.code))
+                val resp = ApiClient.instance.searchFare(token = token, request = SearchRequest(src.code, dst.code))
                 if (resp.isSuccessful && resp.body() != null) {
                     searchId = resp.body()?.searchId
                     if (searchId != null) {
@@ -116,7 +116,7 @@ fun MakcoNavHost() {
         error = null
         scope.launch {
             try {
-                val resp = ApiClient.instance.confirmBooking(token, quote.quoteId, request = ConfirmRequest(quantity))
+                val resp = ApiClient.instance.confirmBooking(token = token, quoteId = quote.quoteId, request = ConfirmRequest(quantity))
                 if (resp.isSuccessful && resp.body() != null) {
                     bookingId = resp.body()?.bookingId
                     currentScreen = Screen.Ticket
