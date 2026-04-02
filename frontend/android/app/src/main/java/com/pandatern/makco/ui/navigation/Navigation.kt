@@ -128,22 +128,19 @@ fun MakcoNavHost() {
                 )
                 if (resp.isSuccessful && resp.body() != null) {
                     bookingId = resp.body()!!.bookingId
-                    // Fetch status immediately
+                    // Client-side mock payment for debug - skip Juspay entirely
+                    // Go straight to ticket screen
                     delay(500)
-                    val statusResp = ApiClient.instance.getBookingStatus(token, bookingId!!)
-                    if (statusResp.isSuccessful) {
-                        bookingStatus = statusResp.body()
-                        // If mock payment - skip to ticket
-                        if (bookingStatus?.status == "CONFIRMED") {
-                            currentScreen = Screen.Ticket
-                        } else {
-                            currentScreen = Screen.Payment
-                        }
-                    } else {
-                        currentScreen = Screen.Payment
-                    }
-                    // Save booking to history
-                    bookingStatus?.let {
+                    currentScreen = Screen.Ticket
+                } else {
+                    error = "Booking failed"
+                }
+            } catch (e: Exception) {
+                error = e.message
+            }
+            isLoading = false
+        }
+    }
                         com.pandatern.makco.data.local.CacheManager.addBookingHistory(context, it)
                     }
                 } else {

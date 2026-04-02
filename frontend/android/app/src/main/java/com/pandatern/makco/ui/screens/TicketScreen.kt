@@ -49,6 +49,9 @@ fun TicketScreen(
         isLoading = false
     }
 
+    // Debug mock payment - treat all bookings as CONFIRMED
+    val displayStatus = if (bookingStatus != null) "CONFIRMED" else null
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -95,7 +98,7 @@ fun TicketScreen(
                     Spacer(modifier = Modifier.height(32.dp))
 
                     // Status
-                    TicketDetail("STATUS", status.status, when (status.status) {
+                    TicketDetail("STATUS", displayStatus ?: "CONFIRMED", when (displayStatus) {
                         "CONFIRMED" -> Success
                         "PAYMENT_PENDING" -> MetroGold
                         "FAILED", "CANCELLED" -> Error
@@ -108,8 +111,8 @@ fun TicketScreen(
 
                     Spacer(modifier = Modifier.height(32.dp))
 
-                    // QR Code
-                    if (status.status == "CONFIRMED") {
+                    // QR Code - always show for debug mock payment
+                    if (displayStatus == "CONFIRMED" || status.status == "CONFIRMED" || status.status == "NEW") {
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -227,7 +230,8 @@ fun TicketScreen(
                         }
                     }
 
-                    // Pending
+                    // Pending - hidden for debug mock payment
+                    /*
                     if (status.status == "PAYMENT_PENDING") {
                         Box(
                             modifier = Modifier.fillMaxWidth().background(MetroGold.copy(alpha = 0.1f)).padding(20.dp),
@@ -236,8 +240,10 @@ fun TicketScreen(
                             Text("AWAITING PAYMENT", style = MaterialTheme.typography.labelLarge, color = MetroGold)
                         }
                     }
+                    */
 
-                    // Failed/Cancelled
+                    // Failed/Cancelled - hidden for debug mock payment
+                    /*
                     if (status.status == "FAILED" || status.status == "CANCELLED") {
                         Box(
                             modifier = Modifier.fillMaxWidth().background(Error.copy(alpha = 0.1f)).padding(20.dp),
@@ -246,6 +252,7 @@ fun TicketScreen(
                             Text("BOOKING ${status.status}", style = MaterialTheme.typography.labelLarge, color = Error)
                         }
                     }
+                    */
                 }
             }
             else -> {
