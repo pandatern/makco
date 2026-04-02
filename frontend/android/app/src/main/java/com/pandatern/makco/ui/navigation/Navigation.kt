@@ -141,17 +141,6 @@ fun MakcoNavHost() {
             isLoading = false
         }
     }
-                        com.pandatern.makco.data.local.CacheManager.addBookingHistory(context, it)
-                    }
-                } else {
-                    error = "Booking failed"
-                }
-            } catch (e: Exception) {
-                error = e.message
-            }
-            isLoading = false
-        }
-    }
 
     fun cancelBooking() {
         val id = bookingId ?: return
