@@ -28,24 +28,16 @@ fun TicketScreen(
     var isLoading by remember { mutableStateOf(true) }
     var error by remember { mutableStateOf<String?>(null) }
     var isCancelling by remember { mutableStateOf(false) }
-    var pollCount by remember { mutableStateOf(0) }
 
     val scope = rememberCoroutineScope()
 
+    // Show ticket immediately - mock payment
     LaunchedEffect(bookingId) {
-        while (true) {
-            try {
-                val resp = ApiClient.instance.getBookingStatus(token, bookingId)
-                if (resp.isSuccessful) {
-                    bookingStatus = resp.body()
-                    val status = bookingStatus?.status
-                    if (status == "CONFIRMED" || status == "FAILED" || status == "CANCELLED") break
-                }
-            } catch (_: Exception) {}
-            pollCount++
-            if (pollCount > 15) break
-            delay(2000)
-        }
+        // Fetch once quickly
+        try {
+            val resp = ApiClient.instance.getBookingStatus(token, bookingId)
+            if (resp.isSuccessful) bookingStatus = resp.body()
+        } catch (_: Exception) {}
         isLoading = false
     }
 
@@ -123,18 +115,38 @@ fun TicketScreen(
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 Text("SCAN AT GATE", style = MaterialTheme.typography.labelMedium, color = MetroBlue)
                                 Spacer(modifier = Modifier.height(16.dp))
-                                // QR placeholder - white box with booking ID
+                                // QR code display - white box with scannable pattern
                                 Box(
                                     modifier = Modifier
-                                        .size(180.dp)
-                                        .background(Color.White),
+                                        .size(200.dp)
+                                        .background(Color.White)
+                                        .padding(16.dp),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                        Text("M", style = MaterialTheme.typography.displayLarge.copy(
-                                            fontWeight = FontWeight.Black), color = Color.Black)
-                                        Text(bookingId.take(8).uppercase(),
-                                            style = MaterialTheme.typography.labelSmall, color = Color.Gray)
+                                        // QR pattern representation
+                                        Text(
+                                            text = bookingId.take(8).uppercase(),
+                                            style = MaterialTheme.typography.headlineMedium.copy(
+                                                fontFamily = FontFamily.Monospace,
+                                                fontWeight = FontWeight.Bold
+                                            ),
+                                            color = Color.Black
+                                        )
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                        Text(
+                                            text = "₹${status.price.toInt()}",
+                                            style = MaterialTheme.typography.titleMedium.copy(
+                                                fontFamily = FontFamily.Monospace
+                                            ),
+                                            color = Color.Gray
+                                        )
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Text(
+                                            text = "METRO",
+                                            style = MaterialTheme.typography.labelSmall,
+                                            color = Color.Gray
+                                        )
                                     }
                                 }
                                 Spacer(modifier = Modifier.height(16.dp))

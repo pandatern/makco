@@ -18,6 +18,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun ProfileScreen(
     token: String,
+    onThemeToggle: () -> Unit,
     onLogout: () -> Unit
 ) {
     val theme = LocalThemeManager.current
@@ -95,7 +96,7 @@ fun ProfileScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { theme.toggle() }
+                    .clickable { onThemeToggle() }
                     .background(theme.bg2)
                     .padding(16.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,

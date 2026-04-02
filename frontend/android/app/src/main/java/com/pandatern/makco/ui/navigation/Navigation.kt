@@ -1,5 +1,6 @@
 package com.pandatern.makco.ui.navigation
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
@@ -7,6 +8,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import com.pandatern.makco.data.local.TokenManager
+import com.pandatern.makco.data.local.CacheManager
 import com.pandatern.makco.data.model.*
 import com.pandatern.makco.data.remote.ApiClient
 import com.pandatern.makco.ui.screens.*
@@ -53,21 +55,48 @@ fun MakcoNavHost() {
     var isLoading by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
 
+    // Back handler - don't quit app, go to home
+    BackHandler(enabled = currentScreen !is Screen.Splash && currentScreen !is Screen.Auth) {
+        when (currentScreen) {
+            is Screen.Main -> {
+                if (selectedTab != BottomTab.HOME) {
+                    selectedTab = BottomTab.HOME
+                }
+                // Don't quit app on back from home
+            }
+            is Screen.SourcePicker, is Screen.DestinationPicker -> {
+                currentScreen = Screen.Main
+            }
+            is Screen.Booking -> {
+                currentScreen = Screen.Main
+                quotes = emptyList()
+                error = null
+            }
+            is Screen.Payment, is Screen.PaymentWeb, is Screen.Ticket -> {
+                currentScreen = Screen.Main
+                bookingId = null
+                bookingStatus = null
+            }
+            else -> {
+                currentScreen = Screen.Main
+            }
+        }
+    }
+
     fun loadMetroData() {
         scope.launch {
             try {
                 val s = ApiClient.instance.getStations(token)
                 if (s.isSuccessful) {
                     stations = s.body() ?: emptyList()
-                    com.pandatern.makco.data.local.CacheManager.saveStations(context, stations)
+                    CacheManager.saveStations(context, stations)
                 } else if (s.code() == 401) {
-                    // Token expired - clear and go to auth
                     token = ""
-                    com.pandatern.makco.data.local.TokenManager.clearToken(context)
+                    TokenManager.clearToken(context)
                     currentScreen = Screen.Auth
                 }
             } catch (_: Exception) {
-                val cached = com.pandatern.makco.data.local.CacheManager.getStations(context)
+                val cached = CacheManager.getStations(context)
                 if (cached != null) stations = cached
             }
         }
@@ -89,10 +118,9 @@ fun MakcoNavHost() {
                 )
                 if (resp.isSuccessful && resp.body() != null) {
                     searchId = resp.body()!!.searchId
-                    // Poll for quotes
                     var attempts = 0
-                    while (attempts < 10) {
-                        delay(2000)
+                    while (attempts < 5) {
+                        delay(1500)
                         val quoteResp = ApiClient.instance.getQuote(token, searchId!!)
                         if (quoteResp.isSuccessful) {
                             val body = quoteResp.body()
@@ -128,31 +156,10 @@ fun MakcoNavHost() {
                 )
                 if (resp.isSuccessful && resp.body() != null) {
                     bookingId = resp.body()!!.bookingId
-                    // Client-side mock payment for debug - skip Juspay entirely
-                    // Go straight to ticket screen
-                    delay(500)
+                    // Mock payment - skip to ticket immediately
                     currentScreen = Screen.Ticket
                 } else {
                     error = "Booking failed"
-                }
-            } catch (e: Exception) {
-                error = e.message
-            }
-            isLoading = false
-        }
-    }
-
-    fun cancelBooking() {
-        val id = bookingId ?: return
-        isLoading = true
-        error = null
-        scope.launch {
-            try {
-                val resp = ApiClient.instance.cancelBooking(token = token, bookingId = id)
-                if (resp.isSuccessful) {
-                    bookingStatus = resp.body()
-                } else {
-                    error = "Cancellation failed"
                 }
             } catch (e: Exception) {
                 error = e.message
@@ -167,8 +174,7 @@ fun MakcoNavHost() {
         if (savedToken != null && savedToken.isNotEmpty()) {
             token = savedToken
             loadMetroData()
-            // Load cached stations
-            val cached = com.pandatern.makco.data.local.CacheManager.getStations(context)
+            val cached = CacheManager.getStations(context)
             if (cached != null) stations = cached
             currentScreen = Screen.Main
         } else if (onboardingDone) {
@@ -176,10 +182,10 @@ fun MakcoNavHost() {
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        CompositionLocalProvider(LocalThemeManager provides themeManager) {
-            key(themeManager.currentTheme) {
-            when (currentScreen) {
+    // Force recomposition when theme changes
+    key(themeManager.currentTheme) {
+    CompositionLocalProvider(LocalThemeManager provides themeManager) {
+        when (currentScreen) {
             is Screen.Splash -> {
                 SplashScreen {
                     val savedToken = TokenManager.getToken(context)
@@ -209,9 +215,8 @@ fun MakcoNavHost() {
                 }
             }
             is Screen.Main -> {
-                key(themeManager.currentTheme, selectedTab) {
+                key(selectedTab) {
                 Box(modifier = Modifier.fillMaxSize()) {
-                    // Content fills full screen
                     when (selectedTab) {
                         BottomTab.HOME -> HomeScreen(
                             stations = stations,
@@ -234,6 +239,7 @@ fun MakcoNavHost() {
                         )
                         BottomTab.PROFILE -> ProfileScreen(
                             token = token,
+                            onThemeToggle = { themeManager.toggle() },
                             onLogout = {
                                 token = ""
                                 TokenManager.clearToken(context)
@@ -241,8 +247,6 @@ fun MakcoNavHost() {
                             }
                         )
                     }
-
-                    // Nav floats on top of content
                     Box(modifier = Modifier.align(Alignment.BottomCenter)) {
                         BottomNavBar(selectedTab = selectedTab, onTabSelected = { selectedTab = it })
                     }
@@ -254,7 +258,7 @@ fun MakcoNavHost() {
                     stations = stations,
                     onStationSelected = { station ->
                         selectedSource = station
-                        com.pandatern.makco.data.local.CacheManager.addRecentStation(context, station)
+                        CacheManager.addRecentStation(context, station)
                         currentScreen = Screen.Main
                     },
                     onBack = { currentScreen = Screen.Main }
@@ -265,7 +269,7 @@ fun MakcoNavHost() {
                     stations = stations,
                     onStationSelected = { station ->
                         selectedDestination = station
-                        com.pandatern.makco.data.local.CacheManager.addRecentStation(context, station)
+                        CacheManager.addRecentStation(context, station)
                         currentScreen = Screen.Main
                     },
                     onBack = { currentScreen = Screen.Main }
@@ -295,7 +299,6 @@ fun MakcoNavHost() {
                     onPayClick = { currentScreen = Screen.PaymentWeb },
                     onViewTicket = { currentScreen = Screen.Ticket },
                     onRetry = {
-                        // Refresh booking status
                         scope.launch {
                             bookingId?.let { id ->
                                 try {
@@ -336,8 +339,7 @@ fun MakcoNavHost() {
                     }
                 )
             }
-            }
-            }
         }
+    }
     }
 }
