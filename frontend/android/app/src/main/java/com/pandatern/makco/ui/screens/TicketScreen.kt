@@ -12,37 +12,35 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.pandatern.makco.data.model.*
 import com.pandatern.makco.data.remote.ApiClient
+import com.pandatern.makco.data.local.CacheManager
 import com.pandatern.makco.ui.theme.*
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
 fun TicketScreen(
     token: String,
     bookingId: String,
-    onCancel: () -> Unit,
     onBack: () -> Unit
 ) {
     val theme = LocalThemeManager.current
+    val ctx = androidx.compose.ui.platform.LocalContext.current
     var bookingStatus by remember { mutableStateOf<BookingStatus?>(null) }
-    var isLoading by remember { mutableStateOf(true) }
-    var error by remember { mutableStateOf<String?>(null) }
-    var isCancelling by remember { mutableStateOf(false) }
 
     val scope = rememberCoroutineScope()
 
-    // Show ticket immediately - mock payment
+    // Fetch in background, show immediately
     LaunchedEffect(bookingId) {
-        // Fetch once quickly
-        try {
-            val resp = ApiClient.instance.getBookingStatus(token, bookingId)
-            if (resp.isSuccessful) bookingStatus = resp.body()
-        } catch (_: Exception) {}
-        isLoading = false
+        scope.launch {
+            try {
+                val resp = ApiClient.instance.getBookingStatus(token, bookingId)
+                if (resp.isSuccessful) {
+                    bookingStatus = resp.body()
+                    // Save to history
+                    bookingStatus?.let { CacheManager.addBookingHistory(ctx, it) }
+                }
+            } catch (_: Exception) {}
+        }
     }
-
-    // Debug mock payment - treat all bookings as CONFIRMED
-    val displayStatus = if (bookingStatus != null) "CONFIRMED" else null
 
     Column(
         modifier = Modifier
@@ -59,235 +57,90 @@ fun TicketScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        when {
-            isLoading -> {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        CircularProgressIndicator(color = theme.t1, strokeWidth = 2.dp)
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text("GENERATING TICKET...", style = MaterialTheme.typography.labelMedium, color = theme.t3)
-                    }
-                }
-            }
-            bookingStatus != null -> {
-                val status = bookingStatus!!
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 24.dp)
-                ) {
-                    // Booking ID
-                    Text("BOOKING", style = MaterialTheme.typography.labelMedium, color = theme.t3)
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = bookingId.take(8).uppercase(),
-                        style = MaterialTheme.typography.headlineLarge.copy(
-                            fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold
-                        ),
-                        color = theme.t1
-                    )
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp)
+        ) {
+            // Booking ID
+            Text("BOOKING", style = MaterialTheme.typography.labelMedium, color = theme.t4)
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = bookingId.take(8).uppercase(),
+                style = MaterialTheme.typography.headlineLarge.copy(
+                    fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Black
+                ),
+                color = theme.t1
+            )
 
-                    Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
-                    // Status
-                    TicketDetail("STATUS", displayStatus ?: "CONFIRMED", when (displayStatus) {
-                        "CONFIRMED" -> Success
-                        "PAYMENT_PENDING" -> MetroGold
-                        "FAILED", "CANCELLED" -> Error
-                        else -> theme.t3
-                    }, theme)
+            // Status - always CONFIRMED for debug
+            Text("STATUS", style = MaterialTheme.typography.labelSmall, color = theme.t4)
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = "CONFIRMED",
+                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.SemiBold),
+                color = Success
+            )
 
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    TicketDetail("AMOUNT", "₹${status.price.toInt()}", theme.t1, theme)
-
-                    Spacer(modifier = Modifier.height(32.dp))
-
-                    // QR Code - always show for debug mock payment
-                    if (displayStatus == "CONFIRMED" || status.status == "CONFIRMED" || status.status == "NEW") {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(theme.bg2)
-                                .padding(24.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text("SCAN AT GATE", style = MaterialTheme.typography.labelMedium, color = MetroBlue)
-                                Spacer(modifier = Modifier.height(16.dp))
-                                // QR code display - white box with scannable pattern
-                                Box(
-                                    modifier = Modifier
-                                        .size(200.dp)
-                                        .background(Color.White)
-                                        .padding(16.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                        // QR pattern representation
-                                        Text(
-                                            text = bookingId.take(8).uppercase(),
-                                            style = MaterialTheme.typography.headlineMedium.copy(
-                                                fontFamily = FontFamily.Monospace,
-                                                fontWeight = FontWeight.Bold
-                                            ),
-                                            color = Color.Black
-                                        )
-                                        Spacer(modifier = Modifier.height(8.dp))
-                                        Text(
-                                            text = "₹${status.price.toInt()}",
-                                            style = MaterialTheme.typography.titleMedium.copy(
-                                                fontFamily = FontFamily.Monospace
-                                            ),
-                                            color = Color.Gray
-                                        )
-                                        Spacer(modifier = Modifier.height(4.dp))
-                                        Text(
-                                            text = "METRO",
-                                            style = MaterialTheme.typography.labelSmall,
-                                            color = Color.Gray
-                                        )
-                                    }
-                                }
-                                Spacer(modifier = Modifier.height(16.dp))
-                                Text("CHENNAI METRO", style = MaterialTheme.typography.labelSmall, color = theme.t4)
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Text("Valid for single entry + exit",
-                                    style = MaterialTheme.typography.bodySmall, color = theme.t4)
-
-                                Spacer(modifier = Modifier.height(12.dp))
-
-                                // Platform info
-                                Box(modifier = Modifier.fillMaxWidth().background(theme.bg).padding(12.dp)) {
-                                    Column {
-                                        Text("PLATFORM INFO", style = MaterialTheme.typography.labelSmall, color = theme.t4)
-                                        Spacer(modifier = Modifier.height(4.dp))
-                                        Text("Blue Line: Platform 1", style = MaterialTheme.typography.bodySmall, color = theme.t3)
-                                        Text("Green Line: Platform 2", style = MaterialTheme.typography.bodySmall, color = theme.t3)
-                                    }
-                                }
-
-                                Spacer(modifier = Modifier.height(8.dp))
-
-                                // Timetable
-                                Box(modifier = Modifier.fillMaxWidth().background(theme.bg).padding(12.dp)) {
-                                    Column {
-                                        Text("FIRST / LAST TRAIN", style = MaterialTheme.typography.labelSmall, color = theme.t4)
-                                        Spacer(modifier = Modifier.height(4.dp))
-                                        Text("First: 05:30 AM", style = MaterialTheme.typography.bodySmall, color = theme.t3)
-                                        Text("Last: 11:00 PM", style = MaterialTheme.typography.bodySmall, color = theme.t3)
-                                    }
-                                }
-
-                                Spacer(modifier = Modifier.height(8.dp))
-
-                                // Walking directions
-                                Box(modifier = Modifier.fillMaxWidth().background(theme.bg).padding(12.dp)) {
-                                    Column {
-                                        Text("AFTER EXIT", style = MaterialTheme.typography.labelSmall, color = theme.t4)
-                                        Spacer(modifier = Modifier.height(4.dp))
-                                        Text("Follow signs to nearest exit gate", style = MaterialTheme.typography.bodySmall, color = theme.t3)
-                                        Text("Show QR at exit scanner", style = MaterialTheme.typography.bodySmall, color = theme.t3)
-                                    }
-                                }
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(24.dp))
-
-                        // Share button
-                        val context = androidx.compose.ui.platform.LocalContext.current
-                        Button(
-                            onClick = {
-                                val shareIntent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
-                                    type = "text/plain"
-                                    putExtra(android.content.Intent.EXTRA_TEXT,
-                                        "Makco Metro Ticket\nBooking: ${bookingId.take(8).uppercase()}\nAmount: ₹${status.price.toInt()}")
-                                }
-                                context.startActivity(android.content.Intent.createChooser(shareIntent, "Share Ticket"))
-                            },
-                            modifier = Modifier.fillMaxWidth().height(48.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = theme.bg3,
-                                contentColor = theme.t1
-                            )
-                        ) {
-                            Text("SHARE TICKET", style = MaterialTheme.typography.labelMedium)
-                        }
-
-                        Spacer(modifier = Modifier.height(12.dp))
-
-                        // Cancel button
-                        Button(
-                            onClick = {
-                                isCancelling = true
-                                scope.launch {
-                                    try {
-                                        val resp = ApiClient.instance.cancelBooking(token, bookingId)
-                                        if (resp.isSuccessful) bookingStatus = resp.body()
-                                        else error = "Cancellation failed"
-                                    } catch (e: Exception) { error = e.message }
-                                    isCancelling = false
-                                }
-                            },
-                            modifier = Modifier.fillMaxWidth().height(48.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Error.copy(alpha = 0.1f),
-                                contentColor = Error
-                            ),
-                            enabled = !isCancelling
-                        ) {
-                            if (isCancelling) CircularProgressIndicator(modifier = Modifier.size(20.dp), color = Error, strokeWidth = 2.dp)
-                            else Text("CANCEL TICKET", style = MaterialTheme.typography.labelMedium)
-                        }
-                    }
-
-                    // Pending - hidden for debug mock payment
-                    /*
-                    if (status.status == "PAYMENT_PENDING") {
-                        Box(
-                            modifier = Modifier.fillMaxWidth().background(MetroGold.copy(alpha = 0.1f)).padding(20.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text("AWAITING PAYMENT", style = MaterialTheme.typography.labelLarge, color = MetroGold)
-                        }
-                    }
-                    */
-
-                    // Failed/Cancelled - hidden for debug mock payment
-                    /*
-                    if (status.status == "FAILED" || status.status == "CANCELLED") {
-                        Box(
-                            modifier = Modifier.fillMaxWidth().background(Error.copy(alpha = 0.1f)).padding(20.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text("BOOKING ${status.status}", style = MaterialTheme.typography.labelLarge, color = Error)
-                        }
-                    }
-                    */
-                }
-            }
-            else -> {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("Could not load ticket", style = MaterialTheme.typography.bodyMedium, color = theme.t3)
-                }
-            }
-        }
-
-        error?.let {
             Spacer(modifier = Modifier.height(12.dp))
-            Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp).background(Error.copy(alpha = 0.1f)).padding(14.dp)) {
-                Text(it, color = Error, style = MaterialTheme.typography.labelMedium)
+
+            // Amount
+            Text("AMOUNT", style = MaterialTheme.typography.labelSmall, color = theme.t4)
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = "₹${bookingStatus?.price?.toInt() ?: 32}",
+                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.SemiBold),
+                color = theme.t1
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // QR Code
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(theme.bg2)
+                    .padding(24.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("SCAN AT GATE", style = MaterialTheme.typography.labelMedium, color = MetroBlue)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Box(
+                        modifier = Modifier
+                            .size(200.dp)
+                            .background(Color.White)
+                            .padding(16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text(
+                                text = bookingId.take(8).uppercase(),
+                                style = MaterialTheme.typography.headlineMedium.copy(
+                                    fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold
+                                ),
+                                color = Color.Black
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = "₹${bookingStatus?.price?.toInt() ?: 32}",
+                                style = MaterialTheme.typography.titleMedium.copy(
+                                    fontFamily = FontFamily.Monospace
+                                ),
+                                color = Color.Gray
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text("METRO", style = MaterialTheme.typography.labelSmall, color = Color.Gray)
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text("CHENNAI METRO", style = MaterialTheme.typography.labelSmall, color = theme.t4)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text("Valid for single entry + exit", style = MaterialTheme.typography.bodySmall, color = theme.t4)
+                }
             }
         }
-    }
-}
-
-@Composable
-fun TicketDetail(label: String, value: String, valueColor: Color, theme: ThemeManager) {
-    Column {
-        Text(label, style = MaterialTheme.typography.labelSmall, color = theme.t4)
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(value, style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.SemiBold), color = valueColor)
     }
 }

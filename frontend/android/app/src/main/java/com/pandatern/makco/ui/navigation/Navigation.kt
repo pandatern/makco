@@ -24,8 +24,6 @@ sealed class Screen {
     object SourcePicker : Screen()
     object DestinationPicker : Screen()
     object Booking : Screen()
-    object Payment : Screen()
-    object PaymentWeb : Screen()
     object Ticket : Screen()
 }
 
@@ -45,40 +43,24 @@ fun MakcoNavHost() {
     var selectedDestination by remember { mutableStateOf<Station?>(null) }
 
     var quotes by remember { mutableStateOf<List<Quote>>(emptyList()) }
-    var selectedQuote by remember { mutableStateOf<Quote?>(null) }
-    var selectedQuantity by remember { mutableStateOf(1) }
     var searchId by remember { mutableStateOf<String?>(null) }
 
     var bookingId by remember { mutableStateOf<String?>(null) }
-    var bookingStatus by remember { mutableStateOf<BookingStatus?>(null) }
 
     var isLoading by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
 
-    // Back handler - don't quit app, go to home
+    // Back handler
     BackHandler(enabled = currentScreen !is Screen.Splash && currentScreen !is Screen.Auth) {
         when (currentScreen) {
             is Screen.Main -> {
-                if (selectedTab != BottomTab.HOME) {
-                    selectedTab = BottomTab.HOME
-                }
-                // Don't quit app on back from home
-            }
-            is Screen.SourcePicker, is Screen.DestinationPicker -> {
-                currentScreen = Screen.Main
-            }
-            is Screen.Booking -> {
-                currentScreen = Screen.Main
-                quotes = emptyList()
-                error = null
-            }
-            is Screen.Payment, is Screen.PaymentWeb, is Screen.Ticket -> {
-                currentScreen = Screen.Main
-                bookingId = null
-                bookingStatus = null
+                if (selectedTab != BottomTab.HOME) selectedTab = BottomTab.HOME
             }
             else -> {
                 currentScreen = Screen.Main
+                bookingId = null
+                quotes = emptyList()
+                error = null
             }
         }
     }
@@ -90,10 +72,6 @@ fun MakcoNavHost() {
                 if (s.isSuccessful) {
                     stations = s.body() ?: emptyList()
                     CacheManager.saveStations(context, stations)
-                } else if (s.code() == 401) {
-                    token = ""
-                    TokenManager.clearToken(context)
-                    currentScreen = Screen.Auth
                 }
             } catch (_: Exception) {
                 val cached = CacheManager.getStations(context)
@@ -103,50 +81,32 @@ fun MakcoNavHost() {
     }
 
     fun startSearch() {
-        if (selectedSource == null || selectedDestination == null) return
+        val src = selectedSource
+        val dst = selectedDestination
+        if (src == null || dst == null) return
         isLoading = true
         error = null
         quotes = emptyList()
         scope.launch {
             try {
-                val src = selectedSource
-                val dst = selectedDestination
-                if (src == null || dst == null) {
-                    error = "Select stations"
-                    isLoading = false
-                    return@launch
-                }
-                val resp = ApiClient.instance.searchFare(
-                    token = token,
-                    request = SearchRequest(
-                        fromStationCode = src.code,
-                        toStationCode = dst.code
-                    )
-                )
+                val resp = ApiClient.instance.searchFare(token, SearchRequest(src.code, dst.code))
                 if (resp.isSuccessful && resp.body() != null) {
                     searchId = resp.body()?.searchId
                     if (searchId != null) {
                         var attempts = 0
                         while (attempts < 5) {
                             delay(1500)
-                            val quoteResp = ApiClient.instance.getQuote(token, searchId!!)
-                            if (quoteResp.isSuccessful) {
-                                val body = quoteResp.body()
-                                if (!body.isNullOrEmpty()) {
-                                    quotes = body
-                                    break
-                                }
+                            val q = ApiClient.instance.getQuote(token, searchId!!)
+                            if (q.isSuccessful && !q.body().isNullOrEmpty()) {
+                                quotes = q.body()!!
+                                break
                             }
                             attempts++
                         }
-                        if (quotes.isEmpty()) error = "No quotes found"
+                        if (quotes.isEmpty()) error = "No quotes"
                     }
-                } else {
-                    error = "Search failed"
-                }
-            } catch (e: Exception) {
-                error = e.message
-            }
+                } else error = "Search failed"
+            } catch (e: Exception) { error = e.message }
             isLoading = false
         }
     }
@@ -154,201 +114,149 @@ fun MakcoNavHost() {
     fun confirmBooking(quote: Quote, quantity: Int) {
         isLoading = true
         error = null
-        selectedQuote = quote
-        selectedQuantity = quantity
         scope.launch {
             try {
-                val resp = ApiClient.instance.confirmBooking(
-                    token = token,
-                    quoteId = quote.quoteId,
-                    request = ConfirmRequest(quantity = quantity)
-                )
+                val resp = ApiClient.instance.confirmBooking(token, quote.quoteId, request = ConfirmRequest(quantity))
                 if (resp.isSuccessful && resp.body() != null) {
                     bookingId = resp.body()?.bookingId
-                    // Mock payment - skip to ticket immediately
                     currentScreen = Screen.Ticket
-                } else {
-                    error = "Booking failed"
-                }
-            } catch (e: Exception) {
-                error = e.message
-            }
+                } else error = "Booking failed"
+            } catch (e: Exception) { error = e.message }
             isLoading = false
         }
     }
 
+    // Init
     LaunchedEffect(Unit) {
         val savedToken = TokenManager.getToken(context)
-        val onboardingDone = TokenManager.isOnboardingDone(context)
         if (savedToken != null && savedToken.isNotEmpty()) {
             token = savedToken
             loadMetroData()
-            val cached = CacheManager.getStations(context)
-            if (cached != null) stations = cached
             currentScreen = Screen.Main
-        } else if (onboardingDone) {
+        } else if (TokenManager.isOnboardingDone(context)) {
             currentScreen = Screen.Auth
         }
     }
 
-    // Force recomposition when theme changes
-    key(themeManager.currentTheme) {
-    CompositionLocalProvider(LocalThemeManager provides themeManager) {
-        when (currentScreen) {
-            is Screen.Splash -> {
-                SplashScreen {
-                    val savedToken = TokenManager.getToken(context)
-                    if (savedToken != null && savedToken.isNotEmpty()) {
-                        token = savedToken
-                        loadMetroData()
-                        currentScreen = Screen.Main
-                    } else if (TokenManager.isOnboardingDone(context)) {
-                        currentScreen = Screen.Auth
-                    } else {
-                        currentScreen = Screen.Onboarding
-                    }
-                }
-            }
-            is Screen.Onboarding -> {
-                OnboardingScreen {
-                    TokenManager.setOnboardingDone(context)
-                    currentScreen = Screen.Auth
-                }
-            }
-            is Screen.Auth -> {
-                AuthScreen { newToken ->
-                    token = newToken
-                    TokenManager.saveToken(context, newToken)
-                    loadMetroData()
-                    currentScreen = Screen.Main
-                }
-            }
-            is Screen.Main -> {
-                key(selectedTab) {
-                Box(modifier = Modifier.fillMaxSize()) {
-                    when (selectedTab) {
-                        BottomTab.HOME -> HomeScreen(
-                            stations = stations,
-                            selectedSource = selectedSource,
-                            selectedDestination = selectedDestination,
-                            onStationClick = { isSource ->
-                                currentScreen = if (isSource) Screen.SourcePicker else Screen.DestinationPicker
-                            },
-                            onSearchClick = {
-                                currentScreen = Screen.Booking
-                                startSearch()
-                            }
-                        )
-                        BottomTab.TICKETS -> TicketHistoryScreen(
-                            token = token,
-                            onTicketClick = { id ->
-                                bookingId = id
-                                currentScreen = Screen.Ticket
-                            }
-                        )
-                        BottomTab.PROFILE -> ProfileScreen(
-                            token = token,
-                            onThemeToggle = { themeManager.toggle() },
-                            onLogout = {
-                                token = ""
-                                TokenManager.clearToken(context)
+    // THEME FIX: key on the outermost level
+    key(themeManager.currentTheme, currentScreen, selectedTab) {
+        CompositionLocalProvider(LocalThemeManager provides themeManager) {
+            Box(modifier = Modifier.fillMaxSize().background(themeManager.bg)) {
+                when (currentScreen) {
+                    is Screen.Splash -> {
+                        SplashScreen {
+                            val savedToken = TokenManager.getToken(context)
+                            if (savedToken != null && savedToken.isNotEmpty()) {
+                                token = savedToken
+                                loadMetroData()
+                                currentScreen = Screen.Main
+                            } else if (TokenManager.isOnboardingDone(context)) {
                                 currentScreen = Screen.Auth
-                            }
-                        )
-                    }
-                    Box(modifier = Modifier.align(Alignment.BottomCenter)) {
-                        BottomNavBar(selectedTab = selectedTab, onTabSelected = { selectedTab = it })
-                    }
-                }
-                }
-            }
-            is Screen.SourcePicker -> {
-                StationPickerScreen(
-                    stations = stations,
-                    onStationSelected = { station ->
-                        selectedSource = station
-                        CacheManager.addRecentStation(context, station)
-                        currentScreen = Screen.Main
-                    },
-                    onBack = { currentScreen = Screen.Main }
-                )
-            }
-            is Screen.DestinationPicker -> {
-                StationPickerScreen(
-                    stations = stations,
-                    onStationSelected = { station ->
-                        selectedDestination = station
-                        CacheManager.addRecentStation(context, station)
-                        currentScreen = Screen.Main
-                    },
-                    onBack = { currentScreen = Screen.Main }
-                )
-            }
-            is Screen.Booking -> {
-                BookingScreen(
-                    quotes = quotes,
-                    fromStation = selectedSource,
-                    toStation = selectedDestination,
-                    isLoading = isLoading,
-                    error = error,
-                    onConfirm = { quote, quantity -> confirmBooking(quote, quantity) },
-                    onRetry = { startSearch() },
-                    onBack = {
-                        currentScreen = Screen.Main
-                        quotes = emptyList()
-                        error = null
-                    }
-                )
-            }
-            is Screen.Payment -> {
-                PaymentScreen(
-                    bookingStatus = bookingStatus,
-                    isLoading = isLoading,
-                    error = error,
-                    onPayClick = { currentScreen = Screen.PaymentWeb },
-                    onViewTicket = { currentScreen = Screen.Ticket },
-                    onRetry = {
-                        scope.launch {
-                            bookingId?.let { id ->
-                                try {
-                                    val statusResp = ApiClient.instance.getBookingStatus(token, id)
-                                    if (statusResp.isSuccessful) bookingStatus = statusResp.body()
-                                } catch (_: Exception) {}
+                            } else {
+                                currentScreen = Screen.Onboarding
                             }
                         }
-                    },
-                    onBack = {
-                        currentScreen = Screen.Main
-                        bookingId = null
-                        bookingStatus = null
                     }
-                )
-            }
-            is Screen.PaymentWeb -> {
-                val payUrl = bookingStatus?.payment?.order?.paymentLinks?.web ?: ""
-                PaymentWebView(
-                    paymentUrl = payUrl,
-                    onPaymentComplete = { currentScreen = Screen.Ticket },
-                    onBack = { currentScreen = Screen.Payment }
-                )
-            }
-            is Screen.Ticket -> {
-                TicketScreen(
-                    token = token,
-                    bookingId = bookingId ?: "",
-                    onCancel = {
-                        currentScreen = Screen.Main
-                        bookingId = null
-                        bookingStatus = null
-                    },
-                    onBack = {
-                        currentScreen = Screen.Main
-                        bookingId = null
-                        bookingStatus = null
+                    is Screen.Onboarding -> {
+                        OnboardingScreen {
+                            TokenManager.setOnboardingDone(context)
+                            currentScreen = Screen.Auth
+                        }
                     }
-                )
+                    is Screen.Auth -> {
+                        AuthScreen { newToken ->
+                            token = newToken
+                            TokenManager.saveToken(context, newToken)
+                            loadMetroData()
+                            currentScreen = Screen.Main
+                        }
+                    }
+                    is Screen.Main -> {
+                        when (selectedTab) {
+                            BottomTab.HOME -> HomeScreen(
+                                stations = stations,
+                                selectedSource = selectedSource,
+                                selectedDestination = selectedDestination,
+                                onStationClick = { isSource ->
+                                    currentScreen = if (isSource) Screen.SourcePicker else Screen.DestinationPicker
+                                },
+                                onSearchClick = {
+                                    currentScreen = Screen.Booking
+                                    startSearch()
+                                }
+                            )
+                            BottomTab.TICKETS -> TicketHistoryScreen(
+                                token = token,
+                                onTicketClick = { id ->
+                                    bookingId = id
+                                    currentScreen = Screen.Ticket
+                                }
+                            )
+                            BottomTab.PROFILE -> ProfileScreen(
+                                token = token,
+                                onThemeToggle = { themeManager.toggle() },
+                                onLogout = {
+                                    token = ""
+                                    TokenManager.clearToken(context)
+                                    currentScreen = Screen.Auth
+                                }
+                            )
+                        }
+                        // Bottom nav
+                        Box(modifier = Modifier.align(Alignment.BottomCenter)) {
+                            BottomNavBar(selectedTab = selectedTab, onTabSelected = { selectedTab = it })
+                        }
+                    }
+                    is Screen.SourcePicker -> {
+                        StationPickerScreen(
+                            stations = stations,
+                            onStationSelected = { station ->
+                                selectedSource = station
+                                CacheManager.addRecentStation(context, station)
+                                currentScreen = Screen.Main
+                            },
+                            onBack = { currentScreen = Screen.Main }
+                        )
+                    }
+                    is Screen.DestinationPicker -> {
+                        StationPickerScreen(
+                            stations = stations,
+                            onStationSelected = { station ->
+                                selectedDestination = station
+                                CacheManager.addRecentStation(context, station)
+                                currentScreen = Screen.Main
+                            },
+                            onBack = { currentScreen = Screen.Main }
+                        )
+                    }
+                    is Screen.Booking -> {
+                        BookingScreen(
+                            quotes = quotes,
+                            fromStation = selectedSource,
+                            toStation = selectedDestination,
+                            isLoading = isLoading,
+                            error = error,
+                            onConfirm = { quote, quantity -> confirmBooking(quote, quantity) },
+                            onRetry = { startSearch() },
+                            onBack = {
+                                currentScreen = Screen.Main
+                                quotes = emptyList()
+                                error = null
+                            }
+                        )
+                    }
+                    is Screen.Ticket -> {
+                        TicketScreen(
+                            token = token,
+                            bookingId = bookingId ?: "",
+                            onBack = {
+                                currentScreen = Screen.Main
+                                bookingId = null
+                            }
+                        )
+                    }
+                }
             }
         }
-    }
     }
 }
