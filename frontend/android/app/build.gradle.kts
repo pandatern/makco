@@ -72,5 +72,7 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.5.0")
     implementation("androidx.webkit:webkit:1.9.0")
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
+    // QR Code generation
+    implementation("com.google.zxing:core:3.5.2")
     debugImplementation("androidx.compose.ui:ui-tooling")
 }

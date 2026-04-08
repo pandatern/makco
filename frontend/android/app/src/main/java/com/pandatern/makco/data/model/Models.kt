@@ -59,13 +59,26 @@ data class PriceCurrency(
     @SerializedName("currency") val currency: String
 )
 
+data class Ticket(
+    @SerializedName("id") val id: String,
+    @SerializedName("qrString") val qrString: String?,
+    @SerializedName("verificationCode") val verificationCode: String?,
+    @SerializedName("status") val status: String?,
+    @SerializedName("ticketNumber") val ticketNumber: String?,
+    @SerializedName("issuedAt") val issuedAt: String?,
+    @SerializedName("validTill") val validTill: String?
+)
+
 data class BookingResponse(
     @SerializedName("bookingId") val bookingId: String,
     @SerializedName("status") val status: String,
     @SerializedName("price") val price: Double,
     @SerializedName("priceWithCurrency") val priceWithCurrency: PriceCurrency,
     @SerializedName("stations") val stations: List<Station>,
-    @SerializedName("validTill") val validTill: String
+    @SerializedName("validTill") val validTill: String,
+    @SerializedName("tickets") val tickets: List<Ticket> = emptyList(),
+    @SerializedName("quantity") val quantity: Int = 1,
+    @SerializedName("_type") val type: String? = null
 )
 
 data class BookingStatus(

@@ -43,6 +43,7 @@ fun MakcoNavHost() {
     var selectedDestination by remember { mutableStateOf<Station?>(null) }
     var quotes by remember { mutableStateOf<List<Quote>>(emptyList()) }
     var bookingId by remember { mutableStateOf<String?>(null) }
+    var currentBooking by remember { mutableStateOf<BookingResponse?>(null) }
     var isLoading by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
 
@@ -126,9 +127,11 @@ fun MakcoNavHost() {
                     request = ConfirmRequest(1)
                 )
                 if (resp.isSuccessful && resp.body() != null) {
-                    bookingId = resp.body()?.bookingId
+                    val booking = resp.body()!!
+                    bookingId = booking.bookingId
+                    currentBooking = booking
                     // Save booking
-                    bookingId?.let { CacheManager.saveLastBooking(context, it) }
+                    booking.bookingId.let { CacheManager.saveLastBooking(context, it) }
                     // Go straight to ticket - no payment
                     subScreen = SubScreen.TICKET
                 } else error = "Booking failed"
@@ -276,10 +279,18 @@ fun MakcoNavHost() {
                         }
                         SubScreen.TICKET -> {
                             TicketScreen(
-                                bookingId = bookingId ?: "",
+                                booking = currentBooking ?: BookingResponse(
+                                    bookingId = bookingId ?: "",
+                                    status = "CONFIRMED",
+                                    price = 0.0,
+                                    priceWithCurrency = PriceCurrency(0.0, "INR"),
+                                    stations = emptyList(),
+                                    validTill = ""
+                                ),
                                 onBack = {
                                     subScreen = SubScreen.NONE
                                     bookingId = null
+                                    currentBooking = null
                                 }
                             )
                         }

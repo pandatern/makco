@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Blue background -->
+    <path
+        android:fillColor="#2196F3"
+        android:pathData="M0,0h108v108h-108z"/>
+    <!-- Metro icon -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M30,70L30,38L42,58L54,38L54,70M54,38L66,58L78,38L78,70L66,70L66,50L54,65L54,38M42,70L54,70L54,65L42,65L42,70Z"/>
+    <!-- Train tracks at bottom -->
+    <path
+        android:pathData="M28,72L28,76L44,76L44,72"
+        android:strokeWidth="2"
+        android:strokeColor="#FFFFFF"/>
+    <path
+        android:pathData="M64,72L64,76L80,76L80,72"
+        android:strokeWidth="2"
+        android:strokeColor="#FFFFFF"/>
+</vector>

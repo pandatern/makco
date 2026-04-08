@@ -21,38 +21,60 @@ enum class BottomTab { HOME, TICKETS, PROFILE }
 fun BottomNavBar(selectedTab: BottomTab, onTabSelected: (BottomTab) -> Unit) {
     val theme = LocalThemeManager.current
 
-    // Footer centered with padding
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 32.dp, end = 32.dp, bottom = 20.dp),
+            .padding(start = 24.dp, end = 24.dp, bottom = 20.dp),
         contentAlignment = Alignment.Center
     ) {
-        // Glassmorphism pill
         Row(
             modifier = Modifier
-                .clip(RoundedCornerShape(28.dp))
-                .background(theme.glass)
-                .padding(horizontal = 6.dp, vertical = 6.dp),
+                .clip(RoundedCornerShape(32.dp))
+                .background(if (theme.isDark) Color(0xFF0A0A0A) else Color(0xFFF5F5F5))
+                .padding(horizontal = 8.dp, vertical = 8.dp),
             horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            TabItem("HOME", selectedTab == BottomTab.HOME, { onTabSelected(BottomTab.HOME) }, theme)
-            TabItem("TICKETS", selectedTab == BottomTab.TICKETS, { onTabSelected(BottomTab.TICKETS) }, theme)
-            TabItem("PROFILE", selectedTab == BottomTab.PROFILE, { onTabSelected(BottomTab.PROFILE) }, theme)
+            TabItem(
+                icon = "🚇",
+                label = "Home",
+                isSelected = selectedTab == BottomTab.HOME,
+                onClick = { onTabSelected(BottomTab.HOME) },
+                theme = theme
+            )
+            TabItem(
+                icon = "🎫",
+                label = "Tickets",
+                isSelected = selectedTab == BottomTab.TICKETS,
+                onClick = { onTabSelected(BottomTab.TICKETS) },
+                theme = theme
+            )
+            TabItem(
+                icon = "👤",
+                label = "Profile",
+                isSelected = selectedTab == BottomTab.PROFILE,
+                onClick = { onTabSelected(BottomTab.PROFILE) },
+                theme = theme
+            )
         }
     }
 }
 
 @Composable
-fun TabItem(label: String, isSelected: Boolean, onClick: () -> Unit, theme: ThemeManager) {
-    Box(
+fun TabItem(icon: String, label: String, isSelected: Boolean, onClick: () -> Unit, theme: ThemeManager) {
+    Row(
         modifier = Modifier
-            .clip(RoundedCornerShape(22.dp))
-            .background(if (isSelected) theme.glassSelected else Color.Transparent)
+            .clip(RoundedCornerShape(24.dp))
+            .background(if (isSelected) theme.highlight else Color.Transparent)
             .clickable(onClick = onClick)
-            .padding(horizontal = 22.dp, vertical = 12.dp),
-        contentAlignment = Alignment.Center
+            .padding(horizontal = 20.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
     ) {
+        Text(
+            text = icon,
+            style = MaterialTheme.typography.titleMedium
+        )
+        Spacer(modifier = Modifier.width(6.dp))
         Text(
             text = label,
             style = MaterialTheme.typography.labelMedium.copy(

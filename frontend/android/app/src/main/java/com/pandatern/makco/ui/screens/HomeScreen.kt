@@ -2,6 +2,7 @@ package com.pandatern.makco.ui.screens
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -15,8 +16,17 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color as AndroidColor
+import android.graphics.Paint
+import androidx.compose.ui.graphics.toArgb
 import com.pandatern.makco.data.model.*
 import com.pandatern.makco.data.local.CacheManager
 import com.pandatern.makco.ui.theme.*
@@ -49,16 +59,33 @@ fun HomeScreen(
     ) {
         Spacer(modifier = Modifier.height(48.dp))
 
-        // Header
-        Text(
-            text = "MAKCO",
-            style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Black),
-            color = theme.t1
-        )
-
-        Spacer(modifier = Modifier.height(4.dp))
-
-        Text("CHENNAI METRO", style = MaterialTheme.typography.labelMedium, color = theme.t4)
+        // Header with Metro icon
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Metro icon badge
+            Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .background(MetroBlue, RoundedCornerShape(12.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "M",
+                    style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Black),
+                    color = Color.White
+                )
+            }
+            Spacer(modifier = Modifier.width(16.dp))
+            Column {
+                Text(
+                    text = "MAKCO",
+                    style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Black),
+                    color = theme.t1
+                )
+                Text("CHENNAI METRO", style = MaterialTheme.typography.labelMedium, color = theme.t4)
+            }
+        }
 
         Spacer(modifier = Modifier.height(40.dp))
 
@@ -182,7 +209,7 @@ fun HomeScreen(
 
         Spacer(modifier = Modifier.weight(1f))
 
-        // Lines indicator
+        // Lines indicator with styled badges
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -190,15 +217,33 @@ fun HomeScreen(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Box(modifier = Modifier.size(8.dp).background(MetroBlue))
-            Spacer(modifier = Modifier.width(8.dp))
-            Text("BLUE", style = MaterialTheme.typography.labelSmall, color = theme.t4)
-            Spacer(modifier = Modifier.width(20.dp))
-            Box(modifier = Modifier.size(8.dp).background(MetroGreen))
-            Spacer(modifier = Modifier.width(8.dp))
-            Text("GREEN", style = MaterialTheme.typography.labelSmall, color = theme.t4)
-            Spacer(modifier = Modifier.width(20.dp))
-            Text("${stations.size} STATIONS", style = MaterialTheme.typography.labelSmall, color = theme.t4)
+            // Blue line badge
+            Box(
+                modifier = Modifier
+                    .background(MetroBlue.copy(alpha = 0.15f), RoundedCornerShape(4.dp))
+                    .padding(horizontal = 8.dp, vertical = 4.dp)
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(modifier = Modifier.size(6.dp).background(MetroBlue))
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text("BLUE LINE", style = MaterialTheme.typography.labelSmall, color = MetroBlue)
+                }
+            }
+            Spacer(modifier = Modifier.width(16.dp))
+            // Green line badge
+            Box(
+                modifier = Modifier
+                    .background(MetroGreen.copy(alpha = 0.15f), RoundedCornerShape(4.dp))
+                    .padding(horizontal = 8.dp, vertical = 4.dp)
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(modifier = Modifier.size(6.dp).background(MetroGreen))
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text("GREEN LINE", style = MaterialTheme.typography.labelSmall, color = MetroGreen)
+                }
+            }
+            Spacer(modifier = Modifier.width(16.dp))
+            Text("${stations.size} stations", style = MaterialTheme.typography.labelSmall, color = theme.t4)
         }
     }
 }

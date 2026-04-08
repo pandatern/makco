@@ -2,6 +2,7 @@ package com.pandatern.makco.ui.screens
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -12,18 +13,39 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import android.graphics.Bitmap
+import android.graphics.Color as AndroidColor
+import android.graphics.pdf.PdfRenderer
+import android.util.Base64
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.unit.dp
+import com.google.zxing.BarcodeFormat
+import com.google.zxing.EncodeHintType
+import com.google.zxing.qrcode.QRCodeWriter
+import com.pandatern.makco.data.model.BookingResponse
+import com.pandatern.makco.data.model.Ticket
 import com.pandatern.makco.ui.theme.*
 
 @Composable
 fun TicketScreen(
-    bookingId: String,
+    booking: BookingResponse,
     onBack: () -> Unit
 ) {
     val theme = LocalThemeManager.current
+    val ticket = booking.tickets.firstOrNull()
+    val qrString = ticket?.qrString ?: ticket?.verificationCode ?: booking.bookingId
 
     // Animate content appearance
     var visible by remember { mutableStateOf(false) }
@@ -55,7 +77,7 @@ fun TicketScreen(
                 Text("TICKET", style = MaterialTheme.typography.labelMedium, color = theme.t4)
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = bookingId.take(8).uppercase(),
+                    text = booking.bookingId.take(8).uppercase(),
                     style = MaterialTheme.typography.displayLarge.copy(
                         fontFamily = FontFamily.Monospace,
                         fontWeight = FontWeight.Black,
@@ -75,7 +97,7 @@ fun TicketScreen(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "CONFIRMED",
+                        text = booking.status,
                         style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
                         color = Success
                     )
@@ -97,42 +119,81 @@ fun TicketScreen(
                         .padding(24.dp)
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        // Metro logo
-                        Text(
-                            text = "METRO",
-                            style = MaterialTheme.typography.labelLarge.copy(
-                                fontWeight = FontWeight.Bold,
-                                letterSpacing = 4.sp
-                            ),
-                            color = MetroBlue
-                        )
+                        // Metro logo with icon
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            // Metro icon (styled)
+                            Box(
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .background(MetroBlue, RoundedCornerShape(4.dp)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    "M",
+                                    color = Color.White,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 14.sp
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "METRO",
+                                style = MaterialTheme.typography.labelLarge.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    letterSpacing = 4.sp
+                                ),
+                                color = MetroBlue
+                            )
+                        }
 
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        // QR Code - REAL pattern based on booking ID
-                        val qrData = generateQRPattern(bookingId)
-                        Box(
-                            modifier = Modifier
-                                .size(200.dp)
-                                .background(Color.White)
-                                .padding(12.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.spacedBy(2.dp)
+                        // REAL QR Code from API
+                        if (qrString.isNotEmpty()) {
+                            val qrBitmap = remember(qrString) { generateQRBitmap(qrString, 512) }
+                            Box(
+                                modifier = Modifier
+                                    .size(200.dp)
+                                    .background(Color.White)
+                                    .padding(12.dp),
+                                contentAlignment = Alignment.Center
                             ) {
-                                // QR grid
-                                qrData.forEach { row ->
-                                    Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
-                                        row.forEach { filled ->
-                                            Box(
-                                                modifier = Modifier
-                                                    .size(12.dp)
-                                                    .background(
-                                                        if (filled) Color.Black else Color.White
-                                                    )
-                                            )
+                                qrBitmap?.let {
+                                    Image(
+                                        bitmap = it.asImageBitmap(),
+                                        contentDescription = "QR Code",
+                                        modifier = Modifier.fillMaxSize()
+                                    )
+                                } ?: Text("Generating QR...", color = theme.t4)
+                            }
+                        } else {
+                            // Fallback placeholder if no QR data
+                            Box(
+                                modifier = Modifier
+                                    .size(200.dp)
+                                    .background(Color.White)
+                                    .padding(12.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                val pattern = generateQRPattern(booking.bookingId)
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.spacedBy(2.dp)
+                                ) {
+                                    pattern.forEach { row ->
+                                        Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+                                            row.forEach { filled ->
+                                                Box(
+                                                    modifier = Modifier
+                                                        .size(12.dp)
+                                                        .background(
+                                                            if (filled) Color.Black else Color.White
+                                                        )
+                                                )
+                                            }
                                         }
                                     }
                                 }
@@ -141,24 +202,38 @@ fun TicketScreen(
 
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        // Booking ID under QR
-                        Text(
-                            text = bookingId.take(8).uppercase(),
-                            style = MaterialTheme.typography.headlineSmall.copy(
-                                fontFamily = FontFamily.Monospace,
-                                fontWeight = FontWeight.Bold,
-                                letterSpacing = 6.sp
-                            ),
-                            color = if (theme.isDark) Color.White else Color.Black
-                        )
+                        // Verification Code
+                        ticket?.verificationCode?.let { code ->
+                            Text(
+                                text = code,
+                                style = MaterialTheme.typography.headlineSmall.copy(
+                                    fontFamily = FontFamily.Monospace,
+                                    fontWeight = FontWeight.Bold,
+                                    letterSpacing = 6.sp
+                                ),
+                                color = if (theme.isDark) Color.White else Color.Black
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                        }
 
-                        Spacer(modifier = Modifier.height(8.dp))
-
+                        // Ticket details
                         Text(
-                            text = "₹32 • ADULT",
+                            text = "₹${booking.price.toInt()} • ${booking.quantity} TICKET${if (booking.quantity > 1) "S" else ""}",
                             style = MaterialTheme.typography.bodyMedium,
                             color = theme.t4
                         )
+
+                        // Show station info
+                        booking.stations.firstOrNull()?.let { from ->
+                            booking.stations.lastOrNull()?.let { to ->
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    text = "${from.name} → ${to.name}",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = theme.t3
+                                )
+                            }
+                        }
                     }
                 }
 
@@ -176,13 +251,13 @@ fun TicketScreen(
                         Text("VALIDITY", style = MaterialTheme.typography.labelSmall, color = theme.t4)
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            "Single journey • Entry + Exit",
+                            if (booking.type == "ReturnJourney") "Return journey • Entry + Exit" else "Single journey • Entry + Exit",
                             style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
                             color = theme.t3
                         )
                         Spacer(modifier = Modifier.height(2.dp))
                         Text(
-                            "Scan QR at gate",
+                            "Valid until: ${booking.validTill.take(16).replace("T", " ")}",
                             style = MaterialTheme.typography.bodySmall,
                             color = theme.t4
                         )
@@ -193,13 +268,34 @@ fun TicketScreen(
     }
 }
 
-// Generate QR-like pattern from booking ID
+// Generate real QR bitmap from string
+private fun generateQRBitmap(content: String, size: Int): Bitmap? {
+    return try {
+        val hints = mapOf(
+            EncodeHintType.MARGIN to 1,
+            EncodeHintType.CHARACTER_SET to "UTF-8"
+        )
+        val writer = QRCodeWriter()
+        val bitMatrix = writer.encode(content, BarcodeFormat.QR_CODE, size, size, hints)
+        
+        val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.RGB_565)
+        for (x in 0 until size) {
+            for (y in 0 until size) {
+                bitmap.setPixel(x, y, if (bitMatrix[x, y]) AndroidColor.BLACK else AndroidColor.WHITE)
+            }
+        }
+        bitmap
+    } catch (e: Exception) {
+        null
+    }
+}
+
+// Fallback pattern generator
 private fun generateQRPattern(bookingId: String): List<List<Boolean>> {
     val size = 12
     val hash = bookingId.hashCode()
     val pattern = mutableListOf<List<Boolean>>()
 
-    // Outer frame (always filled)
     for (row in 0 until size) {
         val rowData = mutableListOf<Boolean>()
         for (col in 0 until size) {
