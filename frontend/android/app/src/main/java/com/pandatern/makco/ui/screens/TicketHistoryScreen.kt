@@ -1,5 +1,6 @@
 package com.pandatern.makco.ui.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -13,9 +14,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.pandatern.makco.R
 import com.pandatern.makco.data.model.*
 import com.pandatern.makco.data.remote.ApiClient
 import com.pandatern.makco.ui.theme.*
@@ -29,28 +33,27 @@ fun TicketHistoryScreen(
     val theme = LocalThemeManager.current
     var tickets by remember { mutableStateOf<List<BookingStatus>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
-    var isRefreshing by remember { mutableStateOf(false) }
+    var error by remember { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
 
-    val outline = if (theme.isDark) Color(0xFF2A2A2A) else Color(0xFFD0D0D0)
-
     suspend fun loadTickets() {
+        isLoading = true
+        error = null
         try {
             val resp = ApiClient.instance.getTickets(token, "chennai")
-            if (resp.isSuccessful) tickets = resp.body() ?: emptyList()
-        } catch (_: Exception) {}
+            if (resp.isSuccessful) {
+                val body = resp.body()
+                tickets = body ?: emptyList()
+            } else {
+                error = "Failed to load tickets"
+            }
+        } catch (e: Exception) {
+            error = "Network error"
+        }
         isLoading = false
     }
 
     LaunchedEffect(Unit) { loadTickets() }
-
-    fun refresh() {
-        isRefreshing = true
-        scope.launch {
-            loadTickets()
-            isRefreshing = false
-        }
-    }
 
     Column(
         modifier = Modifier
@@ -65,24 +68,11 @@ fun TicketHistoryScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = "MY TICKETS",
-                style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Black),
-                color = theme.t1
-            )
-
-            // Refresh button
-            if (!isLoading) {
-                TextButton(
-                    onClick = { refresh() },
-                    enabled = !isRefreshing
-                ) {
-                    if (isRefreshing) {
-                        CircularProgressIndicator(modifier = Modifier.size(16.dp), color = theme.t4, strokeWidth = 2.dp)
-                    } else {
-                        Text("REFRESH", style = MaterialTheme.typography.labelSmall, color = theme.t4)
-                    }
-                }
+            Text("MY TICKETS", style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Black), color = theme.t1)
+            TextButton(onClick = { scope.launch { loadTickets() } }, enabled = !isLoading) {
+                Image(painter = painterResource(R.drawable.ic_ticket), contentDescription = null, colorFilter = ColorFilter.tint(theme.t3), modifier = Modifier.size(20.dp))
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("REFRESH", style = MaterialTheme.typography.labelSmall, color = theme.t3)
             }
         }
 
@@ -94,62 +84,71 @@ fun TicketHistoryScreen(
                     CircularProgressIndicator(color = theme.t1, strokeWidth = 2.dp)
                 }
             }
+            error != null -> {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Image(painter = painterResource(R.drawable.ic_ticket), contentDescription = null, colorFilter = ColorFilter.tint(theme.t4), modifier = Modifier.size(48.dp))
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(error!!, style = MaterialTheme.typography.bodyMedium, color = theme.t3)
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Button(onClick = { scope.launch { loadTickets() } }, colors = ButtonDefaults.buttonColors(containerColor = theme.t1, contentColor = theme.bg)) {
+                            Text("RETRY")
+                        }
+                    }
+                }
+            }
             tickets.isEmpty() -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("NO TICKETS YET", style = MaterialTheme.typography.labelMedium, color = theme.t3)
+                        Image(painter = painterResource(R.drawable.ic_ticket), contentDescription = null, colorFilter = ColorFilter.tint(theme.t4), modifier = Modifier.size(64.dp))
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text("NO TICKETS YET", style = MaterialTheme.typography.titleMedium, color = theme.t3)
                         Spacer(modifier = Modifier.height(8.dp))
-                        TextButton(onClick = { refresh() }) {
-                            Text("REFRESH", style = MaterialTheme.typography.labelMedium, color = theme.t1)
-                        }
+                        Text("Your booked tickets will appear here", style = MaterialTheme.typography.bodySmall, color = theme.t4)
                     }
                 }
             }
             else -> {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(bottom = 100.dp)
-                ) {
+                LazyColumn(contentPadding = PaddingValues(bottom = 100.dp)) {
                     items(tickets) { ticket ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(8.dp))
-                                .border(1.dp, outline, RoundedCornerShape(8.dp))
-                                .clickable { onTicketClick(ticket.bookingId) }
-                                .background(theme.bg)
-                                .padding(16.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    text = ticket.bookingId.take(8).uppercase(),
-                                    style = MaterialTheme.typography.labelLarge.copy(fontFamily = FontFamily.Monospace),
-                                    color = theme.t1
-                                )
-                                Spacer(modifier = Modifier.height(4.dp))
-                                Text(
-                                    text = ticket.status,
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = when (ticket.status) {
-                                        "CONFIRMED" -> theme.t2
-                                        "PAYMENT_PENDING" -> theme.t2
-                                        "CANCELLED" -> theme.t1
-                                        else -> theme.t3
-                                    }
-                                )
-                            }
-                            Text(
-                                text = "₹${ticket.price.toInt()}",
-                                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                                color = theme.t1
-                            )
-                        }
-                        Spacer(modifier = Modifier.height(8.dp))
+                        TicketCard(ticket = ticket, theme = theme, onClick = { onTicketClick(ticket.bookingId) })
+                        Spacer(modifier = Modifier.height(12.dp))
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun TicketCard(ticket: BookingStatus, theme: ThemeManager, onClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .border(1.dp, theme.outline)
+            .clickable(onClick = onClick)
+            .background(theme.bg2)
+            .padding(16.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Image(painter = painterResource(R.drawable.ic_ticket), contentDescription = null, colorFilter = ColorFilter.tint(theme.t2), modifier = Modifier.size(24.dp))
+            Spacer(modifier = Modifier.width(16.dp))
+            Column {
+                Text(ticket.bookingId.take(8).uppercase(), style = MaterialTheme.typography.labelLarge.copy(fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold), color = theme.t1)
+                Spacer(modifier = Modifier.height(4.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(modifier = Modifier.size(8.dp).background(theme.t2, RoundedCornerShape(4.dp)))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(ticket.status, style = MaterialTheme.typography.bodySmall, color = theme.t2)
+                }
+            }
+        }
+        Column(horizontalAlignment = Alignment.End) {
+            Text("₹${ticket.price.toInt()}", style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold), color = theme.t1)
+            Text("VIEW →", style = MaterialTheme.typography.labelSmall, color = theme.t3)
         }
     }
 }

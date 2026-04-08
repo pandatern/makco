@@ -4,12 +4,15 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -18,7 +21,7 @@ import android.graphics.Color as AndroidColor
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.EncodeHintType
 import com.google.zxing.qrcode.QRCodeWriter
-import com.pandatern.makco.BuildConfig
+import com.pandatern.makco.R
 import com.pandatern.makco.data.model.BookingResponse
 import com.pandatern.makco.data.model.Ticket
 import com.pandatern.makco.ui.theme.*
@@ -36,92 +39,117 @@ fun TicketScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(theme.bg)
+            .padding(24.dp)
     ) {
-        TextButton(onClick = onBack, modifier = Modifier.padding(16.dp)) {
-            Text("← BACK", style = MaterialTheme.typography.labelLarge, color = theme.t1)
+        // Header
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Image(painter = painterResource(R.drawable.ic_location), contentDescription = "Back", colorFilter = ColorFilter.tint(theme.t1), modifier = Modifier.size(24.dp).clickable { onBack() })
+            Spacer(modifier = Modifier.width(12.dp))
+            Text("TICKET", style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold), color = theme.t1)
+            Spacer(modifier = Modifier.weight(1f))
+            Box(modifier = Modifier.clip(RoundedCornerShape(4.dp)).background(theme.bg3).padding(horizontal = 8.dp, vertical = 4.dp)) {
+                Text(booking.status, style = MaterialTheme.typography.labelSmall, color = theme.t2)
+            }
         }
 
-        Column(
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Ticket info card
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
+                .clip(RoundedCornerShape(16.dp))
+                .border(2.dp, theme.outline)
+                .background(theme.bg2)
                 .padding(24.dp)
         ) {
-            // Header - plain text
-            Text("TICKET", style = MaterialTheme.typography.labelMedium, color = theme.t3)
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = booking.bookingId.take(8).uppercase(),
-                style = MaterialTheme.typography.displaySmall.copy(
-                    fontFamily = FontFamily.Monospace,
-                    fontWeight = FontWeight.Bold
-                ),
-                color = theme.t1
-            )
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(booking.bookingId.take(8).uppercase(), style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold, fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace), color = theme.t1)
 
-            Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
-            // Status - plain text
-            Text(booking.status, style = MaterialTheme.typography.labelMedium, color = theme.t2)
-
-            // DEBUG banner - mono
-            if (BuildConfig.IS_DEBUG) {
-                Spacer(modifier = Modifier.height(16.dp))
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .border(2.dp, theme.t1)
-                        .padding(12.dp)
-                ) {
-                    Text(
-                        "DEBUG MODE",
-                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
-                        color = theme.t1
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // QR box - simple bordered
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(1f)
-                    .border(2.dp, theme.t1)
-                    .background(theme.bg2)
-                    .padding(16.dp),
-                contentAlignment = Alignment.Center
-            ) {
+                // Large QR Code
                 if (qrString.isNotEmpty()) {
-                    val qrBitmap = remember(qrString) { generateQRBitmap(qrString, 400) }
-                    qrBitmap?.let {
-                        Image(
-                            bitmap = it.asImageBitmap(),
-                            contentDescription = "QR",
-                            modifier = Modifier.fillMaxSize()
-                        )
+                    val qrBitmap = remember(qrString) { generateQRBitmap(qrString, 300) }
+                    Box(
+                        modifier = Modifier
+                            .size(220.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(Color.White)
+                            .padding(16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        qrBitmap?.let {
+                            Image(bitmap = it.asImageBitmap(), contentDescription = "QR", modifier = Modifier.fillMaxSize())
+                        }
                     }
                 } else {
-                    Text("QR", style = MaterialTheme.typography.headlineLarge, color = theme.t3)
+                    Box(modifier = Modifier.size(220.dp).clip(RoundedCornerShape(12.dp)).border(2.dp, theme.outline), contentAlignment = Alignment.Center) {
+                        Text("QR", style = MaterialTheme.typography.displayMedium, color = theme.t3)
+                    }
                 }
-            }
 
-            Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-            // Info - plain text
-            Text(
-                "₹${booking.price.toInt()} × ${booking.quantity}",
-                style = MaterialTheme.typography.titleMedium,
-                color = theme.t1
-            )
-
-            booking.stations.firstOrNull()?.let { from ->
-                booking.stations.lastOrNull()?.let { to ->
+                ticket?.verificationCode?.let { code ->
+                    Text(code, style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, letterSpacing = 4.sp), color = theme.t1)
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text("${from.name} → ${to.name}", style = MaterialTheme.typography.bodyMedium, color = theme.t2)
+                }
+
+                Text("SCAN AT GATE", style = MaterialTheme.typography.labelSmall, color = theme.t4)
+            }
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Journey details
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(12.dp))
+                .border(1.dp, theme.outline)
+                .background(theme.bg2)
+                .padding(20.dp)
+        ) {
+            Column {
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Column {
+                        Text("ROUTE", style = MaterialTheme.typography.labelSmall, color = theme.t4)
+                        Spacer(modifier = Modifier.height(4.dp))
+                        booking.stations.firstOrNull()?.let { from ->
+                            booking.stations.lastOrNull()?.let { to ->
+                                Text("${from.name} → ${to.name}", style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold), color = theme.t1)
+                            }
+                        }
+                    }
+                    Column(horizontalAlignment = Alignment.End) {
+                        Text("FARE", style = MaterialTheme.typography.labelSmall, color = theme.t4)
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text("₹${booking.price.toInt()} × ${booking.quantity}", style = MaterialTheme.typography.bodyMedium, color = theme.t1)
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Column {
+                        Text("VALIDITY", style = MaterialTheme.typography.labelSmall, color = theme.t4)
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(booking.validTill.take(10), style = MaterialTheme.typography.bodySmall, color = theme.t2)
+                    }
+                    Column(horizontalAlignment = Alignment.End) {
+                        Text("TYPE", style = MaterialTheme.typography.labelSmall, color = theme.t4)
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(booking.type ?: "Single Journey", style = MaterialTheme.typography.bodySmall, color = theme.t2)
+                    }
                 }
             }
         }
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        // Footer
+        Text("Show this ticket at the metro station entrance", style = MaterialTheme.typography.labelSmall, color = theme.t4, modifier = Modifier.align(Alignment.CenterHorizontally))
     }
 }
 
