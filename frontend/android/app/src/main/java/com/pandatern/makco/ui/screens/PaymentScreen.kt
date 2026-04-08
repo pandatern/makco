@@ -46,16 +46,16 @@ fun PaymentScreen(
                 }
             }
             error != null -> {
-                Box(modifier = Modifier.fillMaxWidth().background(Error.copy(alpha = 0.1f)).padding(16.dp)) {
-                    Text(error, color = Error, style = MaterialTheme.typography.labelMedium)
+                Box(modifier = Modifier.fillMaxWidth().background(theme.t1.copy(alpha = 0.1f)).padding(16.dp)) {
+                    Text(error, color = theme.t1, style = MaterialTheme.typography.labelMedium)
                 }
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(
                     onClick = onRetry,
                     modifier = Modifier.fillMaxWidth().height(48.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = if (theme.isDark) Color.White else Color.Black,
-                        contentColor = if (theme.isDark) Color.Black else Color.White
+                        containerColor = theme.t1,
+                        contentColor = theme.bg
                     )
                 ) {
                     Text("RETRY", style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold))
@@ -79,9 +79,9 @@ fun PaymentScreen(
 
                 // Status
                 PaymentRow("STATUS", status.status, when (status.status) {
-                    "PAYMENT_PENDING" -> MetroGold
-                    "CONFIRMED" -> Success
-                    "FAILED", "CANCELLED" -> Error
+                    "PAYMENT_PENDING" -> theme.t2
+                    "CONFIRMED" -> theme.t2
+                    "FAILED", "CANCELLED" -> theme.t1
                     else -> theme.t3
                 }, theme)
 
@@ -125,8 +125,8 @@ fun PaymentScreen(
                             onClick = onRetry,
                             modifier = Modifier.fillMaxWidth().height(52.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = Error,
-                                contentColor = Color.White
+                                containerColor = theme.t1,
+                                contentColor = theme.bg
                             )
                         ) {
                             Text("TRY AGAIN",

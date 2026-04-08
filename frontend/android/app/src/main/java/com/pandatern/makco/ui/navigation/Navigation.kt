@@ -116,11 +116,9 @@ fun MakcoNavHost() {
                                 Quote(
                                     quoteId = sid,
                                     price = 32.0,
-                                    type = "SingleJourney",
-                                    quantity = 1,
                                     stations = listOf(
-                                        Station(name = src.name, stationType = "START"),
-                                        Station(name = dst.name, stationType = "END")
+                                        Station(code = "", name = src.name, lat = 0.0, lon = 0.0, stationType = "START"),
+                                        Station(code = "", name = dst.name, lat = 0.0, lon = 0.0, stationType = "END")
                                     )
                                 )
                             )
@@ -136,11 +134,9 @@ fun MakcoNavHost() {
                     Quote(
                         quoteId = "mock-${System.currentTimeMillis()}",
                         price = 32.0,
-                        type = "SingleJourney",
-                        quantity = 1,
                         stations = listOf(
-                            Station(name = src.name, stationType = "START"),
-                            Station(name = dst.name, stationType = "END")
+                            Station(code = "", name = src.name, lat = 0.0, lon = 0.0, stationType = "START"),
+                            Station(code = "", name = dst.name, lat = 0.0, lon = 0.0, stationType = "END")
                         )
                     )
                 )

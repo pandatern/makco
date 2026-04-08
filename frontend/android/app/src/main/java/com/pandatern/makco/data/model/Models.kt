@@ -29,14 +29,15 @@ data class SearchResponse(
 )
 
 data class Quote(
-    @SerializedName("_type") val type: String,
-    @SerializedName("quoteId") val quoteId: String,
-    @SerializedName("price") val price: Double,
-    @SerializedName("priceWithCurrency") val priceWithCurrency: PriceCurrency,
-    @SerializedName("stations") val stations: List<Station>,
-    @SerializedName("validTill") val validTill: String,
-    @SerializedName("vehicleType") val vehicleType: String,
-    @SerializedName("categories") val categories: List<QuoteCategory>? = null
+    @SerializedName("_type") val type: String = "SingleJourney",
+    @SerializedName("quoteId") val quoteId: String = "",
+    @SerializedName("price") val price: Double = 0.0,
+    @SerializedName("priceWithCurrency") val priceWithCurrency: PriceCurrency = PriceCurrency(0.0, "INR"),
+    @SerializedName("stations") val stations: List<Station> = emptyList(),
+    @SerializedName("validTill") val validTill: String = "",
+    @SerializedName("vehicleType") val vehicleType: String = "METRO",
+    @SerializedName("categories") val categories: List<QuoteCategory>? = null,
+    @SerializedName("quantity") val quantity: Int = 1
 )
 
 data class QuoteCategory(

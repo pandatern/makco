@@ -168,7 +168,7 @@ fun ProfileScreen(
                     Text(
                         text = "LOGOUT",
                         style = MaterialTheme.typography.labelLarge,
-                        color = Error
+                        color = theme.t1
                     )
                 }
             }

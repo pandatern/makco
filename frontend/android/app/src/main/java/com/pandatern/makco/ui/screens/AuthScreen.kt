@@ -152,7 +152,7 @@ fun AuthScreen(
             Spacer(modifier = Modifier.height(10.dp))
 
             Text("$attemptsLeft ATTEMPTS REMAINING", style = MaterialTheme.typography.labelSmall,
-                color = if (attemptsLeft <= 1) Error else theme.t4)
+                color = if (attemptsLeft <= 1) theme.t1 else theme.t4)
 
             Spacer(modifier = Modifier.height(28.dp))
 
@@ -205,8 +205,8 @@ fun AuthScreen(
         // Error
         error?.let {
             Spacer(modifier = Modifier.height(12.dp))
-            Box(modifier = Modifier.fillMaxWidth().background(Error.copy(alpha = 0.1f)).padding(14.dp)) {
-                Text(it, color = Error, style = MaterialTheme.typography.labelMedium)
+            Box(modifier = Modifier.fillMaxWidth().background(theme.t1.copy(alpha = 0.1f)).padding(14.dp)) {
+                Text(it, color = theme.t1, style = MaterialTheme.typography.labelMedium)
             }
         }
     }

@@ -61,7 +61,7 @@ fun PaymentWebView(
         if (state == PaymentState.LOADING) {
             LinearProgressIndicator(
                 modifier = Modifier.fillMaxWidth(),
-                color = MetroBlue,
+                color = theme.t2,
                 trackColor = theme.bg3
             )
         }
@@ -149,7 +149,7 @@ fun PaymentWebView(
                     StatusOverlay(
                         title = "PAYMENT SUCCESS",
                         message = "Your ticket is being generated...",
-                        color = Success,
+                        color = theme.t2,
                         theme = theme
                     )
                 }
@@ -157,7 +157,7 @@ fun PaymentWebView(
                     StatusOverlay(
                         title = "PAYMENT FAILED",
                         message = errorMsg ?: "Payment could not be completed",
-                        color = Error,
+                        color = theme.t1,
                         theme = theme,
                         onRetry = {
                             state = PaymentState.LOADING
@@ -170,7 +170,7 @@ fun PaymentWebView(
                     StatusOverlay(
                         title = "PAYMENT CANCELLED",
                         message = "You cancelled the payment",
-                        color = MetroGold,
+                        color = theme.t2,
                         theme = theme,
                         onRetry = {
                             state = PaymentState.LOADING
@@ -183,7 +183,7 @@ fun PaymentWebView(
                     StatusOverlay(
                         title = "TIMEOUT",
                         message = "Payment took too long. Check your bank statement before retrying.",
-                        color = MetroGold,
+                        color = theme.t2,
                         theme = theme,
                         onRetry = {
                             state = PaymentState.LOADING
@@ -196,7 +196,7 @@ fun PaymentWebView(
                     StatusOverlay(
                         title = "NETWORK ERROR",
                         message = errorMsg ?: "Check your internet connection",
-                        color = Error,
+                        color = theme.t1,
                         theme = theme,
                         onRetry = {
                             state = PaymentState.LOADING

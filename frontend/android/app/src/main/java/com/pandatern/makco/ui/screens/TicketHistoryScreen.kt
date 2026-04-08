@@ -133,9 +133,9 @@ fun TicketHistoryScreen(
                                     text = ticket.status,
                                     style = MaterialTheme.typography.bodySmall,
                                     color = when (ticket.status) {
-                                        "CONFIRMED" -> Success
-                                        "PAYMENT_PENDING" -> MetroGold
-                                        "CANCELLED" -> Error
+                                        "CONFIRMED" -> theme.t2
+                                        "PAYMENT_PENDING" -> theme.t2
+                                        "CANCELLED" -> theme.t1
                                         else -> theme.t3
                                     }
                                 )

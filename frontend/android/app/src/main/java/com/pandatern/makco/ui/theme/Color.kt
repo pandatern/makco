@@ -31,5 +31,12 @@ val Text2_Light = Color(0xFF333333)
 val Text3_Light = Color(0xFF666666)
 val Text4_Light = Color(0xFF999999)
 
-// Mono accent only
+// Mono accent - mapped to white in neo-brutalist
+val MetroBlue = Color(0xFFFFFFFF)
+val MetroGreen = Color(0xFFFFFFFF)
+val MetroGold = Color(0xFFFFFFFF)
+val Error = Color(0xFFFFFFFF)
+val Success = Color(0xFFFFFFFF)
+
+// For compatibility - Accent
 val Accent = Color(0xFFFFFFFF)
