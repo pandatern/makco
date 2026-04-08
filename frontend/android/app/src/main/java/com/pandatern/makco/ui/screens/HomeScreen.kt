@@ -25,6 +25,7 @@ import com.pandatern.makco.data.model.*
 import com.pandatern.makco.data.local.CacheManager
 import com.pandatern.makco.ui.theme.*
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun HomeScreen(
     stations: List<Station>,

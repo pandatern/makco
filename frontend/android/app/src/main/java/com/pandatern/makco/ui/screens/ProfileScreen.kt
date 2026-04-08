@@ -104,7 +104,7 @@ fun ProfileScreen(
                 // Toggle indicator
                 Box(
                     modifier = Modifier
-                        .size(48, 24.dp)
+                        .size(48.dp, 24.dp)
                         .clip(RoundedCornerShape(12.dp))
                         .background(theme.bg3),
                     contentAlignment = if (theme.isDark) Alignment.CenterEnd else Alignment.CenterStart

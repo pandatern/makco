@@ -45,10 +45,10 @@ fun TicketHistoryScreen(
                 val body = resp.body()
                 tickets = body ?: emptyList()
             } else {
-                error = "Failed to load tickets"
+                error = "Error: ${resp.code()} - ${resp.message()}"
             }
         } catch (e: Exception) {
-            error = "Network error"
+            error = "Network error: ${e.message}"
         }
         isLoading = false
     }

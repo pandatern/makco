@@ -83,10 +83,16 @@ data class BookingResponse(
 )
 
 data class BookingStatus(
-    @SerializedName("bookingId") val bookingId: String,
-    @SerializedName("status") val status: String,
-    @SerializedName("price") val price: Double,
-    @SerializedName("payment") val payment: PaymentOrder?
+    @SerializedName("bookingId") val bookingId: String = "",
+    @SerializedName("status") val status: String = "",
+    @SerializedName("price") val price: Double = 0.0,
+    @SerializedName("payment") val payment: PaymentOrder? = null,
+    @SerializedName("createdAt") val createdAt: String? = null,
+    @SerializedName("validTill") val validTill: String? = null,
+    @SerializedName("tickets") val tickets: List<Ticket> = emptyList(),
+    @SerializedName("quantity") val quantity: Int = 1,
+    @SerializedName("vehicleType") val vehicleType: String? = null,
+    @SerializedName("stations") val stations: List<Station>? = null
 )
 
 data class PaymentOrder(

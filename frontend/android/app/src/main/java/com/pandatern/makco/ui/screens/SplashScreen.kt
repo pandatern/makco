@@ -115,7 +115,7 @@ fun SplashScreen(themeManager: com.pandatern.makco.ui.theme.ThemeManager, onFini
             Spacer(modifier = Modifier.height(32.dp))
 
             // Animated text
-            Column(alpha = contentAlpha) {
+            Column(modifier = Modifier.alpha(contentAlpha)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         text = "MAKCO",

@@ -20,6 +20,7 @@ import com.pandatern.makco.ui.theme.*
 
 enum class BottomTab { HOME, TICKETS, PROFILE }
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun BottomNavBar(selectedTab: BottomTab, onTabSelected: (BottomTab) -> Unit) {
     val theme = LocalThemeManager.current
@@ -42,6 +43,7 @@ fun BottomNavBar(selectedTab: BottomTab, onTabSelected: (BottomTab) -> Unit) {
     }
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun TabItem(icon: Int, label: String, isSelected: Boolean, onClick: () -> Unit, theme: ThemeManager) {
     // Animate scale on selection
