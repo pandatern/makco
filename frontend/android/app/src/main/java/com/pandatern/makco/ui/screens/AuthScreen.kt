@@ -148,11 +148,11 @@ fun AuthScreen(onAuthSuccess: (token: String) -> Unit) {
                             .clip(androidx.compose.foundation.shape.RoundedCornerShape(12.dp))
                             .border(2.dp, theme.outline, androidx.compose.foundation.shape.RoundedCornerShape(12.dp))
                             .background(theme.bg2)
-                            .padding(20.dp)
+                            .padding(16.dp)
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text("+91", style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold), color = theme.t2)
-                            Spacer(modifier = Modifier.width(16.dp))
+                            Spacer(modifier = Modifier.width(12.dp))
                             BasicTextField(
                                 value = phone,
                                 onValueChange = { if (it.length <= 10) phone = it },
@@ -170,7 +170,7 @@ fun AuthScreen(onAuthSuccess: (token: String) -> Unit) {
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
 
                     Button(
                         onClick = {

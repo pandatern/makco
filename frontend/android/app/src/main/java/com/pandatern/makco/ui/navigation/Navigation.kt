@@ -189,6 +189,8 @@ fun MakcoNavHost() {
             appScreen = AppScreen.MAIN
         } else if (TokenManager.isOnboardingDone(context)) {
             appScreen = AppScreen.AUTH
+        } else {
+            appScreen = AppScreen.AUTH // Skip onboarding
         }
     }
 
@@ -198,7 +200,8 @@ fun MakcoNavHost() {
         Box(modifier = Modifier.fillMaxSize().background(themeManager.bg)) {
             when (appScreen) {
                 AppScreen.SPLASH -> {
-                    SplashScreen(themeManager = themeManager) {
+                    // Skip splash - go directly to auth
+                    LaunchedEffect(Unit) {
                         val saved = TokenManager.getToken(context)
                         if (saved != null && saved.isNotEmpty()) {
                             token = saved
@@ -207,8 +210,12 @@ fun MakcoNavHost() {
                         } else if (TokenManager.isOnboardingDone(context)) {
                             appScreen = AppScreen.AUTH
                         } else {
-                            appScreen = AppScreen.ONBOARDING
+                            appScreen = AppScreen.AUTH
                         }
+                    }
+                    // Show simple loading while checking
+                    Box(modifier = Modifier.fillMaxSize().background(themeManager.bg), contentAlignment = Alignment.Center) {
+                        Text("Loading...", color = themeManager.t1)
                     }
                 }
                 AppScreen.ONBOARDING -> {
