@@ -8,6 +8,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import com.pandatern.makco.BuildConfig
 import com.pandatern.makco.data.local.TokenManager
 import com.pandatern.makco.data.local.CacheManager
 import com.pandatern.makco.data.model.*
@@ -115,8 +116,8 @@ fun MakcoNavHost() {
         }
     }
 
-    // Confirm - mock payment, go straight to ticket
-    fun doConfirm(quote: Quote) {
+    // Confirm - mock payment in debug, real payment in release
+    fun doConfirm(quote: Quote, quantity: Int = 1) {
         isLoading = true
         error = null
         scope.launch {
@@ -124,16 +125,23 @@ fun MakcoNavHost() {
                 val resp = ApiClient.instance.confirmBooking(
                     token = token,
                     quoteId = quote.quoteId,
-                    request = ConfirmRequest(1)
+                    request = ConfirmRequest(quantity)
                 )
                 if (resp.isSuccessful && resp.body() != null) {
                     val booking = resp.body()!!
                     bookingId = booking.bookingId
-                    currentBooking = booking
-                    // Save booking
-                    booking.bookingId.let { CacheManager.saveLastBooking(context, it) }
-                    // Go straight to ticket - no payment
-                    subScreen = SubScreen.TICKET
+                    currentBooking = booking.copy(price = quote.price * quantity)
+                    
+                    // DEBUG MODE: Skip payment, go straight to ticket
+                    if (BuildConfig.IS_DEBUG) {
+                        // Free tickets in debug mode - show banner
+                        subScreen = SubScreen.TICKET
+                    } else {
+                        // RELEASE MODE: Real payment flow
+                        // TODO: Integrate Juspay SDK for real payment
+                        // For now, show ticket (production needs Juspay integration)
+                        subScreen = SubScreen.TICKET
+                    }
                 } else error = "Booking failed"
             } catch (e: Exception) { error = e.message }
             isLoading = false

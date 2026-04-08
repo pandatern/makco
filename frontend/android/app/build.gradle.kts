@@ -15,6 +15,18 @@ android {
         versionName = "1.0.0"
     }
 
+    buildTypes {
+        debug {
+            isMinifyEnabled = false
+            buildConfigField("boolean", "IS_DEBUG", "true")
+        }
+        release {
+            signingConfig = signingConfigs.getByName("debug")
+            isMinifyEnabled = false
+            buildConfigField("boolean", "IS_DEBUG", "false")
+        }
+    }
+
     signingConfigs {
         getByName("debug") {
             storeFile = file("debug.keystore")

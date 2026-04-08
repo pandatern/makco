@@ -48,7 +48,7 @@ jobs:
             -keypass android \
             -dname "CN=Debug, OU=Debug, O=Debug, L=Debug, S=Debug, C=US"
 
-      - name: Build Debug APK
+      - name: Build Debug APK (Free Tickets - Skip Payment)
         working-directory: frontend/android
         run: ./gradlew assembleDebug
 
@@ -59,7 +59,7 @@ jobs:
           path: frontend/android/app/build/outputs/apk/debug/*.apk
           retention-days: 30
 
-      - name: Build Release APK
+      - name: Build Release APK (Real Payment)
         if: github.ref == 'refs/heads/main'
         working-directory: frontend/android
         run: ./gradlew assembleRelease

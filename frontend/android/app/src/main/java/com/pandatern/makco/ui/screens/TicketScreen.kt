@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.EncodeHintType
 import com.google.zxing.qrcode.QRCodeWriter
+import com.pandatern.makco.BuildConfig
 import com.pandatern.makco.data.model.BookingResponse
 import com.pandatern.makco.data.model.Ticket
 import com.pandatern.makco.ui.theme.*
@@ -104,6 +105,29 @@ fun TicketScreen(
                 }
 
                 Spacer(modifier = Modifier.height(28.dp))
+
+                // DEBUG MODE: Free ticket banner
+                if (BuildConfig.IS_DEBUG) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(MetroGold.copy(alpha = 0.2f))
+                            .border(1.dp, MetroGold, RoundedCornerShape(8.dp))
+                            .padding(12.dp)
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text("🎉", style = MaterialTheme.typography.titleMedium)
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                "DEBUG MODE - Free Ticket",
+                                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                                color = MetroGold
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
 
                 // Metro ticket card
                 Box(
