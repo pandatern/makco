@@ -1,15 +1,22 @@
 package com.pandatern.makco.ui.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.pandatern.makco.R
 import com.pandatern.makco.data.model.*
 import com.pandatern.makco.data.remote.ApiClient
 import com.pandatern.makco.ui.theme.*
@@ -46,185 +53,120 @@ fun ProfileScreen(
 
         Text(
             text = "PROFILE",
-            style = MaterialTheme.typography.headlineLarge.copy(
-                fontWeight = FontWeight.Black
-            ),
+            style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Black),
             color = theme.t1
         )
 
         Spacer(modifier = Modifier.height(32.dp))
 
         if (isLoading) {
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator(color = theme.t1, strokeWidth = 2.dp)
             }
         } else {
-            // Phone
             profile?.let { p ->
                 Text(
                     text = p.maskedMobileNumber,
-                    style = MaterialTheme.typography.headlineMedium.copy(
-                        fontWeight = FontWeight.Bold
-                    ),
+                    style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
                     color = theme.t1
                 )
-
                 if (p.firstName != null) {
                     Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = p.firstName,
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = theme.t2
-                    )
+                    Text(p.firstName, style = MaterialTheme.typography.bodyLarge, color = theme.t2)
                 }
-            }
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            // Theme toggle
-            Text(
-                text = "APPEARANCE",
-                style = MaterialTheme.typography.labelMedium,
-                color = theme.t4
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { onThemeToggle() }
-                    .background(theme.bg2)
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "THEME",
-                    style = MaterialTheme.typography.bodyLarge.copy(
-                        fontWeight = FontWeight.Medium
-                    ),
-                    color = theme.t2
-                )
-
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = if (theme.isDark) "DARK" else "LIGHT",
-                        style = MaterialTheme.typography.labelMedium,
-                        color = theme.t3
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Box(
-                        modifier = Modifier
-                            .width(40.dp)
-                            .height(22.dp)
-                            .background(
-                                if (theme.isDark) MetroBlue else theme.bg4,
-                                shape = androidx.compose.foundation.shape.RoundedCornerShape(11.dp)
-                            ),
-                        contentAlignment = if (theme.isDark) Alignment.CenterEnd else Alignment.CenterStart
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .padding(3.dp)
-                                .size(16.dp)
-                                .background(
-                                    if (theme.isDark) MaterialTheme.colorScheme.background else theme.t1,
-                                    shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp)
-                                )
-                        )
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // Info
-            Text(
-                text = "INFO",
-                style = MaterialTheme.typography.labelMedium,
-                color = theme.t4
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            ProfileItem("VERSION", "1.0.0", theme)
-            ProfileItem("NETWORK", "CHENNAI METRO", theme)
-            ProfileItem("LINES", "BLUE & GREEN", theme)
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            // Logout
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 16.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                TextButton(onClick = onLogout) {
-                    Text(
-                        text = "LOGOUT",
-                        style = MaterialTheme.typography.labelLarge,
-                        color = theme.t1
-                    )
-                }
-            }
-
-            // Footer
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 100.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = "MAKCO v1.0.0",
-                    style = MaterialTheme.typography.labelMedium.copy(
-                        fontWeight = FontWeight.Bold
-                    ),
-                    color = theme.t4
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = "BUILT BY PANDATERN",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = theme.t4
-                )
             }
         }
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        // Theme Toggle - Animated
+        Text("APPEARANCE", style = MaterialTheme.typography.labelMedium, color = theme.t4)
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(8.dp))
+                .clickable { onThemeToggle() }
+                .background(theme.bg2)
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text("THEME", style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium), color = theme.t2)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = if (theme.isDark) "DARK" else "LIGHT",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = theme.t3
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                // Toggle indicator
+                Box(
+                    modifier = Modifier
+                        .size(48, 24.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(theme.bg3),
+                    contentAlignment = if (theme.isDark) Alignment.CenterEnd else Alignment.CenterStart
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .padding(2.dp)
+                            .size(20.dp)
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(theme.t1)
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Menu items with icons
+        MenuItem(icon = R.drawable.ic_ticket, text = "My Tickets", theme = theme, onClick = {})
+        MenuItem(icon = R.drawable.ic_location, text = "Recent Stations", theme = theme, onClick = {})
+        MenuItem(icon = R.drawable.ic_profile, text = "Account Settings", theme = theme, onClick = {})
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        // Logout button
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(8.dp))
+                .border(2.dp, theme.outline)
+                .clickable { onLogout() }
+                .padding(16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text("LOGOUT", style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold), color = theme.t1)
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Footer
+        Text("MAKCO v1.0.0", style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold), color = theme.t4, modifier = Modifier.align(Alignment.CenterHorizontally))
+        Text("BUILT BY PANDATERN", style = MaterialTheme.typography.labelSmall, color = theme.t4, modifier = Modifier.align(Alignment.CenterHorizontally))
+        Spacer(modifier = Modifier.height(100.dp))
     }
 }
 
 @Composable
-fun ProfileItem(label: String, value: String, theme: ThemeManager) {
+fun MenuItem(icon: Int, text: String, theme: ThemeManager, onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 12.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
+            .clip(RoundedCornerShape(8.dp))
+            .clickable(onClick = onClick)
+            .background(theme.bg2)
+            .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelMedium,
-            color = theme.t4
-        )
-        Text(
-            text = value,
-            style = MaterialTheme.typography.bodyLarge.copy(
-                fontWeight = FontWeight.Medium
-            ),
-            color = theme.t2
-        )
+        Image(painter = painterResource(icon), contentDescription = null, colorFilter = ColorFilter.tint(theme.t2), modifier = Modifier.size(20.dp))
+        Spacer(modifier = Modifier.width(16.dp))
+        Text(text, style = MaterialTheme.typography.bodyLarge, color = theme.t2)
+        Spacer(modifier = Modifier.weight(1f))
+        Text("→", color = theme.t3)
     }
-
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(1.dp)
-            .background(theme.divider)
-    )
+    Spacer(modifier = Modifier.height(8.dp))
 }

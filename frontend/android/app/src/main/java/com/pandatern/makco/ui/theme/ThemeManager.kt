@@ -14,16 +14,13 @@ class ThemeManager(context: Context) {
     private val prefs: SharedPreferences = context.getSharedPreferences("makco_prefs", Context.MODE_PRIVATE)
     private val deviceDark = (context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
 
-    var currentTheme by mutableStateOf(loadTheme())
+    var currentTheme by mutableStateOf(AppTheme.DARK) // Default to dark
         private set
 
-    private fun loadTheme(): AppTheme {
-        val saved = prefs.getString("app_theme", null)
-        return when (saved) {
-            "LIGHT" -> AppTheme.LIGHT
-            "DARK" -> AppTheme.DARK
-            else -> if (deviceDark) AppTheme.DARK else AppTheme.DARK // Default to dark
-        }
+    init {
+        // Load saved theme or default to dark
+        val saved = prefs.getString("app_theme", "DARK")
+        currentTheme = try { AppTheme.valueOf(saved!!) } catch (e: Exception) { AppTheme.DARK }
     }
 
     fun toggle() {
@@ -33,13 +30,13 @@ class ThemeManager(context: Context) {
 
     val isDark get() = currentTheme == AppTheme.DARK
 
-    // Pure black/white - Neo Brutalist
+    // Backgrounds
     val bg = if (isDark) Color(0xFF000000) else Color(0xFFFFFFFF)
     val bg2 = if (isDark) Color(0xFF111111) else Color(0xFFEEEEEE)
     val bg3 = if (isDark) Color(0xFF222222) else Color(0xFFDDDDDD)
     val bg4 = if (isDark) Color(0xFF333333) else Color(0xFFCCCCCC)
 
-    // Pure contrast text
+    // Text colors
     val t1 = if (isDark) Color(0xFFFFFFFF) else Color(0xFF000000)
     val t2 = if (isDark) Color(0xFFCCCCCC) else Color(0xFF333333)
     val t3 = if (isDark) Color(0xFF999999) else Color(0xFF666666)
@@ -47,14 +44,15 @@ class ThemeManager(context: Context) {
 
     val divider = if (isDark) Color(0xFF333333) else Color(0xFFDDDDDD)
 
-    // Mono - no colors
-    val glass = if (isDark) Color(0x33FFFFFF) else Color(0x33000000)
-    val glassSelected = if (isDark) Color(0x44FFFFFF) else Color(0x44000000)
+    // Accent colors for actions - subtle accent in neo-brutalist
+    val accent = if (isDark) Color(0xFFFFFFFF) else Color(0xFF000000)
+    val accentSubtle = if (isDark) Color(0x33FFFFFF) else Color(0x33000000)
+    val success = if (isDark) Color(0xFFFFFFFF) else Color(0xFF000000)
+    val error = if (isDark) Color(0xFFFFFFFF) else Color(0xFF000000)
 
+    // UI elements
+    val glass = if (isDark) Color(0x22FFFFFF) else Color(0x22000000)
     val highlight = if (isDark) Color(0xFF222222) else Color(0xFFEEEEEE)
     val highlightBorder = if (isDark) Color(0xFF444444) else Color(0xFFCCCCCC)
-    val highlightText = if (isDark) Color(0xFFFFFFFF) else Color(0xFF000000)
-
     val outline = if (isDark) Color(0xFF444444) else Color(0xFFBBBBBB)
-    val outlineHighlight = if (isDark) Color(0xFFFFFFFF) else Color(0xFF000000)
 }

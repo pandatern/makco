@@ -1,5 +1,7 @@
 package com.pandatern.makco.ui.screens
 
+import androidx.compose.animation.*
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -11,7 +13,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -45,45 +49,79 @@ fun HomeScreen(
     ) {
         Spacer(modifier = Modifier.height(48.dp))
 
-        // Header with icon
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Image(painter = painterResource(R.drawable.ic_location), contentDescription = "M", colorFilter = ColorFilter.tint(theme.t1), modifier = Modifier.size(32.dp))
-            Spacer(modifier = Modifier.width(12.dp))
-            Column {
-                Text("MAKCO", style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Black), color = theme.t1)
-                Text("CHENNAI METRO", style = MaterialTheme.typography.labelMedium, color = theme.t3)
+        // Animated header
+        var headerVisible by remember { mutableStateOf(false) }
+        LaunchedEffect(Unit) { headerVisible = true }
+
+        AnimatedVisibility(
+            visible = headerVisible,
+            enter = fadeIn(animationSpec = tween(300)) + slideInVertically(initialOffsetY = {-30})
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Image(painter = painterResource(R.drawable.ic_location), contentDescription = "M", colorFilter = ColorFilter.tint(theme.t1), modifier = Modifier.size(32.dp))
+                Spacer(modifier = Modifier.width(12.dp))
+                Column {
+                    Text("MAKCO", style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Black), color = theme.t1)
+                    Text("CHENNAI METRO", style = MaterialTheme.typography.labelMedium, color = theme.t3)
+                }
             }
         }
 
         Spacer(modifier = Modifier.height(40.dp))
 
-        // Station selectors with icons
-        StationSelector(
-            label = "FROM",
-            icon = R.drawable.ic_location,
-            station = selectedSource,
-            onClick = { onStationClick(true) },
-            theme = theme
-        )
+        // Station selectors with animation
+        var selectorsVisible by remember { mutableStateOf(false) }
+        LaunchedEffect(Unit) { selectorsVisible = true }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        AnimatedVisibility(
+            visible = selectorsVisible,
+            enter = fadeIn(animationSpec = tween(400, delayMillis = 100)) + slideInVertically(initialOffsetY = {30})
+        ) {
+            Column {
+                StationSelector(
+                    label = "FROM",
+                    icon = R.drawable.ic_location,
+                    station = selectedSource,
+                    onClick = { onStationClick(true) },
+                    theme = theme
+                )
 
-        StationSelector(
-            label = "TO",
-            icon = R.drawable.ic_location,
-            station = selectedDestination,
-            onClick = { onStationClick(false) },
-            theme = theme
-        )
+                Spacer(modifier = Modifier.height(8.dp))
+
+                StationSelector(
+                    label = "TO",
+                    icon = R.drawable.ic_location,
+                    station = selectedDestination,
+                    onClick = { onStationClick(false) },
+                    theme = theme
+                )
+            }
+        }
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Search button
+        // Search button with scale animation
         val isReady = selectedSource != null && selectedDestination != null
+
+        var buttonScale by remember { mutableFloatStateOf(1f) }
+        LaunchedEffect(isReady) {
+            buttonScale = 1f
+        }
+
         Button(
-            onClick = onSearchClick,
+            onClick = {
+                // Scale animation on click
+                buttonScale = 0.95f
+                onSearchClick()
+            },
             enabled = isReady,
-            modifier = Modifier.fillMaxWidth().height(56.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp)
+                .graphicsLayer {
+                    scaleX = buttonScale
+                    scaleY = buttonScale
+                },
             colors = ButtonDefaults.buttonColors(
                 containerColor = theme.t1,
                 contentColor = theme.bg,
@@ -92,31 +130,57 @@ fun HomeScreen(
             ),
             shape = RoundedCornerShape(0.dp)
         ) {
-            Text("SEARCH", style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold))
+            AnimatedContent(
+                targetState = isReady,
+                transitionSpec = {
+                    fadeIn(tween(200)) with fadeOut(tween(200))
+                },
+                label = "button_text"
+            ) { ready ->
+                Text(
+                    if (ready) "SEARCH" else "SELECT STATIONS",
+                    style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold)
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Recent stations
+        // Recent stations with stagger animation
         if (recentStations.isNotEmpty()) {
-            Text("RECENT", style = MaterialTheme.typography.labelMedium, color = theme.t3)
-            Spacer(modifier = Modifier.height(12.dp))
+            var recentVisible by remember { mutableStateOf(false) }
+            LaunchedEffect(Unit) { recentVisible = true }
 
-            recentStations.take(3).forEach { station ->
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(0.dp))
-                        .border(1.dp, theme.outline)
-                        .clickable { onStationClick(true) }
-                        .padding(12.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Image(painter = painterResource(R.drawable.ic_location), contentDescription = null, colorFilter = ColorFilter.tint(theme.t3), modifier = Modifier.size(16.dp))
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Text(station.name, style = MaterialTheme.typography.bodyMedium, color = theme.t2)
+            AnimatedVisibility(visible = recentVisible, enter = fadeIn(tween(300, delayMillis = 200))) {
+                Column {
+                    Text("RECENT", style = MaterialTheme.typography.labelMedium, color = theme.t3)
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    recentStations.take(3).forEachIndexed { index, station ->
+                        var itemVisible by remember { mutableStateOf(false) }
+                        LaunchedEffect(Unit) { itemVisible = true }
+
+                        AnimatedVisibility(
+                            visible = itemVisible,
+                            enter = fadeIn(tween(200, delayMillis = 300 + index * 50)) + slideInHorizontally(initialOffsetX = {20})
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(0.dp))
+                                    .border(1.dp, theme.outline)
+                                    .clickable { onStationClick(true) }
+                                    .padding(12.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Image(painter = painterResource(R.drawable.ic_location), contentDescription = null, colorFilter = ColorFilter.tint(theme.t3), modifier = Modifier.size(16.dp))
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Text(station.name, style = MaterialTheme.typography.bodyMedium, color = theme.t2)
+                            }
+                            Spacer(modifier = Modifier.height(8.dp))
+                        }
+                    }
                 }
-                Spacer(modifier = Modifier.height(8.dp))
             }
         }
 

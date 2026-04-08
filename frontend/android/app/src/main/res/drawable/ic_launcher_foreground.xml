@@ -4,12 +4,16 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- Black background -->
+    <!-- Dark bg for app icon -->
     <path
-        android:fillColor="#000000"
+        android:fillColor="#0A0A0A"
         android:pathData="M0,0h108v108h-108z"/>
-    <!-- Simple M letter -->
+    <!-- M letter with accent -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M30,80L30,28L42,55L54,28L54,80M54,28L66,55L78,28L78,80L66,80L66,45L54,72L54,28M42,80L54,80L54,72L42,72L42,80Z"/>
+        android:pathData="M30,75L30,33L42,55L54,33L54,75M54,33L66,55L78,33L78,75L66,75L66,48L54,70L54,33M42,75L54,75L54,70L42,70L42,75Z"/>
+    <!-- Accent dot -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M85,85m-8,0a8,8 0,1 1,16 0a8,8 0,1 1,-16 0"/>
 </vector>
