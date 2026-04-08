@@ -1,5 +1,6 @@
 package com.pandatern.makco.ui.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -11,8 +12,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.pandatern.makco.R
 import com.pandatern.makco.data.model.Station
 import com.pandatern.makco.ui.theme.*
 
@@ -46,12 +50,7 @@ fun StationPickerScreen(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        Text(
-            text = "SELECT STATION",
-            style = MaterialTheme.typography.labelMedium,
-            color = theme.t3,
-            modifier = Modifier.padding(horizontal = 24.dp)
-        )
+        Text("SELECT STATION", style = MaterialTheme.typography.labelMedium, color = theme.t3, modifier = Modifier.padding(horizontal = 24.dp))
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -65,7 +64,7 @@ fun StationPickerScreen(
                 .padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("◎", color = theme.t3, style = MaterialTheme.typography.titleMedium)
+            Image(painter = painterResource(R.drawable.ic_location), contentDescription = null, colorFilter = ColorFilter.tint(theme.t3), modifier = Modifier.size(20.dp))
             Spacer(modifier = Modifier.width(12.dp))
             BasicTextField(
                 value = searchQuery,
@@ -98,25 +97,15 @@ fun StationPickerScreen(
                         .padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Metro icon based on line
                     val icon = when {
-                        station.code.contains("|01") → "●"  // Blue line
-                        station.code.contains("|02") → "○"  // Green line
-                        else → "○"
+                        station.code.contains("|01") -> "●"
+                        station.code.contains("|02") -> "○"
+                        else -> "○"
                     }
                     Text(icon, color = theme.t1, style = MaterialTheme.typography.titleMedium)
                     Spacer(modifier = Modifier.width(16.dp))
-                    Text(
-                        text = station.name,
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = theme.t1,
-                        modifier = Modifier.weight(1f)
-                    )
-                    Text(
-                        text = station.code.split("|").firstOrNull() ?: "",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = theme.t4
-                    )
+                    Text(station.name, style = MaterialTheme.typography.bodyLarge, color = theme.t1, modifier = Modifier.weight(1f))
+                    Text(station.code.split("|").firstOrNull() ?: "", style = MaterialTheme.typography.labelSmall, color = theme.t4)
                 }
                 Spacer(modifier = Modifier.height(8.dp))
             }

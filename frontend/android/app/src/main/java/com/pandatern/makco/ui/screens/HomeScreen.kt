@@ -1,5 +1,6 @@
 package com.pandatern.makco.ui.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -10,9 +11,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.pandatern.makco.R
 import com.pandatern.makco.data.model.*
 import com.pandatern.makco.data.local.CacheManager
 import com.pandatern.makco.ui.theme.*
@@ -43,7 +47,7 @@ fun HomeScreen(
 
         // Header with icon
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text("◉", color = theme.t1, style = MaterialTheme.typography.headlineLarge)
+            Image(painter = painterResource(R.drawable.ic_location), contentDescription = "M", colorFilter = ColorFilter.tint(theme.t1), modifier = Modifier.size(32.dp))
             Spacer(modifier = Modifier.width(12.dp))
             Column {
                 Text("MAKCO", style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Black), color = theme.t1)
@@ -56,7 +60,7 @@ fun HomeScreen(
         // Station selectors with icons
         StationSelector(
             label = "FROM",
-            icon = "●",
+            icon = R.drawable.ic_location,
             station = selectedSource,
             onClick = { onStationClick(true) },
             theme = theme
@@ -66,7 +70,7 @@ fun HomeScreen(
 
         StationSelector(
             label = "TO",
-            icon = "○",
+            icon = R.drawable.ic_location,
             station = selectedDestination,
             onClick = { onStationClick(false) },
             theme = theme
@@ -74,14 +78,12 @@ fun HomeScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Search button - mono
+        // Search button
         val isReady = selectedSource != null && selectedDestination != null
         Button(
             onClick = onSearchClick,
             enabled = isReady,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp),
+            modifier = Modifier.fillMaxWidth().height(56.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = theme.t1,
                 contentColor = theme.bg,
@@ -110,7 +112,7 @@ fun HomeScreen(
                         .padding(12.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("●", color = theme.t3)
+                    Image(painter = painterResource(R.drawable.ic_location), contentDescription = null, colorFilter = ColorFilter.tint(theme.t3), modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(12.dp))
                     Text(station.name, style = MaterialTheme.typography.bodyMedium, color = theme.t2)
                 }
@@ -120,13 +122,12 @@ fun HomeScreen(
 
         Spacer(modifier = Modifier.weight(1f))
 
-        // Footer
         Text("${stations.size} STATIONS", style = MaterialTheme.typography.labelSmall, color = theme.t4, modifier = Modifier.padding(bottom = 100.dp))
     }
 }
 
 @Composable
-fun StationSelector(label: String, icon: String, station: Station?, onClick: () -> Unit, theme: ThemeManager) {
+fun StationSelector(label: String, icon: Int, station: Station?, onClick: () -> Unit, theme: ThemeManager) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -137,15 +138,11 @@ fun StationSelector(label: String, icon: String, station: Station?, onClick: () 
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(icon, color = theme.t1, style = MaterialTheme.typography.titleMedium)
+        Image(painter = painterResource(icon), contentDescription = null, colorFilter = ColorFilter.tint(theme.t1), modifier = Modifier.size(20.dp))
         Spacer(modifier = Modifier.width(14.dp))
         Column {
             Text(label, style = MaterialTheme.typography.labelSmall, color = theme.t3)
-            Text(
-                text = station?.name ?: "Select station",
-                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = if (station != null) FontWeight.Bold else FontWeight.Normal),
-                color = if (station != null) theme.t1 else theme.t4
-            )
+            Text(text = station?.name ?: "Select station", style = MaterialTheme.typography.bodyLarge.copy(fontWeight = if (station != null) FontWeight.Bold else FontWeight.Normal), color = if (station != null) theme.t1 else theme.t4)
         }
         Spacer(modifier = Modifier.weight(1f))
         Text("→", color = theme.t3, style = MaterialTheme.typography.titleMedium)
