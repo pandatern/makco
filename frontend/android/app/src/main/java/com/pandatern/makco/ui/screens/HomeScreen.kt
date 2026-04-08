@@ -2,7 +2,6 @@ package com.pandatern.makco.ui.screens
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -14,19 +13,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Color as AndroidColor
-import android.graphics.Paint
-import androidx.compose.ui.graphics.toArgb
 import com.pandatern.makco.data.model.*
 import com.pandatern.makco.data.local.CacheManager
 import com.pandatern.makco.ui.theme.*
@@ -40,7 +30,7 @@ fun HomeScreen(
     onSearchClick: () -> Unit
 ) {
     val theme = LocalThemeManager.current
-    val ctx = androidx.compose.ui.platform.LocalContext.current
+    val ctx = LocalContext.current
     var recentStations by remember { mutableStateOf(CacheManager.getRecentStations(ctx)) }
     var animatedSource by remember { mutableStateOf(false) }
     var animatedDest by remember { mutableStateOf(false) }
@@ -59,45 +49,127 @@ fun HomeScreen(
     ) {
         Spacer(modifier = Modifier.height(48.dp))
 
-        // Header with Metro icon
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Metro icon badge
-            Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .background(MetroBlue, RoundedCornerShape(12.dp)),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "M",
-                    style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Black),
-                    color = Color.White
-                )
-            }
-            Spacer(modifier = Modifier.width(16.dp))
-            Column {
-                Text(
-                    text = "MAKCO",
-                    style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Black),
-                    color = theme.t1
-                )
-                Text("CHENNAI METRO", style = MaterialTheme.typography.labelMedium, color = theme.t4)
-            }
+        // Header - plain text, no icon
+        Column {
+            Text(
+                text = "MAKCO",
+                style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Black),
+                color = theme.t1
+            )
+            Text("CHENNAI METRO", style = MaterialTheme.typography.labelMedium, color = theme.t3)
         }
 
         Spacer(modifier = Modifier.height(40.dp))
 
-        // Metro card
-        Box(
+        // Station selectors - simple bordered boxes
+        StationSelector(
+            label = "FROM",
+            station = selectedSource,
+            onClick = { onStationClick(true) },
+            theme = theme
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        StationSelector(
+            label = "TO",
+            station = selectedDestination,
+            onClick = { onStationClick(false) },
+            theme = theme
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Search button - mono
+        val isReady = selectedSource != null && selectedDestination != null
+        Button(
+            onClick = onSearchClick,
+            enabled = isReady,
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(16.dp))
-                .background(theme.bg2)
-                .padding(20.dp)
+                .height(56.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = theme.t1,
+                contentColor = theme.bg,
+                disabledContainerColor = theme.bg3,
+                disabledContentColor = theme.t4
+            ),
+            shape = RoundedCornerShape(0.dp)
         ) {
-            Column {
+            Text("SEARCH", style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold))
+        }
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        // Recent stations - plain list
+        if (recentStations.isNotEmpty()) {
+            Text("RECENT", style = MaterialTheme.typography.labelMedium, color = theme.t3)
+            Spacer(modifier = Modifier.height(12.dp))
+
+            recentStations.take(3).forEach { station ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(0.dp))
+                        .border(1.dp, theme.outline)
+                        .clickable { onStationClick(true) }
+                        .padding(12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("●", color = theme.t3)
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Text(station.name, style = MaterialTheme.typography.bodyMedium, color = theme.t2)
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+        }
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        // Footer - plain text
+        Text(
+            "${stations.size} STATIONS",
+            style = MaterialTheme.typography.labelSmall,
+            color = theme.t4,
+            modifier = Modifier.padding(bottom = 100.dp)
+        )
+    }
+}
+
+@Composable
+fun StationSelector(
+    label: String,
+    station: Station?,
+    onClick: () -> Unit,
+    theme: ThemeManager
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(0.dp))
+            .border(2.dp, if (station != null) theme.t1 else theme.outline)
+            .clickable(onClick = onClick)
+            .background(theme.bg2)
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelSmall,
+            color = theme.t3
+        )
+        Spacer(modifier = Modifier.width(14.dp))
+        Text(
+            text = station?.name ?: "Select station",
+            style = MaterialTheme.typography.bodyLarge.copy(
+                fontWeight = if (station != null) FontWeight.Bold else FontWeight.Normal
+            ),
+            color = if (station != null) theme.t1 else theme.t4,
+            modifier = Modifier.weight(1f)
+        )
+        Text("→", style = MaterialTheme.typography.titleMedium, color = theme.t3)
+    }
+}
                 Text("PLAN YOUR JOURNEY", style = MaterialTheme.typography.labelMedium, color = theme.t4)
 
                 Spacer(modifier = Modifier.height(20.dp))

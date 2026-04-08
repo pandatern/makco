@@ -8,7 +8,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -24,33 +23,29 @@ fun BottomNavBar(selectedTab: BottomTab, onTabSelected: (BottomTab) -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 24.dp, end = 24.dp, bottom = 20.dp),
+            .padding(start = 16.dp, end = 16.dp, bottom = 20.dp),
         contentAlignment = Alignment.Center
     ) {
         Row(
             modifier = Modifier
-                .clip(RoundedCornerShape(32.dp))
-                .background(if (theme.isDark) Color(0xFF0A0A0A) else Color(0xFFF5F5F5))
-                .padding(horizontal = 8.dp, vertical = 8.dp),
-            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                .clip(RoundedCornerShape(0.dp))
+                .background(if (theme.isDark) Color(0xFF111111) else Color(0xFFEEEEEE)),
+            horizontalArrangement = Arrangement.spacedBy(0.dp)
         ) {
             TabItem(
-                icon = "🚇",
-                label = "Home",
+                label = "HOME",
                 isSelected = selectedTab == BottomTab.HOME,
                 onClick = { onTabSelected(BottomTab.HOME) },
                 theme = theme
             )
             TabItem(
-                icon = "🎫",
-                label = "Tickets",
+                label = "TICKETS",
                 isSelected = selectedTab == BottomTab.TICKETS,
                 onClick = { onTabSelected(BottomTab.TICKETS) },
                 theme = theme
             )
             TabItem(
-                icon = "👤",
-                label = "Profile",
+                label = "PROFILE",
                 isSelected = selectedTab == BottomTab.PROFILE,
                 onClick = { onTabSelected(BottomTab.PROFILE) },
                 theme = theme
@@ -60,27 +55,21 @@ fun BottomNavBar(selectedTab: BottomTab, onTabSelected: (BottomTab) -> Unit) {
 }
 
 @Composable
-fun TabItem(icon: String, label: String, isSelected: Boolean, onClick: () -> Unit, theme: ThemeManager) {
-    Row(
+fun TabItem(label: String, isSelected: Boolean, onClick: () -> Unit, theme: ThemeManager) {
+    Box(
         modifier = Modifier
-            .clip(RoundedCornerShape(24.dp))
-            .background(if (isSelected) theme.highlight else Color.Transparent)
+            .clip(RoundedCornerShape(0.dp))
+            .background(if (isSelected) theme.t1 else Color.Transparent)
             .clickable(onClick = onClick)
-            .padding(horizontal = 20.dp, vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center
+            .padding(horizontal = 24.dp, vertical = 16.dp),
+        contentAlignment = Alignment.Center
     ) {
-        Text(
-            text = icon,
-            style = MaterialTheme.typography.titleMedium
-        )
-        Spacer(modifier = Modifier.width(6.dp))
         Text(
             text = label,
             style = MaterialTheme.typography.labelMedium.copy(
-                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
+                fontWeight = FontWeight.Bold
             ),
-            color = if (isSelected) theme.t1 else theme.t4
+            color = if (isSelected) theme.bg else theme.t3
         )
     }
 }

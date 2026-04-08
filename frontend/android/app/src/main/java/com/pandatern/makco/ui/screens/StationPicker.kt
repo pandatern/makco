@@ -1,6 +1,7 @@
 package com.pandatern.makco.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -14,22 +15,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.pandatern.makco.data.model.Station
 import com.pandatern.makco.ui.theme.*
-
-private fun getLineColor(code: String): Color {
-    return when {
-        code.contains("|01") -> MetroBlue
-        code.contains("|02") -> MetroGreen
-        else -> Color.Gray
-    }
-}
-
-private fun getLineName(code: String): String {
-    return when {
-        code.contains("|01") -> "BLUE"
-        code.contains("|02") -> "GREEN"
-        else -> "OTHER"
-    }
-}
 
 @Composable
 fun StationPickerScreen(
@@ -46,10 +31,6 @@ fun StationPickerScreen(
             it.name.contains(searchQuery, ignoreCase = true) ||
             it.code.contains(searchQuery, ignoreCase = true)
         }
-    }
-
-    val grouped = remember(filteredStations) {
-        filteredStations.groupBy { getLineName(it.code) }
     }
 
     Column(
@@ -74,10 +55,56 @@ fun StationPickerScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Search
+        // Search - plain bordered input
         Box(
             modifier = Modifier
                 .fillMaxWidth()
+                .padding(horizontal = 24.dp)
+                .border(2.dp, theme.outline)
+                .background(theme.bg2)
+                .padding(16.dp)
+        ) {
+            Text(
+                text = searchQuery.ifEmpty { "Search stations..." },
+                style = MaterialTheme.typography.bodyLarge,
+                color = if (searchQuery.isEmpty()) theme.t4 else theme.t1
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Station list - simple text list
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 24.dp)
+        ) {
+            items(filteredStations) { station ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .border(1.dp, theme.outline)
+                        .clickable { onStationSelected(station) }
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = station.name,
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = theme.t1,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Text(
+                        text = station.code.split("|").firstOrNull() ?: "",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = theme.t4
+                    )
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+        }
+    }
+}
                 .padding(horizontal = 24.dp)
                 .background(theme.bg2)
                 .padding(horizontal = 20.dp, vertical = 4.dp)

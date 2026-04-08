@@ -22,7 +22,7 @@ class ThemeManager(context: Context) {
         return when (saved) {
             "LIGHT" -> AppTheme.LIGHT
             "DARK" -> AppTheme.DARK
-            else -> if (deviceDark) AppTheme.DARK else AppTheme.LIGHT
+            else -> if (deviceDark) AppTheme.DARK else AppTheme.DARK // Default to dark
         }
     }
 
@@ -33,30 +33,28 @@ class ThemeManager(context: Context) {
 
     val isDark get() = currentTheme == AppTheme.DARK
 
-    // Pure black for dark, pure white for light
+    // Pure black/white - Neo Brutalist
     val bg = if (isDark) Color(0xFF000000) else Color(0xFFFFFFFF)
-    val bg2 = if (isDark) Color(0xFF0A0A0A) else Color(0xFFF5F5F5)
-    val bg3 = if (isDark) Color(0xFF111111) else Color(0xFFEBEBEB)
-    val bg4 = if (isDark) Color(0xFF1A1A1A) else Color(0xFFDDDDDD)
+    val bg2 = if (isDark) Color(0xFF111111) else Color(0xFFEEEEEE)
+    val bg3 = if (isDark) Color(0xFF222222) else Color(0xFFDDDDDD)
+    val bg4 = if (isDark) Color(0xFF333333) else Color(0xFFCCCCCC)
 
-    // Text colors - MORE WHITE, less grey
+    // Pure contrast text
     val t1 = if (isDark) Color(0xFFFFFFFF) else Color(0xFF000000)
-    val t2 = if (isDark) Color(0xFFF0F0F0) else Color(0xFF111111)
-    val t3 = if (isDark) Color(0xFFD0D0D0) else Color(0xFF333333)
-    val t4 = if (isDark) Color(0xFFAAAAAA) else Color(0xFF666666)
+    val t2 = if (isDark) Color(0xFFCCCCCC) else Color(0xFF333333)
+    val t3 = if (isDark) Color(0xFF999999) else Color(0xFF666666)
+    val t4 = if (isDark) Color(0xFF666666) else Color(0xFF999999)
 
-    val divider = if (isDark) Color(0xFF1A1A1A) else Color(0xFFE0E0E0)
+    val divider = if (isDark) Color(0xFF333333) else Color(0xFFDDDDDD)
 
-    // Glassmorphism bar color
-    val glass = if (isDark) Color(0x22FFFFFF) else Color(0x22000000)
-    val glassSelected = if (isDark) Color(0x33FFFFFF) else Color(0x33000000)
+    // Mono - no colors
+    val glass = if (isDark) Color(0x33FFFFFF) else Color(0x33000000)
+    val glassSelected = if (isDark) Color(0x44FFFFFF) else Color(0x44000000)
 
-    // Highlight colors
-    val highlight = if (isDark) Color(0xFF111111) else Color(0xFFE8E8E8)
-    val highlightBorder = if (isDark) Color(0xFF222222) else Color(0xFFDDDDDD)
-    val highlightText = if (isDark) Color(0xFFE0E0E0) else Color(0xFF1A1A1A)
+    val highlight = if (isDark) Color(0xFF222222) else Color(0xFFEEEEEE)
+    val highlightBorder = if (isDark) Color(0xFF444444) else Color(0xFFCCCCCC)
+    val highlightText = if (isDark) Color(0xFFFFFFFF) else Color(0xFF000000)
 
-    // Outline colors
-    val outline = if (isDark) Color(0xFF2A2A2A) else Color(0xFFD0D0D0)
-    val outlineHighlight = if (isDark) Color(0xFF444444) else Color(0xFFAAAAAA)
+    val outline = if (isDark) Color(0xFF444444) else Color(0xFFBBBBBB)
+    val outlineHighlight = if (isDark) Color(0xFFFFFFFF) else Color(0xFF000000)
 }
