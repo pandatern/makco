@@ -198,7 +198,7 @@ fun MakcoNavHost() {
         Box(modifier = Modifier.fillMaxSize().background(themeManager.bg)) {
             when (appScreen) {
                 AppScreen.SPLASH -> {
-                    SplashScreen {
+                    SplashScreen(themeManager = themeManager) {
                         val saved = TokenManager.getToken(context)
                         if (saved != null && saved.isNotEmpty()) {
                             token = saved

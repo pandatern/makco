@@ -1,15 +1,18 @@
 package com.pandatern.makco.ui.screens
 
+import androidx.compose.animation.*
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.pandatern.makco.ui.theme.*
@@ -34,29 +37,46 @@ fun OnboardingScreen(onFinished: () -> Unit) {
     val pagerState = rememberPagerState(pageCount = { pages.size })
     val scope = rememberCoroutineScope()
 
-    Column(modifier = Modifier.fillMaxSize().background(theme.bg)) {
-        HorizontalPager(
-            state = pagerState,
-            modifier = Modifier.weight(1f).fillMaxWidth()
+    // Animate page transitions
+    val animatedPage by animateIntAsState(
+        targetValue = pagerState.currentPage,
+        animationSpec = tween(300),
+        label = "page"
+    )
+
+    Column(modifier = Modifier.fillMaxSize().background(theme.bg).padding(horizontal = 24.dp)) {
+        Spacer(modifier = Modifier.height(80.dp))
+
+        // Animated content
+        AnimatedContent(
+            targetState = animatedPage,
+            transitionSpec = {
+                fadeIn(tween(300)) togetherWith fadeOut(tween(300))
+            },
+            label = "onboarding"
         ) { page ->
             val data = pages[page]
             Column(
-                modifier = Modifier.fillMaxSize().padding(horizontal = 32.dp),
-                horizontalAlignment = Alignment.Start,
+                modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.Center
             ) {
+                // Title with animation
                 Text(
                     text = data.title,
-                    style = MaterialTheme.typography.displayLarge.copy(fontWeight = FontWeight.Black),
-                    color = theme.t1
+                    style = MaterialTheme.typography.displayMedium.copy(fontWeight = FontWeight.Black),
+                    color = theme.t1,
+                    modifier = Modifier.graphicsLayer {
+                        scaleX = 1f
+                        scaleY = 1f
+                    }
                 )
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(12.dp))
                 Text(
                     text = data.subtitle,
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MetroBlue
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                    color = theme.t2
                 )
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(24.dp))
                 Text(
                     text = data.description,
                     style = MaterialTheme.typography.bodyLarge,
@@ -65,34 +85,60 @@ fun OnboardingScreen(onFinished: () -> Unit) {
             }
         }
 
-        // Bottom nav
+        // Page indicators with animation
         Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp, vertical = 48.dp),
+            modifier = Modifier.fillMaxWidth().padding(vertical = 32.dp),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            repeat(pages.size) { i ->
+                val isSelected = i == pagerState.currentPage
+                val width by animateDpAsState(
+                    targetValue = if (isSelected) 24.dp else 8.dp,
+                    animationSpec = tween(200),
+                    label = "indicator_width"
+                )
+                Box(
+                    modifier = Modifier
+                        .width(width)
+                        .height(4.dp)
+                        .background(
+                            if (isSelected) theme.t1 else theme.bg4,
+                            shape = androidx.compose.foundation.shape.RoundedCornerShape(2.dp)
+                        )
+                )
+                if (i < pages.size - 1) Spacer(modifier = Modifier.width(8.dp))
+            }
+        }
+
+        // Navigation buttons
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(bottom = 40.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                repeat(pages.size) { i ->
-                    Box(
-                        modifier = Modifier
-                            .width(if (i == pagerState.currentPage) 24.dp else 8.dp)
-                            .height(4.dp)
-                            .background(if (i == pagerState.currentPage) theme.t1 else theme.bg4)
-                    )
-                }
+            // Skip button
+            TextButton(onClick = onFinished) {
+                Text("SKIP", style = MaterialTheme.typography.labelMedium, color = theme.t4)
             }
 
-            TextButton(onClick = {
-                if (pagerState.currentPage < pages.size - 1) {
-                    scope.launch { pagerState.animateScrollToPage(pagerState.currentPage + 1) }
-                } else {
-                    onFinished()
-                }
-            }) {
+            // Next/Get Started button
+            Button(
+                onClick = {
+                    if (pagerState.currentPage < pages.size - 1) {
+                        scope.launch { pagerState.animateScrollToPage(pagerState.currentPage + 1) }
+                    } else {
+                        onFinished()
+                    }
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = theme.t1,
+                    contentColor = theme.bg
+                )
+            ) {
                 Text(
-                    text = if (pagerState.currentPage < pages.size - 1) "NEXT →" else "GET STARTED",
-                    style = MaterialTheme.typography.labelLarge,
-                    color = theme.t1
+                    text = if (pagerState.currentPage < pages.size - 1) "NEXT" else "GET STARTED",
+                    style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold)
                 )
             }
         }
