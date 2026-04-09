@@ -43,33 +43,42 @@ fun TicketHistoryScreen(
     suspend fun loadTickets() {
         isLoading = true
         error = null
+        
+        // First try API
         try {
             val resp = ApiClient.instance.getTickets(token, "chennai")
             if (resp.isSuccessful) {
                 val body = resp.body()
                 tickets = body ?: emptyList()
-                // Cache tickets locally
                 if (tickets.isNotEmpty()) {
                     CacheManager.saveTickets(context, tickets)
                 }
             } else {
-                // Fallback to cached tickets
+                // Try cached API tickets
                 val cached = CacheManager.getTickets(context)
-                if (cached != null) {
+                if (cached != null && cached.isNotEmpty()) {
                     tickets = cached
                 } else {
-                    error = "Error: ${resp.code()}"
+                    // Fallback to local booking history
+                    tickets = CacheManager.getBookingHistory(context)
                 }
             }
         } catch (e: Exception) {
-            // Fallback to cached tickets on network error
-            val cached = CacheManager.getTickets(context)
-            if (cached != null) {
-                tickets = cached
+            // Try cached tickets first
+            val cachedTickets = CacheManager.getTickets(context)
+            if (cachedTickets != null && cachedTickets.isNotEmpty()) {
+                tickets = cachedTickets
             } else {
-                error = "Network error: ${e.message}"
+                // Fallback to local booking history
+                tickets = CacheManager.getBookingHistory(context)
             }
         }
+        
+        // If still empty, show local booking history
+        if (tickets.isEmpty()) {
+            tickets = CacheManager.getBookingHistory(context)
+        }
+        
         isLoading = false
     }
 
