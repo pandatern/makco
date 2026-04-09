@@ -24,7 +24,7 @@ enum class AppScreen {
 }
 
 enum class SubScreen {
-    NONE, SOURCE_PICKER, DESTINATION_PICKER, BOOKING, TICKET
+    NONE, SOURCE_PICKER, DESTINATION_PICKER, BOOKING, PAYMENT, TICKET
 }
 
 @Composable
@@ -164,13 +164,11 @@ fun MakcoNavHost() {
                     
                     // DEBUG MODE: Skip payment, go straight to ticket
                     if (BuildConfig.IS_DEBUG) {
-                        // Free tickets in debug mode - show banner
+                        // Free tickets in debug mode
                         subScreen = SubScreen.TICKET
                     } else {
-                        // RELEASE MODE: Real payment flow
-                        // TODO: Integrate Juspay SDK for real payment
-                        // For now, show ticket (production needs Juspay integration)
-                        subScreen = SubScreen.TICKET
+                        // RELEASE MODE: Show payment screen
+                        subScreen = SubScreen.PAYMENT
                     }
                 } else error = "Booking failed"
             } catch (e: Exception) { error = e.message }
@@ -318,6 +316,29 @@ fun MakcoNavHost() {
                                 onBack = {
                                     subScreen = SubScreen.NONE
                                     quotes = emptyList()
+                                    error = null
+                                }
+                            )
+                        }
+                        SubScreen.PAYMENT -> {
+                            PaymentScreen(
+                                bookingStatus = currentBooking,
+                                isLoading = isLoading,
+                                error = error,
+                                onPayClick = {
+                                    // TODO: In production, trigger payment API and show WebView
+                                    // For now, simulate successful payment
+                                    isLoading = true
+                                    scope.launch {
+                                        kotlinx.coroutines.delay(1000)
+                                        subScreen = SubScreen.TICKET
+                                        isLoading = false
+                                    }
+                                },
+                                onViewTicket = { subScreen = SubScreen.TICKET },
+                                onRetry = { subScreen = SubScreen.BOOKING },
+                                onBack = {
+                                    subScreen = SubScreen.BOOKING
                                     error = null
                                 }
                             )
