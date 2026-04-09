@@ -194,7 +194,7 @@ fun MakcoNavHost() {
         } else if (TokenManager.isOnboardingDone(context)) {
             appScreen = AppScreen.AUTH
         } else {
-            appScreen = AppScreen.AUTH // Skip onboarding
+            appScreen = AppScreen.ONBOARDING
         }
     }
 
