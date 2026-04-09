@@ -36,11 +36,11 @@ class ThemeManager(context: Context) {
     val bg3 = if (isDark) Color(0xFF222222) else Color(0xFFDDDDDD)
     val bg4 = if (isDark) Color(0xFF333333) else Color(0xFFCCCCCC)
 
-    // Text colors
+    // Text colors - increased contrast for visibility
     val t1 = if (isDark) Color(0xFFFFFFFF) else Color(0xFF000000)
-    val t2 = if (isDark) Color(0xFFCCCCCC) else Color(0xFF333333)
-    val t3 = if (isDark) Color(0xFF999999) else Color(0xFF666666)
-    val t4 = if (isDark) Color(0xFF666666) else Color(0xFF999999)
+    val t2 = if (isDark) Color(0xFFE0E0E0) else Color(0xFF222222)
+    val t3 = if (isDark) Color(0xFFBBBBBB) else Color(0xFF555555)
+    val t4 = if (isDark) Color(0xFF888888) else Color(0xFF888888)
 
     val divider = if (isDark) Color(0xFF333333) else Color(0xFFDDDDDD)
 

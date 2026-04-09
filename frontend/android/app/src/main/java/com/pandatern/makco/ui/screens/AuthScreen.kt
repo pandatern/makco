@@ -50,8 +50,8 @@ fun AuthScreen(onAuthSuccess: (token: String) -> Unit) {
         )
         Text(
             text = "Chennai Metro",
-            style = MaterialTheme.typography.bodyMedium,
-            color = theme.t3
+            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.ExtraBold),
+            color = theme.t2
         )
 
         Spacer(modifier = Modifier.height(48.dp))
@@ -59,15 +59,15 @@ fun AuthScreen(onAuthSuccess: (token: String) -> Unit) {
         // Title
         Text(
             text = if (otpSent) "Enter OTP" else "Login",
-            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+            style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Black),
             color = theme.t1,
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(4.dp))
         Text(
             text = if (otpSent) "We sent a code to +91 ${phone.takeLast(4)}" else "Enter your phone number",
-            style = MaterialTheme.typography.bodySmall,
-            color = theme.t3,
+            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
+            color = theme.t2,
             modifier = Modifier.fillMaxWidth()
         )
 
