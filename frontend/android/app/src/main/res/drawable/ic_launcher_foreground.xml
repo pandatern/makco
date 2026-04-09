@@ -8,12 +8,8 @@
     <path
         android:fillColor="#0A0A0A"
         android:pathData="M0,0h108v108h-108z"/>
-    <!-- Stylized M / Metro track -->
+    <!-- Bold M letter -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M26,78V30h8v30l16,-30h10l16,30v48h-8V42l-12,-24h-6l-12,24v36h-8z"/>
-    <!-- Accent line -->
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M82,78h10v-6h-10z"/>
+        android:pathData="M24,78V30h12v28L48,30h14l12,28V78h-12V46L60,58h-6L42,46V78H24z"/>
 </vector>
