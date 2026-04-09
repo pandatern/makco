@@ -48,24 +48,11 @@ jobs:
             -keypass android \
             -dname "CN=Debug, OU=Debug, O=Debug, L=Debug, S=Debug, C=US"
 
-      - name: Build Debug APK (Free Tickets - Skip Payment)
-        working-directory: frontend/android
-        run: ./gradlew assembleDebug
-
-      - name: Upload Debug APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: makco-debug-apk
-          path: frontend/android/app/build/outputs/apk/debug/*.apk
-          retention-days: 30
-
-      - name: Build Release APK (Real Payment)
-        if: github.ref == 'refs/heads/main'
+      - name: Build Release APK
         working-directory: frontend/android
         run: ./gradlew assembleRelease
 
       - name: Upload Release APK
-        if: github.ref == 'refs/heads/main'
         uses: actions/upload-artifact@v4
         with:
           name: makco-release-apk

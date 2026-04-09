@@ -9,7 +9,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import com.pandatern.makco.BuildConfig
 import com.pandatern.makco.data.local.TokenManager
 import com.pandatern.makco.data.local.CacheManager
 import com.pandatern.makco.data.model.*
