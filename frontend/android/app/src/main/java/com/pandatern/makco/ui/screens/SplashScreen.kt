@@ -15,10 +15,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pandatern.makco.ui.theme.LocalThemeManager
+import com.pandatern.makco.ui.theme.ThemeManager
 import kotlinx.coroutines.delay
 
 @Composable
-fun SplashScreen(themeManager: com.pandatern.makco.ui.theme.ThemeManager, onFinished: () -> Unit) {
+fun SplashScreen(themeManager: ThemeManager, onFinished: () -> Unit) {
     val theme = LocalThemeManager.current
 
     var startAnim by remember { mutableStateOf(false) }

@@ -26,7 +26,10 @@ import kotlinx.coroutines.launch
 fun ProfileScreen(
     token: String,
     onThemeToggle: () -> Unit,
-    onLogout: () -> Unit
+    onLogout: () -> Unit,
+    onTicketsClick: () -> Unit = {},
+    onStationsClick: () -> Unit = {},
+    onSettingsClick: () -> Unit = {}
 ) {
     val theme = LocalThemeManager.current
     var profile by remember { mutableStateOf<UserProfile?>(null) }
@@ -123,9 +126,9 @@ fun ProfileScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         // Menu items with icons
-        MenuItem(icon = R.drawable.ic_ticket, text = "My Tickets", theme = theme, onClick = {})
-        MenuItem(icon = R.drawable.ic_location, text = "Recent Stations", theme = theme, onClick = {})
-        MenuItem(icon = R.drawable.ic_profile, text = "Account Settings", theme = theme, onClick = {})
+        MenuItem(icon = R.drawable.ic_ticket, text = "My Tickets", theme = theme, onClick = onTicketsClick)
+        MenuItem(icon = R.drawable.ic_location, text = "Recent Stations", theme = theme, onClick = onStationsClick)
+        MenuItem(icon = R.drawable.ic_profile, text = "Account Settings", theme = theme, onClick = onSettingsClick)
 
         Spacer(modifier = Modifier.weight(1f))
 

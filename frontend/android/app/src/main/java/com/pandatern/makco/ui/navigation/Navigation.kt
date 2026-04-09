@@ -199,8 +199,7 @@ fun MakcoNavHost() {
         Box(modifier = Modifier.fillMaxSize().background(themeManager.bg)) {
             when (appScreen) {
                 AppScreen.SPLASH -> {
-                    // Skip splash - go directly to auth
-                    LaunchedEffect(Unit) {
+                    SplashScreen(themeManager = themeManager) {
                         val saved = TokenManager.getToken(context)
                         if (saved != null && saved.isNotEmpty()) {
                             token = saved
@@ -211,10 +210,6 @@ fun MakcoNavHost() {
                         } else {
                             appScreen = AppScreen.AUTH
                         }
-                    }
-                    // Show simple loading while checking
-                    Box(modifier = Modifier.fillMaxSize().background(themeManager.bg), contentAlignment = Alignment.Center) {
-                        Text("Loading...", color = themeManager.t1)
                     }
                 }
                 AppScreen.ONBOARDING -> {
@@ -256,12 +251,18 @@ fun MakcoNavHost() {
                                 )
                                 2 -> ProfileScreen(
                                     token = token,
-                                    onThemeToggle = { themeManager.toggle() },
+                                    onThemeToggle = { 
+                                        themeManager.toggle()
+                                        (context as? Activity)?.recreate()
+                                    },
                                     onLogout = {
                                         token = ""
                                         TokenManager.clearToken(context)
                                         appScreen = AppScreen.AUTH
-                                    }
+                                    },
+                                    onTicketsClick = { selectedTab = 1 },
+                                    onStationsClick = { },
+                                    onSettingsClick = { }
                                 )
                             }
                             // Bottom nav

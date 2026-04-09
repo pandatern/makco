@@ -41,8 +41,10 @@ fun TicketScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(theme.bg)
-            .padding(24.dp)
+            .padding(horizontal = 20.dp)
     ) {
+        Spacer(modifier = Modifier.height(48.dp))
+        
         // Header
         Row(verticalAlignment = Alignment.CenterVertically) {
             Image(painter = painterResource(R.drawable.ic_location), contentDescription = "Back", colorFilter = ColorFilter.tint(theme.t1), modifier = Modifier.size(24.dp).clickable { onBack() })
@@ -63,22 +65,23 @@ fun TicketScreen(
                 .clip(RoundedCornerShape(16.dp))
                 .border(2.dp, theme.outline)
                 .background(theme.bg2)
-                .padding(24.dp)
+                .padding(20.dp)
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(booking.bookingId.take(8).uppercase(), style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold, fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace), color = theme.t1)
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(20.dp))
 
                 // Large QR Code
                 if (qrString.isNotEmpty()) {
-                    val qrBitmap = remember(qrString) { generateQRBitmap(qrString, 300) }
+                    val qrBitmap = remember(qrString) { generateQRBitmap(qrString, 280) }
                     Box(
                         modifier = Modifier
-                            .size(220.dp)
+                            .fillMaxWidth()
+                            .aspectRatio(1f)
                             .clip(RoundedCornerShape(12.dp))
                             .background(Color.White)
-                            .padding(16.dp),
+                            .padding(12.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         qrBitmap?.let {
@@ -86,23 +89,23 @@ fun TicketScreen(
                         }
                     }
                 } else {
-                    Box(modifier = Modifier.size(220.dp).clip(RoundedCornerShape(12.dp)).border(2.dp, theme.outline), contentAlignment = Alignment.Center) {
+                    Box(modifier = Modifier.fillMaxWidth().aspectRatio(1f).clip(RoundedCornerShape(12.dp)).border(2.dp, theme.outline), contentAlignment = Alignment.Center) {
                         Text("QR", style = MaterialTheme.typography.displayMedium, color = theme.t3)
                     }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(12.dp))
 
                 ticket?.verificationCode?.let { code ->
                     Text(code, style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, letterSpacing = 4.sp), color = theme.t1)
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
                 }
 
                 Text("SCAN AT GATE", style = MaterialTheme.typography.labelSmall, color = theme.t4)
             }
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
         // Journey details
         Box(
@@ -111,7 +114,7 @@ fun TicketScreen(
                 .clip(RoundedCornerShape(12.dp))
                 .border(1.dp, theme.outline)
                 .background(theme.bg2)
-                .padding(20.dp)
+                .padding(16.dp)
         ) {
             Column {
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
@@ -131,7 +134,7 @@ fun TicketScreen(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(12.dp))
 
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     Column {
@@ -152,6 +155,7 @@ fun TicketScreen(
 
         // Footer
         Text("Show this ticket at the metro station entrance", style = MaterialTheme.typography.labelSmall, color = theme.t4, modifier = Modifier.align(Alignment.CenterHorizontally))
+        Spacer(modifier = Modifier.height(16.dp))
     }
 }
 
