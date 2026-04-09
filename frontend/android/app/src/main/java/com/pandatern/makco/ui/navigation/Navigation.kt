@@ -162,6 +162,9 @@ fun MakcoNavHost() {
                     bookingId = booking.bookingId
                     currentBooking = booking.copy(price = quote.price * quantity)
                     
+                    // Cache the booking for ticket history
+                    CacheManager.addBookingHistory(context, currentBooking!!)
+                    
                     // Always show payment screen (removed debug mode)
                     subScreen = SubScreen.PAYMENT
                 } else error = "Booking failed"

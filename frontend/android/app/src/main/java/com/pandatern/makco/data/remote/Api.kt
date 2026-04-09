@@ -79,11 +79,11 @@ interface MakcoApi {
         @Header("token") token: String
     ): Response<UserProfile>
 
-    @GET("ticket/bookings/v2")
+    // Tickets - use /tickets endpoint
+    @GET("tickets")
     suspend fun getTickets(
         @Header("token") token: String,
-        @Query("city") city: String = "chennai",
-        @Query("vehicleType") vehicleType: String = "METRO"
+        @Query("city") city: String = "chennai"
     ): Response<List<BookingStatus>>
 }
 

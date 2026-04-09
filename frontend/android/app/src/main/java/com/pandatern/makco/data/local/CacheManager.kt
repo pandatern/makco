@@ -89,6 +89,20 @@ object CacheManager {
         return try { gson.fromJson(json, type) } catch (_: Exception) { emptyList() }
     }
 
+    // Tickets (for API fallback)
+    fun saveTickets(context: Context, tickets: List<BookingStatus>) {
+        prefs(context).edit().putString("tickets", gson.toJson(tickets)).apply()
+        prefs(context).edit().putLong("tickets_time", System.currentTimeMillis()).apply()
+    }
+
+    fun getTickets(context: Context): List<BookingStatus>? {
+        val json = prefs(context).getString("tickets", null) ?: return null
+        val time = prefs(context).getLong("tickets_time", 0)
+        if (System.currentTimeMillis() - time > 24 * 60 * 60 * 1000) return null
+        val type = object : TypeToken<List<BookingStatus>>() {}.type
+        return try { gson.fromJson(json, type) } catch (_: Exception) { null }
+    }
+
     // Clear all
     fun clearAll(context: Context) {
         prefs(context).edit().clear().apply()

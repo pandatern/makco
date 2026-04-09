@@ -23,6 +23,9 @@ import com.pandatern.makco.R
 import com.pandatern.makco.data.model.*
 import com.pandatern.makco.data.remote.ApiClient
 import com.pandatern.makco.ui.theme.*
+import com.pandatern.makco.data.local.CacheManager
+import android.content.Context
+import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.launch
 
 @Composable
@@ -31,6 +34,7 @@ fun TicketHistoryScreen(
     onTicketClick: (bookingId: String) -> Unit
 ) {
     val theme = LocalThemeManager.current
+    val context = LocalContext.current
     var tickets by remember { mutableStateOf<List<BookingStatus>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
     var error by remember { mutableStateOf<String?>(null) }
@@ -44,11 +48,27 @@ fun TicketHistoryScreen(
             if (resp.isSuccessful) {
                 val body = resp.body()
                 tickets = body ?: emptyList()
+                // Cache tickets locally
+                if (tickets.isNotEmpty()) {
+                    CacheManager.saveTickets(context, tickets)
+                }
             } else {
-                error = "Error: ${resp.code()} - ${resp.message()}"
+                // Fallback to cached tickets
+                val cached = CacheManager.getTickets(context)
+                if (cached != null) {
+                    tickets = cached
+                } else {
+                    error = "Error: ${resp.code()}"
+                }
             }
         } catch (e: Exception) {
-            error = "Network error: ${e.message}"
+            // Fallback to cached tickets on network error
+            val cached = CacheManager.getTickets(context)
+            if (cached != null) {
+                tickets = cached
+            } else {
+                error = "Network error: ${e.message}"
+            }
         }
         isLoading = false
     }
