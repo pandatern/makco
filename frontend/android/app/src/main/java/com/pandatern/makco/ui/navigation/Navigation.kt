@@ -311,7 +311,7 @@ fun MakcoNavHost() {
                                 toStation = selectedDestination,
                                 isLoading = isLoading,
                                 error = error,
-                                onConfirm = { quote, _ -> doConfirm(quote) },
+                                onConfirm = { quote, quantity -> doConfirm(quote, quantity) },
                                 onRetry = { doSearch() },
                                 onBack = {
                                     subScreen = SubScreen.NONE
