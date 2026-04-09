@@ -162,14 +162,8 @@ fun MakcoNavHost() {
                     bookingId = booking.bookingId
                     currentBooking = booking.copy(price = quote.price * quantity)
                     
-                    // DEBUG MODE: Skip payment, go straight to ticket
-                    if (BuildConfig.IS_DEBUG) {
-                        // Free tickets in debug mode
-                        subScreen = SubScreen.TICKET
-                    } else {
-                        // RELEASE MODE: Show payment screen
-                        subScreen = SubScreen.PAYMENT
-                    }
+                    // Always show payment screen (removed debug mode)
+                    subScreen = SubScreen.PAYMENT
                 } else error = "Booking failed"
             } catch (e: Exception) { error = e.message }
             isLoading = false

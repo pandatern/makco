@@ -6,10 +6,13 @@
     android:viewportHeight="108">
     <!-- Dark bg -->
     <path
-        android:fillColor="#0A0A0A"
+        android:fillColor="#000000"
         android:pathData="M0,0h108v108h-108z"/>
-    <!-- Bold M letter -->
+    <!-- Clean M letter -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M24,78V30h12v28L48,30h14l12,28V78h-12V46L60,58h-6L42,46V78H24z"/>
+        android:pathData="M28,32h10v36h-10zM48,32h10v36h-10z"/>
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M38,32h10l10,26l10,-26h10v46h-10V46l-10,26h-10l-10,-26v32h-10z"/>
 </vector>

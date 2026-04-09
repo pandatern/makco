@@ -55,4 +55,8 @@ class ThemeManager(context: Context) {
     val highlight = if (isDark) Color(0xFF222222) else Color(0xFFEEEEEE)
     val highlightBorder = if (isDark) Color(0xFF444444) else Color(0xFFCCCCCC)
     val outline = if (isDark) Color(0xFF444444) else Color(0xFFBBBBBB)
+    
+    // Action/Interactive color - primary accent
+    val action = if (isDark) Color(0xFFFFFFFF) else Color(0xFF000000)
+    val actionSubtle = if (isDark) Color(0x22FFFFFF) else Color(0x22000000)
 }
