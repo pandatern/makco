@@ -3,6 +3,7 @@ package com.pandatern.makco.ui.screens
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -23,45 +24,42 @@ fun SplashScreen(themeManager: ThemeManager, onFinished: () -> Unit) {
     val theme = LocalThemeManager.current
 
     var startAnim by remember { mutableStateOf(false) }
-    var showPulse by remember { mutableStateOf(false) }
 
-    // Pulse animation for accent
+    // Pulse animation
     val pulseScale by animateFloatAsState(
-        targetValue = if (showPulse) 1.5f else 1f,
+        targetValue = if (startAnim) 1.2f else 1f,
         animationSpec = infiniteRepeatable(
-            animation = tween(800, easing = FastOutSlowInEasing),
+            animation = tween(1000, easing = FastOutSlowInEasing),
             repeatMode = RepeatMode.Reverse
         ),
         label = "pulse"
     )
 
-    val pulseAlpha by animateFloatAsState(
-        targetValue = if (showPulse) 0f else 0.5f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(800, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "pulseAlpha"
-    )
-
-    // Logo entrance
+    // Logo entrance animation
     val logoScale by animateFloatAsState(
-        targetValue = if (startAnim) 1f else 0.5f,
-        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow),
+        targetValue = if (startAnim) 1f else 0.3f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        ),
         label = "logoScale"
     )
 
-    val contentAlpha by animateFloatAsState(
+    val logoAlpha by animateFloatAsState(
         targetValue = if (startAnim) 1f else 0f,
-        animationSpec = tween(600),
-        label = "contentAlpha"
+        animationSpec = tween(800),
+        label = "logoAlpha"
+    )
+
+    val textAlpha by animateFloatAsState(
+        targetValue = if (startAnim) 1f else 0f,
+        animationSpec = tween(600, delayMillis = 300),
+        label = "textAlpha"
     )
 
     LaunchedEffect(Unit) {
         startAnim = true
-        delay(200)
-        showPulse = true
-        delay(1800)
+        delay(2000)
         onFinished()
     }
 
@@ -71,22 +69,25 @@ fun SplashScreen(themeManager: ThemeManager, onFinished: () -> Unit) {
             .background(theme.bg),
         contentAlignment = Alignment.Center
     ) {
-        // Animated background gradient
+        // Background gradient
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .alpha(0.05f)
+                .alpha(0.1f)
                 .background(
                     Brush.radialGradient(
-                        colors = listOf(theme.t1, theme.bg)
+                        colors = listOf(theme.actionSubtle, theme.bg)
                     )
                 )
         )
 
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            // Animated M with glow effect
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.alpha(logoAlpha + textAlpha)
+        ) {
+            // Animated M logo with pulse
             Box(contentAlignment = Alignment.Center) {
-                // Pulse ring behind
+                // Pulse ring
                 Box(
                     modifier = Modifier
                         .size(100.dp)
@@ -94,29 +95,30 @@ fun SplashScreen(themeManager: ThemeManager, onFinished: () -> Unit) {
                             scaleX = pulseScale
                             scaleY = pulseScale
                         }
-                        .background(theme.t1.copy(alpha = pulseAlpha), androidx.compose.foundation.shape.CircleShape)
+                        .background(
+                            theme.actionSubtle,
+                            RoundedCornerShape(50)
+                        )
                 )
-                // Main M
+                // M letter
                 Text(
                     text = "M",
                     style = MaterialTheme.typography.displayLarge.copy(
                         fontWeight = FontWeight.Black,
-                        fontSize = 80.sp
+                        fontSize = 72.sp
                     ),
                     color = theme.t1,
-                    modifier = Modifier
-                        .graphicsLayer {
-                            scaleX = logoScale
-                            scaleY = logoScale
-                        }
-                        .alpha(contentAlpha)
+                    modifier = Modifier.graphicsLayer {
+                        scaleX = logoScale
+                        scaleY = logoScale
+                    }
                 )
             }
 
             Spacer(modifier = Modifier.height(32.dp))
 
             // Animated text
-            Column(modifier = Modifier.alpha(contentAlpha)) {
+            Column(modifier = Modifier.alpha(textAlpha)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         text = "MAKCO",
@@ -126,8 +128,8 @@ fun SplashScreen(themeManager: ThemeManager, onFinished: () -> Unit) {
                     Box(
                         modifier = Modifier
                             .padding(start = 8.dp)
-                            .size(10.dp)
-                            .background(theme.t1, androidx.compose.foundation.shape.CircleShape)
+                            .size(8.dp)
+                            .background(theme.t1, RoundedCornerShape(4.dp))
                     )
                 }
                 Spacer(modifier = Modifier.height(8.dp))
@@ -141,18 +143,18 @@ fun SplashScreen(themeManager: ThemeManager, onFinished: () -> Unit) {
 
             Spacer(modifier = Modifier.height(48.dp))
 
-            // Loading indicator
+            // Loading bar
             Box(
                 modifier = Modifier
-                    .width(40.dp)
+                    .width(120.dp)
                     .height(3.dp)
-                    .background(theme.bg3)
+                    .background(theme.bg3, RoundedCornerShape(2.dp))
             ) {
                 Box(
                     modifier = Modifier
                         .fillMaxHeight()
                         .fillMaxWidth(0.3f)
-                        .background(theme.t1)
+                        .background(theme.t1, RoundedCornerShape(2.dp))
                 )
             }
         }

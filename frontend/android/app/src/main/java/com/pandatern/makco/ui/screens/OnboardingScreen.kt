@@ -6,11 +6,13 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -20,16 +22,31 @@ import com.pandatern.makco.ui.theme.LocalThemeManager
 import kotlinx.coroutines.launch
 
 data class OnboardingPage(
-    val icon: String,
     val title: String,
     val subtitle: String,
-    val description: String
+    val description: String,
+    val gradient: Boolean = false
 )
 
 private val pages = listOf(
-    OnboardingPage("◉", "41 STATIONS", "BLUE & GREEN LINES", "Every station in Chennai at your fingertips. Blue line runs north-south, Green line connects east-west."),
-    OnboardingPage("▣", "INSTANT BOOKING", "SEARCH. SELECT. PAY.", "Get fare quotes in seconds. Choose single or return journey. Pay seamlessly with UPI."),
-    OnboardingPage("◈", "TAP & RIDE", "NO QUEUES. NO CASH.", "Skip the counter. Your QR ticket works at every gate. Just scan and board.")
+    OnboardingPage(
+        title = "41 STATIONS",
+        subtitle = "BLUE & GREEN LINES",
+        description = "Every station in Chennai at your fingertips. Blue line runs north-south, Green line connects east-west.",
+        gradient = true
+    ),
+    OnboardingPage(
+        title = "INSTANT BOOKING",
+        subtitle = "SEARCH. SELECT. PAY.",
+        description = "Get fare quotes in seconds. Choose single or return journey. Pay seamlessly with UPI.",
+        gradient = false
+    ),
+    OnboardingPage(
+        title = "TAP & RIDE",
+        subtitle = "NO QUEUES. NO CASH.",
+        description = "Skip the counter. Your QR ticket works at every gate. Just scan and board.",
+        gradient = true
+    )
 )
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -67,37 +84,59 @@ fun OnboardingScreen(onFinished: () -> Unit) {
             modifier = Modifier.weight(1f).fillMaxWidth()
         ) { page ->
             val data = pages[page]
+            val pageOffset = (pagerState.currentPage - page) + pagerState.currentPageOffsetFraction
 
-            // Page content with animations
-            val pageOffset by animateFloatAsState(
-                targetValue = pagerState.currentPage.toFloat(),
+            // Animate page content
+            val contentAlpha by animateFloatAsState(
+                targetValue = if (page == pagerState.currentPage) 1f else 0.5f,
                 animationSpec = tween(300),
-                label = "pageOffset"
+                label = "contentAlpha"
+            )
+
+            val contentScale by animateFloatAsState(
+                targetValue = if (page == pagerState.currentPage) 1f else 0.9f,
+                animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
+                label = "contentScale"
             )
 
             Column(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .graphicsLayer {
+                        alpha = contentAlpha
+                        scaleX = contentScale
+                        scaleY = contentScale
+                    },
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Animated icon
-                val iconScale by animateFloatAsState(
-                    targetValue = 1f,
-                    animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
-                    label = "iconScale"
-                )
+                // Gradient accent box
+                Box(
+                    modifier = Modifier
+                        .size(120.dp)
+                        .clip(RoundedCornerShape(24.dp))
+                        .background(
+                            Brush.radialGradient(
+                                colors = listOf(
+                                    theme.actionSubtle,
+                                    theme.bg2
+                                )
+                            )
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = when (page) {
+                            0 -> "M"
+                            1 -> "▶"
+                            else -> "⚡"
+                        },
+                        style = MaterialTheme.typography.displayLarge.copy(fontSize = 48.sp, fontWeight = FontWeight.Black),
+                        color = theme.t1
+                    )
+                }
 
-                Text(
-                    text = data.icon,
-                    style = MaterialTheme.typography.displayLarge.copy(fontSize = 64.sp),
-                    color = theme.t1,
-                    modifier = Modifier.graphicsLayer {
-                        scaleX = iconScale
-                        scaleY = iconScale
-                    }
-                )
-
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(40.dp))
 
                 Text(
                     text = data.title,
@@ -143,14 +182,14 @@ fun OnboardingScreen(onFinished: () -> Unit) {
                     modifier = Modifier
                         .width(width)
                         .height(4.dp)
-                        .clip(androidx.compose.foundation.shape.RoundedCornerShape(2.dp))
+                        .clip(RoundedCornerShape(2.dp))
                         .background(if (isSelected) theme.t1 else theme.bg4)
                 )
                 if (i < pages.size - 1) Spacer(modifier = Modifier.width(8.dp))
             }
         }
 
-        // Next button
+        // Next button with animation
         Button(
             onClick = {
                 if (pagerState.currentPage < pages.size - 1) {
@@ -160,7 +199,8 @@ fun OnboardingScreen(onFinished: () -> Unit) {
                 }
             },
             modifier = Modifier.fillMaxWidth().height(56.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = theme.t1, contentColor = theme.bg)
+            colors = ButtonDefaults.buttonColors(containerColor = theme.t1, contentColor = theme.bg),
+            shape = RoundedCornerShape(12.dp)
         ) {
             Text(
                 text = if (pagerState.currentPage < pages.size - 1) "NEXT" else "GET STARTED",
