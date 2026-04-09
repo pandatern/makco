@@ -1,5 +1,7 @@
 package com.pandatern.makco.ui.screens
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -13,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -35,6 +38,13 @@ fun ProfileScreen(
     var profile by remember { mutableStateOf<UserProfile?>(null) }
     var isLoading by remember { mutableStateOf(true) }
     val scope = rememberCoroutineScope()
+
+    // Animate profile card
+    val cardAlpha by animateFloatAsState(
+        targetValue = 1f,
+        animationSpec = tween(500),
+        label = "cardAlpha"
+    )
 
     LaunchedEffect(Unit) {
         scope.launch {
@@ -62,46 +72,88 @@ fun ProfileScreen(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        if (isLoading) {
-            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(color = theme.t1, strokeWidth = 2.dp)
-            }
-        } else {
-            profile?.let { p ->
-                Text(
-                    text = p.maskedMobileNumber,
-                    style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
-                    color = theme.t1
+        // Profile card with gradient
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(16.dp))
+                .background(
+                    androidx.compose.ui.graphics.Brush.radialGradient(
+                        colors = listOf(theme.actionSubtle, theme.bg2)
+                    )
                 )
-                if (p.firstName != null) {
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(p.firstName, style = MaterialTheme.typography.bodyLarge, color = theme.t2)
+                .border(2.dp, theme.outline, RoundedCornerShape(16.dp))
+                .padding(24.dp)
+                .graphicsLayer { alpha = cardAlpha }
+        ) {
+            if (isLoading) {
+                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(color = theme.t1, strokeWidth = 2.dp)
+                }
+            } else {
+                profile?.let { p ->
+                    Column {
+                        // Avatar placeholder
+                        Box(
+                            modifier = Modifier
+                                .size(64.dp)
+                                .clip(RoundedCornerShape(32.dp))
+                                .background(theme.action),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                (p.firstName?.firstOrNull() ?: p.maskedMobileNumber.first()).toString(),
+                                style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
+                                color = theme.bg
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = p.maskedMobileNumber,
+                            style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
+                            color = theme.t1
+                        )
+                        p.firstName?.let {
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(it, style = MaterialTheme.typography.bodyLarge, color = theme.t2)
+                        }
+                    }
                 }
             }
         }
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Theme Toggle - Animated
+        // Theme toggle with action color
         Text("APPEARANCE", style = MaterialTheme.typography.labelMedium, color = theme.t4)
         Spacer(modifier = Modifier.height(12.dp))
 
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(8.dp))
+                .clip(RoundedCornerShape(12.dp))
                 .clickable { onThemeToggle() }
                 .background(theme.bg2)
+                .border(1.dp, theme.outline, RoundedCornerShape(12.dp))
                 .padding(16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("THEME", style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium), color = theme.t2)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Image(
+                    painter = painterResource(R.drawable.ic_profile),
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(theme.action),
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                Text("THEME", style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium), color = theme.t2)
+            }
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = if (theme.isDark) "DARK" else "LIGHT",
                     style = MaterialTheme.typography.labelMedium,
-                    color = theme.t3
+                    color = theme.action
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 // Toggle indicator
@@ -117,59 +169,123 @@ fun ProfileScreen(
                             .padding(2.dp)
                             .size(20.dp)
                             .clip(RoundedCornerShape(10.dp))
-                            .background(theme.t1)
+                            .background(theme.action)
                     )
                 }
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
-        // Menu items with icons
-        MenuItem(icon = R.drawable.ic_ticket, text = "My Tickets", theme = theme, onClick = onTicketsClick)
-        MenuItem(icon = R.drawable.ic_location, text = "Recent Stations", theme = theme, onClick = onStationsClick)
-        MenuItem(icon = R.drawable.ic_profile, text = "Account Settings", theme = theme, onClick = onSettingsClick)
+        // Menu items with real click handlers
+        Text("MENU", style = MaterialTheme.typography.labelMedium, color = theme.t4)
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // My Tickets - goes to tickets tab
+        MenuItem(
+            icon = R.drawable.ic_ticket,
+            text = "My Tickets",
+            theme = theme,
+            onClick = onTicketsClick,
+            actionColor = theme.action
+        )
+        
+        // Recent Stations
+        MenuItem(
+            icon = R.drawable.ic_location,
+            text = "Recent Stations",
+            theme = theme,
+            onClick = onStationsClick,
+            actionColor = theme.action
+        )
+        
+        // Account Settings
+        MenuItem(
+            icon = R.drawable.ic_profile,
+            text = "Account Settings",
+            theme = theme,
+            onClick = onSettingsClick,
+            actionColor = theme.action
+        )
 
         Spacer(modifier = Modifier.weight(1f))
 
-        // Logout button
+        // Logout button with action color
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(8.dp))
-                .border(2.dp, theme.outline)
+                .clip(RoundedCornerShape(12.dp))
+                .border(2.dp, theme.action, RoundedCornerShape(12.dp))
                 .clickable { onLogout() }
                 .padding(16.dp),
             contentAlignment = Alignment.Center
         ) {
-            Text("LOGOUT", style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold), color = theme.t1)
+            Text(
+                "LOGOUT",
+                style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
+                color = theme.action
+            )
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
         // Footer
-        Text("MAKCO v1.0.0", style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold), color = theme.t4, modifier = Modifier.align(Alignment.CenterHorizontally))
-        Text("BUILT BY PANDATERN", style = MaterialTheme.typography.labelSmall, color = theme.t4, modifier = Modifier.align(Alignment.CenterHorizontally))
+        Text(
+            "MAKCO v1.0.0",
+            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+            color = theme.t4,
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        )
+        Text(
+            "BUILT BY PANDATERN",
+            style = MaterialTheme.typography.labelSmall,
+            color = theme.t4,
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        )
         Spacer(modifier = Modifier.height(100.dp))
     }
 }
 
 @Composable
-fun MenuItem(icon: Int, text: String, theme: ThemeManager, onClick: () -> Unit) {
+fun MenuItem(
+    icon: Int,
+    text: String,
+    theme: ThemeManager,
+    onClick: () -> Unit,
+    actionColor: Color = theme.t2
+) {
+    // Animate on press
+    var pressed by remember { mutableStateOf(false) }
+    val scale by animateFloatAsState(
+        targetValue = if (pressed) 0.98f else 1f,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
+        label = "menuScale"
+    )
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(8.dp))
-            .clickable(onClick = onClick)
+            .clip(RoundedCornerShape(12.dp))
+            .clickable { onClick() }
             .background(theme.bg2)
-            .padding(16.dp),
+            .border(1.dp, theme.outline, RoundedCornerShape(12.dp))
+            .padding(16.dp)
+            .graphicsLayer {
+                scaleX = scale
+                scaleY = scale
+            },
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Image(painter = painterResource(icon), contentDescription = null, colorFilter = ColorFilter.tint(theme.t2), modifier = Modifier.size(20.dp))
+        Image(
+            painter = painterResource(icon),
+            contentDescription = null,
+            colorFilter = ColorFilter.tint(actionColor),
+            modifier = Modifier.size(20.dp)
+        )
         Spacer(modifier = Modifier.width(16.dp))
-        Text(text, style = MaterialTheme.typography.bodyLarge, color = theme.t2)
+        Text(text, style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium), color = theme.t2)
         Spacer(modifier = Modifier.weight(1f))
         Text("→", color = theme.t3)
     }
-    Spacer(modifier = Modifier.height(8.dp))
+    Spacer(modifier = Modifier.height(12.dp))
 }
