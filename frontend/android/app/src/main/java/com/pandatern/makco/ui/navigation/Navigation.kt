@@ -162,8 +162,17 @@ fun MakcoNavHost() {
                     bookingId = booking.bookingId
                     currentBooking = booking.copy(price = quote.price * quantity)
                     
-                    // Cache the booking for ticket history
-                    CacheManager.addBookingHistory(context, currentBooking!!)
+                    // Cache the booking for ticket history (convert to BookingStatus)
+                    val bookingStatus = BookingStatus(
+                        bookingId = booking.bookingId,
+                        status = booking.status,
+                        price = quote.price * quantity,
+                        stations = booking.stations,
+                        validTill = booking.validTill,
+                        tickets = booking.tickets,
+                        quantity = quantity
+                    )
+                    CacheManager.addBookingHistory(context, bookingStatus)
                     
                     // Always show payment screen (removed debug mode)
                     subScreen = SubScreen.PAYMENT
