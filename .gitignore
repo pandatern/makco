@@ -31,3 +31,6 @@ certs/
 # Env
 .env
 .env.*
+
+# Progress
+makco_progress.json
