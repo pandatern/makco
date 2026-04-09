@@ -10,12 +10,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.pandatern.makco.data.model.*
+import com.pandatern.makco.data.model.BookingResponse
 import com.pandatern.makco.ui.theme.*
 
 @Composable
 fun PaymentScreen(
-    bookingStatus: BookingStatus?,
+    bookingStatus: BookingResponse?,
     isLoading: Boolean,
     error: String?,
     onPayClick: () -> Unit,
