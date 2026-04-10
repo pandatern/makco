@@ -37,8 +37,14 @@ fun TicketScreen(
     val theme = LocalThemeManager.current
     val ticket = booking.tickets.firstOrNull()
     
-    // Build proper QR data - use ticket's actual QR data if available
-    val qrString = buildQrString(booking, ticket)
+    // Use QR data from API - prioritize available data
+    val qrString: String = buildString {
+        // Try in order: qrString from API, verificationCode, ticketNumber, bookingId
+        ticket?.qrString?.let { append(it); return@buildString }
+        ticket?.verificationCode?.let { append(it); return@buildString }
+        ticket?.ticketNumber?.let { append(it); return@buildString }
+        append(booking.bookingId)
+    }
 
     Column(
         modifier = Modifier
