@@ -22,7 +22,6 @@ import androidx.compose.ui.unit.dp
 import com.pandatern.makco.R
 import com.pandatern.makco.data.model.Station
 import com.pandatern.makco.ui.theme.*
-import androidx.compose.ui.graphics.Color
 
 @Composable
 fun StationPickerScreen(
