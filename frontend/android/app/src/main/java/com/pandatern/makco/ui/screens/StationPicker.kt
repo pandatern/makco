@@ -65,7 +65,6 @@ fun StationPickerScreen(
                 color = theme.t1
             )
         }
-        }
 
         Spacer(modifier = Modifier.height(24.dp))
 
