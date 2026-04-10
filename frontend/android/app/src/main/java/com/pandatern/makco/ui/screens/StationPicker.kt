@@ -1,6 +1,5 @@
 package com.pandatern.makco.ui.screens
 
-import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -15,14 +14,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.pandatern.makco.R
 import com.pandatern.makco.data.model.Station
 import com.pandatern.makco.ui.theme.*
+import androidx.compose.ui.graphics.Color
 
 @Composable
 fun StationPickerScreen(
@@ -124,20 +122,7 @@ fun StationPickerScreen(
                         .background(theme.bg2)
                         .padding(20.dp)
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(station.name, style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold), color = theme.t1)
-                            station.line?.let {
-                                Spacer(modifier = Modifier.height(4.dp))
-                                Text(it, style = MaterialTheme.typography.labelMedium, color = theme.t3)
-                            }
-                        }
-                        Box(
-                            modifier = Modifier
-                                .size(8.dp)
-                                .background(if (station.line == "Blue Line") Color(0xFF2196F3) else if (station.line == "Green Line") Color(0xFF4CAF50) else theme.t3, RoundedCornerShape(4.dp))
-                        )
-                    }
+                    Text(station.name, style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold), color = theme.t1)
                 }
                 Spacer(modifier = Modifier.height(12.dp))
             }
