@@ -1,5 +1,6 @@
 package com.pandatern.makco.ui.screens
 
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -14,6 +15,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -47,95 +49,98 @@ fun StationPickerScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(theme.bg)
-            .padding(horizontal = 24.dp)
+            .padding(horizontal = 20.dp)
     ) {
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(48.dp))
 
+        // Header
         Row(verticalAlignment = Alignment.CenterVertically) {
             Image(painter = painterResource(R.drawable.ic_location), contentDescription = "Back", colorFilter = ColorFilter.tint(theme.t1), modifier = Modifier.size(24.dp).clickable { onBack() })
             Spacer(modifier = Modifier.width(12.dp))
-            Text("SELECT STATION", style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold), color = theme.t1)
+            Text("SELECT STATION", style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Black), color = theme.t1)
         }
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
-        // Line filter chips
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            FilterChip(selected = selectedLine == null, onClick = { selectedLine = null }, label = "ALL", theme = theme)
-            FilterChip(selected = selectedLine == "Blue", onClick = { selectedLine = if (selectedLine == "Blue") null else "Blue" }, label = "BLUE", theme = theme)
-            FilterChip(selected = selectedLine == "Green", onClick = { selectedLine = if (selectedLine == "Green") null else "Green" }, label = "GREEN", theme = theme)
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Search
+        // Search box - styled like profile card
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(12.dp))
-                .border(1.dp, theme.outline)
+                .clip(RoundedCornerShape(16.dp))
+                .border(2.dp, theme.outline, RoundedCornerShape(16.dp))
                 .background(theme.bg2)
                 .padding(16.dp)
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Image(painter = painterResource(R.drawable.ic_location), contentDescription = null, colorFilter = ColorFilter.tint(theme.t3), modifier = Modifier.size(20.dp))
-                Spacer(modifier = Modifier.width(12.dp))
-                BasicTextField(
-                    value = searchQuery,
-                    onValueChange = { searchQuery = it },
-                    modifier = Modifier.weight(1f),
-                    textStyle = MaterialTheme.typography.bodyMedium.copy(color = theme.t1),
-                    cursorBrush = androidx.compose.ui.graphics.SolidColor(theme.t1),
-                    decorationBox = { innerTextField ->
-                        Box { if (searchQuery.isEmpty()) Text("Search stations...", color = theme.t4, style = MaterialTheme.typography.bodyMedium); innerTextField() }
+            BasicTextField(
+                value = searchQuery,
+                onValueChange = { searchQuery = it },
+                modifier = Modifier.fillMaxWidth(),
+                textStyle = MaterialTheme.typography.bodyLarge.copy(color = theme.t1, fontWeight = FontWeight.Medium),
+                cursorBrush = SolidColor(theme.t1),
+                decorationBox = { innerTextField ->
+                    Box {
+                        if (searchQuery.isEmpty()) Text("Search stations...", style = MaterialTheme.typography.bodyLarge, color = theme.t4)
+                        innerTextField()
                     }
-                )
+                }
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Line filters - styled buttons
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            listOf("All" to null, "Blue" to "Blue", "Green" to "Green").forEach { (label, line) ->
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(if (selectedLine == line) theme.action else theme.bg2)
+                        .border(2.dp, if (selectedLine == line) theme.action else theme.outline, RoundedCornerShape(12.dp))
+                        .clickable { selectedLine = line }
+                        .padding(horizontal = 20.dp, vertical = 12.dp)
+                ) {
+                    Text(
+                        label,
+                        style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
+                        color = if (selectedLine == line) theme.bg else theme.t2
+                    )
+                }
             }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        LazyColumn(contentPadding = PaddingValues(bottom = 100.dp)) {
+        // Station list
+        LazyColumn(
+            contentPadding = PaddingValues(bottom = 100.dp)
+        ) {
             items(filteredStations) { station ->
-                Row(
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(RoundedCornerShape(8.dp))
-                        .border(1.dp, theme.outline)
+                        .clip(RoundedCornerShape(12.dp))
+                        .border(1.dp, theme.outline, RoundedCornerShape(12.dp))
                         .clickable { onStationSelected(station) }
                         .background(theme.bg2)
-                        .padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                        .padding(20.dp)
                 ) {
-                    val lineColor = when {
-                        station.code.contains("|01") -> theme.t1
-                        station.code.contains("|02") -> theme.t2
-                        else -> theme.t3
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(station.name, style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold), color = theme.t1)
+                            station.line?.let {
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text(it, style = MaterialTheme.typography.labelMedium, color = theme.t3)
+                            }
+                        }
+                        Box(
+                            modifier = Modifier
+                                .size(8.dp)
+                                .background(if (station.line == "Blue Line") Color(0xFF2196F3) else if (station.line == "Green Line") Color(0xFF4CAF50) else theme.t3, RoundedCornerShape(4.dp))
+                        )
                     }
-                    Box(modifier = Modifier.size(12.dp).background(lineColor, RoundedCornerShape(6.dp)))
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(station.name, style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium), color = theme.t1)
-                        Text(station.code.split("|").firstOrNull() ?: "", style = MaterialTheme.typography.labelSmall, color = theme.t4)
-                    }
-                    Text("→", color = theme.t3)
                 }
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(12.dp))
             }
         }
-    }
-}
-
-@Composable
-fun FilterChip(selected: Boolean, onClick: () -> Unit, label: String, theme: ThemeManager) {
-    Box(
-        modifier = Modifier
-            .clip(RoundedCornerShape(20.dp))
-            .background(if (selected) theme.t1 else theme.bg2)
-            .border(1.dp, if (selected) theme.t1 else theme.outline, RoundedCornerShape(20.dp))
-            .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-    ) {
-        Text(label, style = MaterialTheme.typography.labelMedium.copy(fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal), color = if (selected) theme.bg else theme.t2)
     }
 }

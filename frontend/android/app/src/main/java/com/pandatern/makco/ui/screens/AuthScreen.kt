@@ -1,5 +1,6 @@
 package com.pandatern.makco.ui.screens
 
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -11,6 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -37,67 +39,87 @@ fun AuthScreen(onAuthSuccess: (token: String) -> Unit) {
         modifier = Modifier
             .fillMaxSize()
             .background(theme.bg)
-            .padding(28.dp),
+            .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(60.dp))
+        Spacer(modifier = Modifier.height(80.dp))
 
-        // Logo
+        // Logo with gradient background
+        Box(
+            modifier = Modifier
+                .size(100.dp)
+                .clip(RoundedCornerShape(20.dp))
+                .background(
+                    Brush.radialGradient(
+                        colors = listOf(theme.actionSubtle, theme.bg2)
+                    )
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                "M",
+                style = MaterialTheme.typography.displayLarge.copy(fontWeight = FontWeight.Black),
+                color = theme.t1
+            )
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
         Text(
             text = "MAKCO",
             style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Black),
             color = theme.t1
         )
         Text(
-            text = "Chennai Metro",
-            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.ExtraBold),
-            color = theme.t2
+            text = "CHENNAI METRO",
+            style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.ExtraBold),
+            color = theme.t3
         )
 
         Spacer(modifier = Modifier.height(48.dp))
 
-        // Title
+        // Title with clear hierarchy
         Text(
-            text = if (otpSent) "Enter OTP" else "Login",
+            text = if (otpSent) "VERIFY OTP" else "LOGIN",
             style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Black),
             color = theme.t1,
             modifier = Modifier.fillMaxWidth()
         )
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = if (otpSent) "We sent a code to +91 ${phone.takeLast(4)}" else "Enter your phone number",
-            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
+            text = if (otpSent) "Code sent to +91 ${phone.takeLast(4)}" else "Enter your phone number",
+            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
             color = theme.t2,
             modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(32.dp))
 
         if (!otpSent) {
-            // Phone input
+            // Phone input - styled like profile card
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(56.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .border(2.dp, theme.outline, RoundedCornerShape(12.dp))
+                    .height(64.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .border(3.dp, theme.outline, RoundedCornerShape(16.dp))
                     .background(theme.bg2)
-                    .padding(horizontal = 16.dp),
+                    .padding(horizontal = 20.dp),
                 contentAlignment = Alignment.CenterStart
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("+91", style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold), color = theme.t2)
-                    Spacer(modifier = Modifier.width(12.dp))
+                    Text("+91", style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold), color = theme.t1)
+                    Spacer(modifier = Modifier.width(16.dp))
                     BasicTextField(
                         value = phone,
                         onValueChange = { if (it.length <= 10) phone = it },
                         modifier = Modifier.weight(1f),
-                        textStyle = MaterialTheme.typography.titleMedium.copy(color = theme.t1),
+                        textStyle = MaterialTheme.typography.titleLarge.copy(color = theme.t1, fontWeight = FontWeight.Bold),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                         cursorBrush = SolidColor(theme.t1),
                         decorationBox = { innerTextField ->
                             Box {
-                                if (phone.isEmpty()) Text("Phone number", style = MaterialTheme.typography.titleMedium, color = theme.t4)
+                                if (phone.isEmpty()) Text("Phone number", style = MaterialTheme.typography.titleLarge, color = theme.t4)
                                 innerTextField()
                             }
                         }
@@ -105,9 +127,9 @@ fun AuthScreen(onAuthSuccess: (token: String) -> Unit) {
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
-            // Continue button
+            // Continue button with action color
             Button(
                 onClick = {
                     if (phone.length >= 10) {
@@ -128,21 +150,21 @@ fun AuthScreen(onAuthSuccess: (token: String) -> Unit) {
                 enabled = phone.length >= 10 && !isLoading,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(52.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = theme.t1, contentColor = theme.bg),
-                shape = RoundedCornerShape(12.dp)
+                    .height(60.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = theme.action, contentColor = theme.bg),
+                shape = RoundedCornerShape(16.dp)
             ) {
                 if (isLoading) {
-                    CircularProgressIndicator(color = theme.bg, modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
+                    CircularProgressIndicator(color = theme.bg, modifier = Modifier.size(24.dp), strokeWidth = 3.dp)
                 } else {
-                    Text("CONTINUE", style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold))
+                    Text("CONTINUE", style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold))
                 }
             }
         } else {
-            // OTP input
+            // OTP input - styled boxes
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 repeat(4) { i ->
                     BasicTextField(
@@ -157,11 +179,12 @@ fun AuthScreen(onAuthSuccess: (token: String) -> Unit) {
                         },
                         modifier = Modifier
                             .weight(1f)
-                            .height(56.dp)
-                            .border(2.dp, theme.outline, RoundedCornerShape(8.dp))
+                            .height(64.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .border(3.dp, theme.outline, RoundedCornerShape(12.dp))
                             .background(theme.bg2)
                             .padding(8.dp),
-                        textStyle = MaterialTheme.typography.titleLarge.copy(color = theme.t1, fontWeight = FontWeight.Bold),
+                        textStyle = MaterialTheme.typography.headlineMedium.copy(color = theme.t1, fontWeight = FontWeight.Bold),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
                         cursorBrush = SolidColor(theme.t1),
                         decorationBox = { innerTextField ->
@@ -171,12 +194,12 @@ fun AuthScreen(onAuthSuccess: (token: String) -> Unit) {
                 }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
-            Text("$attemptsLeft attempts left", style = MaterialTheme.typography.labelSmall, color = theme.t4)
+            Spacer(modifier = Modifier.height(12.dp))
+            Text("$attemptsLeft attempts remaining", style = MaterialTheme.typography.labelLarge, color = theme.t4)
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
-            // Verify button
+            // Verify button with action color
             Button(
                 onClick = {
                     if (otp.length >= 4 && authId != null) {
@@ -203,34 +226,35 @@ fun AuthScreen(onAuthSuccess: (token: String) -> Unit) {
                 enabled = otp.length >= 4 && !isLoading,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(52.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = theme.t1, contentColor = theme.bg),
-                shape = RoundedCornerShape(12.dp)
+                    .height(60.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = theme.action, contentColor = theme.bg),
+                shape = RoundedCornerShape(16.dp)
             ) {
                 if (isLoading) {
-                    CircularProgressIndicator(color = theme.bg, modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
+                    CircularProgressIndicator(color = theme.bg, modifier = Modifier.size(24.dp), strokeWidth = 3.dp)
                 } else {
-                    Text("VERIFY", style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold))
+                    Text("VERIFY", style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold))
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(16.dp))
             TextButton(onClick = { otpSent = false; otp = ""; authId = null; error = null }) {
-                Text("Change number", style = MaterialTheme.typography.labelMedium, color = theme.t4)
+                Text("Change number", style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold), color = theme.action)
             }
         }
 
-        // Error message
+        // Error message - styled card
         error?.let {
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(20.dp))
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(theme.t1.copy(alpha = 0.1f))
-                    .padding(12.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(theme.error.copy(alpha = 0.15f))
+                    .border(2.dp, theme.error, RoundedCornerShape(12.dp))
+                    .padding(16.dp)
             ) {
-                Text(it, color = theme.t1, style = MaterialTheme.typography.bodySmall)
+                Text(it, color = theme.error, style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold))
             }
         }
 
@@ -239,7 +263,7 @@ fun AuthScreen(onAuthSuccess: (token: String) -> Unit) {
         // Footer
         Text(
             "By continuing, you agree to our Terms",
-            style = MaterialTheme.typography.labelSmall,
+            style = MaterialTheme.typography.labelMedium,
             color = theme.t4
         )
     }
