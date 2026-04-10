@@ -2,6 +2,7 @@ package com.pandatern.makco.ui.screens
 
 import android.graphics.Bitmap
 import android.graphics.Color as AndroidColor
+import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -80,7 +81,7 @@ fun TicketScreen(
                         modifier = Modifier
                             .size(260.dp)
                             .clip(RoundedCornerShape(16.dp))
-                            .background(AndroidColor.WHITE)
+                            .background(Color.White)
                             .padding(12.dp),
                         contentAlignment = Alignment.Center
                     ) {
