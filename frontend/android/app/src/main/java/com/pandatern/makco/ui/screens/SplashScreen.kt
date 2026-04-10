@@ -4,8 +4,7 @@ import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,46 +21,30 @@ import kotlinx.coroutines.delay
 @Composable
 fun SplashScreen(themeManager: ThemeManager, onFinished: () -> Unit) {
     val theme = LocalThemeManager.current
-
-    // Animation states
     var animStarted by remember { mutableStateOf(false) }
 
-    // Pulse animation
+    // Animations
     val pulseScale by animateFloatAsState(
-        targetValue = if (animStarted) 1.3f else 1f,
+        targetValue = if (animStarted) 1.2f else 1f,
         animationSpec = infiniteRepeatable(
-            animation = tween(1200, easing = FastOutSlowInEasing),
+            animation = tween(1000, easing = FastOutSlowInEasing),
             repeatMode = RepeatMode.Reverse
         ),
         label = "pulseScale"
     )
 
-    val pulseAlpha by animateFloatAsState(
-        targetValue = if (animStarted) 0f else 0.4f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(1200, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "pulseAlpha"
-    )
-
-    // Entry animations
     val logoScale by animateFloatAsState(
-        targetValue = if (animStarted) 1f else 0.4f,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessLow
-        ),
+        targetValue = if (animStarted) 1f else 0.5f,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow),
         label = "logoScale"
     )
 
     val contentAlpha by animateFloatAsState(
         targetValue = if (animStarted) 1f else 0f,
-        animationSpec = tween(800),
+        animationSpec = tween(600),
         label = "contentAlpha"
     )
 
-    // Loading bar animation
     val loadingProgress by animateFloatAsState(
         targetValue = if (animStarted) 1f else 0f,
         animationSpec = tween(2000, easing = LinearEasing),
@@ -71,7 +54,7 @@ fun SplashScreen(themeManager: ThemeManager, onFinished: () -> Unit) {
     LaunchedEffect(Unit) {
         delay(100)
         animStarted = true
-        delay(2200)
+        delay(2500)
         onFinished()
     }
 
@@ -81,38 +64,26 @@ fun SplashScreen(themeManager: ThemeManager, onFinished: () -> Unit) {
             .background(theme.bg),
         contentAlignment = Alignment.Center
     ) {
-        // Animated gradient background
+        // Gradient background
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .alpha(0.15f)
-                .background(
-                    Brush.radialGradient(
-                        colors = listOf(theme.actionSubtle, theme.bg)
-                    )
-                )
+                .alpha(0.1f)
+                .background(Brush.radialGradient(colors = listOf(theme.actionSubtle, theme.bg)))
         )
 
-        // Main content
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.alpha(contentAlpha)
         ) {
-            // Logo with pulse
+            // M Logo with pulse
             Box(contentAlignment = Alignment.Center) {
-                // Pulsing ring
                 Box(
                     modifier = Modifier
                         .size(120.dp)
-                        .graphicsLayer {
-                            scaleX = pulseScale
-                            scaleY = pulseScale
-                            alpha = pulseAlpha
-                        }
-                        .background(theme.action, RoundedCornerShape(60.dp))
+                        .graphicsLayer { scaleX = pulseScale; scaleY = pulseScale }
+                        .background(theme.actionSubtle, RoundedCornerShape(60.dp))
                 )
-                
-                // M letter
                 Box(
                     modifier = Modifier
                         .size(80.dp)
@@ -121,51 +92,33 @@ fun SplashScreen(themeManager: ThemeManager, onFinished: () -> Unit) {
                 ) {
                     Text(
                         "M",
-                        style = MaterialTheme.typography.displayMedium.copy(
-                            fontWeight = FontWeight.Black,
-                            fontSize = 48.sp
-                        ),
+                        style = MaterialTheme.typography.displayMedium.copy(fontWeight = FontWeight.Black, fontSize = 48.sp),
                         color = theme.bg,
-                        modifier = Modifier.graphicsLayer {
-                            scaleX = logoScale
-                            scaleY = logoScale
-                        }
+                        modifier = Modifier.graphicsLayer { scaleX = logoScale; scaleY = logoScale }
                     )
                 }
             }
 
             Spacer(modifier = Modifier.height(40.dp))
 
-            // Title with animation
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = "MAKCO",
-                    style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Black),
-                    color = theme.t1
-                )
-                Box(
-                    modifier = Modifier
-                        .padding(start = 10.dp)
-                        .size(8.dp)
-                        .background(theme.action, RoundedCornerShape(4.dp))
-                )
-            }
-            
-            Spacer(modifier = Modifier.height(8.dp))
-            
             Text(
-                text = "CHENNAI METRO",
-                style = MaterialTheme.typography.labelLarge,
-                color = theme.t3,
-                letterSpacing = 4.sp
+                "MAKCO",
+                style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Black),
+                color = theme.t1
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                "CHENNAI METRO",
+                style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold, letterSpacing = 4.sp),
+                color = theme.t3
             )
 
-            Spacer(modifier = Modifier.height(56.dp))
+            Spacer(modifier = Modifier.height(48.dp))
 
-            // Animated loading bar
+            // Loading bar
             Box(
                 modifier = Modifier
-                    .width(160.dp)
+                    .width(140.dp)
                     .height(4.dp)
                     .background(theme.bg3, RoundedCornerShape(2.dp))
             ) {
@@ -176,14 +129,6 @@ fun SplashScreen(themeManager: ThemeManager, onFinished: () -> Unit) {
                         .background(theme.action, RoundedCornerShape(2.dp))
                 )
             }
-            
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            Text(
-                text = "Loading...",
-                style = MaterialTheme.typography.labelSmall,
-                color = theme.t4
-            )
         }
     }
 }
