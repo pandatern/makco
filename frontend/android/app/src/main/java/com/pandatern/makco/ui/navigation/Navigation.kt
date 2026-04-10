@@ -296,7 +296,8 @@ fun MakcoNavHost() {
                                     CacheManager.addRecentStation(context, station)
                                     subScreen = SubScreen.NONE
                                 },
-                                onBack = { subScreen = SubScreen.NONE }
+                                onBack = { subScreen = SubScreen.NONE },
+                                isSource = true
                             )
                         }
                         SubScreen.DESTINATION_PICKER -> {
@@ -307,8 +308,10 @@ fun MakcoNavHost() {
                                     CacheManager.addRecentStation(context, station)
                                     subScreen = SubScreen.NONE
                                 },
-                                onBack = { subScreen = SubScreen.NONE }
+                                onBack = { subScreen = SubScreen.NONE },
+                                isSource = false
                             )
+                        }
                         }
                         SubScreen.BOOKING -> {
                             BookingScreen(

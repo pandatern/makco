@@ -28,19 +28,22 @@ import androidx.compose.ui.graphics.Color
 fun StationPickerScreen(
     stations: List<Station>,
     onStationSelected: (Station) -> Unit,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    isSource: Boolean = true
 ) {
     val theme = LocalThemeManager.current
     var searchQuery by remember { mutableStateOf("") }
     var selectedLine by remember { mutableStateOf<String?>(null) }
 
+    // Filter stations - flexible matching
     val filteredStations = remember(stations, searchQuery, selectedLine) {
         stations.filter { station ->
             val matchesSearch = searchQuery.isEmpty() ||
-                station.name.contains(searchQuery, ignoreCase = true)
-            val matchesLine = selectedLine == null ||
-                (selectedLine == "Blue" && station.code.contains("|01")) ||
-                (selectedLine == "Green" && station.code.contains("|02"))
+                station.name.contains(searchQuery, ignoreCase = true) ||
+                station.code.contains(searchQuery, ignoreCase = true)
+            val matchesLine = selectedLine == null || 
+                station.code.contains(selectedLine!!, ignoreCase = true) ||
+                station.code.lowercase().contains(selectedLine!!.lowercase())
             matchesSearch && matchesLine
         }
     }
@@ -53,11 +56,16 @@ fun StationPickerScreen(
     ) {
         Spacer(modifier = Modifier.height(48.dp))
 
-        // Header
+        // Header with title
         Row(verticalAlignment = Alignment.CenterVertically) {
             Image(painter = painterResource(R.drawable.ic_location), contentDescription = "Back", colorFilter = ColorFilter.tint(theme.t1), modifier = Modifier.size(24.dp).clickable { onBack() })
             Spacer(modifier = Modifier.width(12.dp))
-            Text("SELECT STATION", style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Black), color = theme.t1)
+            Text(
+                if (isSource) "SELECT SOURCE" else "SELECT DESTINATION", 
+                style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Black), 
+                color = theme.t1
+            )
+        }
         }
 
         Spacer(modifier = Modifier.height(24.dp))
