@@ -190,20 +190,34 @@ private fun buildQrString(booking: BookingResponse, ticket: Ticket?): String {
     }
 }
 
-// Generate QR with proper encoding for metro scanners
+// Generate QR with thicker modules for better scan - use high contrast
 private fun generateQRBitmap(content: String, size: Int): Bitmap? {
     return try {
         val hints = mapOf(
-            EncodeHintType.MARGIN to 1,
+            EncodeHintType.MARGIN to 0,  // No margin - more data
             EncodeHintType.CHARACTER_SET to "UTF-8",
-            EncodeHintType.ERROR_CORRECTION to com.google.zxing.qrcode.decoder.ErrorCorrectionLevel.H
+            EncodeHintType.ERROR_CORRECTION to com.google.zxing.qrcode.decoder.ErrorCorrectionLevel.M,  // Medium - less dense
+            EncodeHintType.BARCODE_FORMAT to BarcodeFormat.QR_CODE
         )
         val writer = QRCodeWriter()
         val bitMatrix = writer.encode(content, BarcodeFormat.QR_CODE, size, size, hints)
-        val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.RGB_565)
-        for (x in 0 until size) {
-            for (y in 0 until size) {
-                bitmap.setPixel(x, y, if (bitMatrix[x, y]) AndroidColor.BLACK else AndroidColor.WHITE)
+        
+        // Scale up for thicker modules
+        val scale = 4  // Each module = 4 pixels
+        val scaledSize = size * scale
+        val bitmap = Bitmap.createBitmap(scaledSize, scaledSize, Bitmap.Config.RGB_565)
+        
+        for (x in 0 until scaledSize) {
+            for (y in 0 until scaledSize) {
+                val moduleX = x / scale
+                val moduleY = y / scale
+                // Add slight gap between modules for better visibility
+                val isModule = if (scale > 2) {
+                    bitMatrix[moduleX, moduleY] && (x % scale > 0) && (y % scale > 0)
+                } else {
+                    bitMatrix[moduleX, moduleY]
+                }
+                bitmap.setPixel(x, y, if (isModule) AndroidColor.BLACK else AndroidColor.WHITE)
             }
         }
         bitmap
