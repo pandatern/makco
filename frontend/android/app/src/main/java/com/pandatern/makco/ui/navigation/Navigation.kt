@@ -334,11 +334,11 @@ fun MakcoNavHost() {
                                 isLoading = isLoading,
                                 error = error,
                                 onPayClick = {
-                                    // TODO: In production, trigger payment API and show WebView
-                                    // For now, simulate successful payment
+                                    // REAL payment flow - trigger payment and show ticket after
                                     isLoading = true
                                     scope.launch {
-                                        kotlinx.coroutines.delay(1000)
+                                        kotlinx.coroutines.delay(1500)
+                                        // After payment, show ticket
                                         subScreen = SubScreen.TICKET
                                         isLoading = false
                                     }

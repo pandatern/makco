@@ -54,7 +54,7 @@ interface MakcoApi {
         @Header("token") token: String,
         @Path("quoteId") quoteId: String,
         @Query("city") city: String = "chennai",
-        @Query("isMockPayment") isMockPayment: Boolean = true,
+        @Query("isMockPayment") isMockPayment: Boolean = false,  // REAL payment
         @Body request: ConfirmRequest = ConfirmRequest()
     ): Response<BookingResponse>
 
