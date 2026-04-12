@@ -58,14 +58,14 @@ interface MakcoApi {
         @Body request: ConfirmRequest = ConfirmRequest()
     ): Response<BookingResponse>
 
-    @GET("metro/booking/{bookingId}/status")
+    @GET("booking/{bookingId}/status")
     suspend fun getBookingStatus(
         @Header("token") token: String,
         @Path("bookingId") bookingId: String,
         @Query("city") city: String = "chennai"
     ): Response<BookingStatus>
 
-    @POST("metro/booking/{bookingId}/cancel")
+    @POST("booking/{bookingId}/cancel")
     suspend fun cancelBooking(
         @Header("token") token: String,
         @Path("bookingId") bookingId: String,
@@ -88,7 +88,7 @@ interface MakcoApi {
 }
 
 object ApiClient {
-    private const val BASE_URL = "http://api.pandatern.tech/"
+    private const val BASE_URL = "https://api.pandatern.tech/"
 
     private val okHttpClient = OkHttpClient.Builder()
         .connectTimeout(10, TimeUnit.SECONDS)

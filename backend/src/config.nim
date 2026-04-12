@@ -8,32 +8,32 @@ const
   SERVER_PORT* = 8080
   SERVER_HOST* = "0.0.0.0"
 
-  # TLS
-  TLS_CERT* = getEnv("TLS_CERT", "certs/server.crt")
-  TLS_KEY* = getEnv("TLS_KEY", "certs/server.key")
+  # TLS - set via environment
+  TLS_CERT* = getEnv("TLS_CERT", "")
+  TLS_KEY* = getEnv("TLS_KEY", "")
 
   # MovingTech API
-  MT_BASE_URL* = "https://api.moving.tech/pilot/app/v2"
+  MT_BASE_URL* = getEnv("MT_BASE_URL", "https://api.moving.tech/pilot/app/v2")
   MT_AUTH_URL* = MT_BASE_URL & "/auth"
   MT_FRFS_URL* = MT_BASE_URL & "/frfs"
   MT_PROFILE_URL* = MT_BASE_URL & "/profile"
 
-  # Firebase
-  FIREBASE_API_KEY* = "AIzaSyD5iVZHCLDX5qZG-3v0rG5bbhA-Q8BmHkM"
+  # Firebase - set via environment
+  FIREBASE_API_KEY* = getEnv("FIREBASE_API_KEY", "")
 
-  # Juspay
-  JUSPAY_MERCHANT* = "nammayatriBAP"
-  JUSPAY_CLIENT* = "nammayatriBAP"
-  JUSPAY_ENV* = "production"
+  # Juspay - set via environment
+  JUSPAY_MERCHANT* = getEnv("JUSPAY_MERCHANT", "")
+  JUSPAY_CLIENT* = getEnv("JUSPAY_CLIENT", "")
+  JUSPAY_ENV* = getEnv("JUSPAY_ENV", "production")
 
   # Metro
   DEFAULT_CITY* = "chennai"
   DEFAULT_VEHICLE* = "METRO"
-  MERCHANT_ID* = "NAMMA_YATRI"
-  CLIENT_ID* = "NAMMA_YATRI"
+  MERCHANT_ID* = getEnv("MERCHANT_ID", "NAMMA_YATRI")
+  CLIENT_ID* = getEnv("CLIENT_ID", "NAMMA_YATRI")
 
-  # JWT
-  JWT_SECRET* = getEnv("JWT_SECRET", "makco-secret-key-change-in-production")
+  # JWT - set via environment
+  JWT_SECRET* = getEnv("JWT_SECRET", "")
   JWT_EXPIRY_HOURS* = 24
 
   # Database
