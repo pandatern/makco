@@ -26,15 +26,9 @@ nim c -d:ssl -d:release -o:makco makco.nim
 
 ## Framework
 
-Currently using **Prologue** (0.6.8) because httpbeast 0.4.1 has compatibility issues with Nim 2.0.8.
+Currently using **Prologue** (0.6.8). httpbeast 0.4.1 has API incompatibilities with both Nim 2.0.8 and 2.2.8.
 
-If upgrading to httpbeast 0.5+, update `makco.nim` to use:
-```nim
-import httpbeast
-# ... handler imports ...
-# ... route definitions using httpbeast API ...
-runHttpBeast(port = SERVER_PORT)
-```
+Note: httpbeast requires different handler API (uses Option types for path/method). Prologue is simpler and works out of the box.
 
 ## Backend
 

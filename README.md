@@ -32,7 +32,7 @@ cd makco
 
 ## Tech Stack
 
-- **Backend**: Nim 2.0.8 + Prologue (httpbeast)
+- **Backend**: Nim 2.2.8 + Prologue
 - **Android**: Kotlin + Jetpack Compose
 - **Auth**: JWT + OTP (phone-based MovingTech)
 - **Payments**: Juspay (UPI, cards, wallet)
