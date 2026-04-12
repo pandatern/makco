@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.layout.statusBarsPadding
 import androidx.compose.ui.unit.sp
 import com.pandatern.makco.ui.theme.LocalThemeManager
 import com.pandatern.makco.ui.theme.ThemeManager
@@ -52,16 +53,17 @@ fun SplashScreen(themeManager: ThemeManager, onFinished: () -> Unit) {
     )
 
     LaunchedEffect(Unit) {
-        delay(100)
+        delay(200)
         animStarted = true
-        delay(2500)
+        delay(2800)
         onFinished()
     }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(theme.bg),
+            .background(theme.bg)
+            .statusBarsPadding(),
         contentAlignment = Alignment.Center
     ) {
         // Gradient background

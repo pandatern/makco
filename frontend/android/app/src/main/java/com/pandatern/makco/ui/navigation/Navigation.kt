@@ -45,6 +45,7 @@ fun MakcoNavHost() {
     var quotes by remember { mutableStateOf<List<Quote>>(emptyList()) }
     var bookingId by remember { mutableStateOf<String?>(null) }
     var currentBooking by remember { mutableStateOf<BookingResponse?>(null) }
+    var paymentUrl by remember { mutableStateOf<String?>(null) }
     var isLoading by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
 
@@ -160,6 +161,9 @@ fun MakcoNavHost() {
                     val booking = resp.body()!!
                     bookingId = booking.bookingId
                     currentBooking = booking.copy(price = quote.price * quantity)
+                    
+                    // Get payment URL from response
+                    paymentUrl = booking.payment?.order?.paymentLinks?.web
                     
                     // Cache the booking for ticket history (convert to BookingStatus)
                     val bookingStatus = BookingStatus(
@@ -329,27 +333,39 @@ fun MakcoNavHost() {
                             )
                         }
                         SubScreen.PAYMENT -> {
-                            PaymentScreen(
-                                bookingStatus = currentBooking,
-                                isLoading = isLoading,
-                                error = error,
-                                onPayClick = {
-                                    // REAL payment flow - trigger payment and show ticket after
-                                    isLoading = true
-                                    scope.launch {
-                                        kotlinx.coroutines.delay(1500)
-                                        // After payment, show ticket
+                            if (paymentUrl != null) {
+                                PaymentWebView(
+                                    paymentUrl = paymentUrl!!,
+                                    onPaymentComplete = {
                                         subScreen = SubScreen.TICKET
-                                        isLoading = false
+                                        paymentUrl = null
+                                    },
+                                    onBack = {
+                                        subScreen = SubScreen.BOOKING
+                                        paymentUrl = null
                                     }
-                                },
-                                onViewTicket = { subScreen = SubScreen.TICKET },
-                                onRetry = { subScreen = SubScreen.BOOKING },
-                                onBack = {
-                                    subScreen = SubScreen.BOOKING
-                                    error = null
-                                }
-                            )
+                                )
+                            } else {
+                                PaymentScreen(
+                                    bookingStatus = currentBooking,
+                                    isLoading = isLoading,
+                                    error = error,
+                                    onPayClick = {
+                                        isLoading = true
+                                        scope.launch {
+                                            kotlinx.coroutines.delay(1500)
+                                            subScreen = SubScreen.TICKET
+                                            isLoading = false
+                                        }
+                                    },
+                                    onViewTicket = { subScreen = SubScreen.TICKET },
+                                    onRetry = { subScreen = SubScreen.BOOKING },
+                                    onBack = {
+                                        subScreen = SubScreen.BOOKING
+                                        error = null
+                                    }
+                                )
+                            }
                         }
                         SubScreen.TICKET -> {
                             TicketScreen(
