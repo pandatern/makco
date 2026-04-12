@@ -20,14 +20,13 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install Nim
-        uses: jiro4981/setup-nim@v1
-        with:
-          nim-version: '2.2.8'
+        run: |
+          curl -sL https://nim-lang.org/choosenim/init.sh | bash -s -- -y
+          echo "$HOME/.nimble/bin" >> $GITHUB_PATH
 
       - name: Build Backend
         working-directory: backend/src
-        run: |
-          nim c -d:ssl -d:release -o:makco makco.nim
+        run: nim c -d:ssl -d:release -o:makco makco.nim
 
       - name: Upload Binary
         uses: actions/upload-artifact@v4
