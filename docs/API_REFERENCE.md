@@ -1,11 +1,17 @@
-# API Reference - Chennai Metro Booking API
+# API Reference - Makco Backend API
 
 Complete documentation of all confirmed working API endpoints.
 
 ## Base URL
 
 ```
-https://api.moving.tech/pilot/app/v2
+https://api.pandatern.tech
+```
+
+Or locally:
+
+```
+http://localhost:8080
 ```
 
 ## Authentication

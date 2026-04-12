@@ -8,12 +8,13 @@ This project reverse-engineers and documents the complete Chennai One / Namma Ya
 
 ## Status
 
+- **Backend**: Running at `https://api.pandatern.tech/`
 - **Auth**: Working (phone OTP based, 4-digit)
 - **Metro Data**: 41 stations, 4 routes (Blue/Green lines)
 - **Search/Quote**: Working (live fare pricing)
 - **Booking**: Working (creates booking, returns Juspay payment order)
 - **Payment**: Juspay integration (production)
-- **Tickets**: QR code generation ready
+- **Android App**: Complete (neo-brutalist design)
 
 ## Quick Start
 
@@ -22,11 +23,54 @@ This project reverse-engineers and documents the complete Chennai One / Namma Ya
 git clone https://github.com/pandatern/makco.git
 cd makco
 
-# Read the docs
-cat docs/API_REFERENCE.md
-cat docs/AUTH_FLOW.md
-cat docs/BOOKING_FLOW.md
+# Backend runs on port 8080
+./backend/src/makco
+
+# Or use nginx (already configured)
+# https://api.pandatern.tech/
 ```
+
+## Tech Stack
+
+- **Backend**: Nim 2.0.8 + Prologue (httpbeast)
+- **Android**: Kotlin + Jetpack Compose
+- **Auth**: JWT + OTP (phone-based MovingTech)
+- **Payments**: Juspay (UPI, cards, wallet)
+- **Deployment**: nginx with SSL
+
+## Project Structure
+
+```
+makco/
+├── backend/               # Nim backend
+│   └── src/
+│       ├── makco.nim      # Main entry
+│       ├── handlers.nim    # HTTP handlers
+│       ├── api_client.nim  # MovingTech proxy
+│       └── config.nim     # Configuration
+├── frontend/android/       # Android app
+│   └── app/src/main/
+│       └── java/com/pandatern/makco/
+│           ├── data/      # API, models
+│           └── ui/        # Screens, theme
+└── docs/                 # Documentation
+```
+
+## API Endpoints
+
+| Endpoint | Description |
+|----------|-------------|
+| `/` | Health check |
+| `/auth` | OTP init |
+| `/auth/{id}/verify` | OTP verify |
+| `/metro/stations` | Get all stations |
+| `/metro/routes` | Get all routes |
+| `/metro/search` | Search fares |
+| `/metro/quote` | Get quote |
+| `/metro/confirm` | Confirm booking |
+| `/booking/{id}/status` | Booking status |
+| `/profile` | User profile |
+| `/tickets` | Ticket history |
 
 ## Documentation
 
@@ -37,32 +81,6 @@ cat docs/BOOKING_FLOW.md
 - [Payment Integration](docs/PAYMENT.md) - Juspay payment gateway details
 - [Data Models](docs/DATA_MODELS.md) - Station, route, booking schemas
 - [Security Analysis](docs/SECURITY.md) - Security posture assessment
-- [Setup Guide](docs/SETUP.md) - Development environment setup
-
-## Project Structure
-
-```
-makco/
-  docs/                    # Documentation
-  src/                     # Source code
-    app/                   # FastAPI application
-      api/                 # API endpoints
-      models/              # Data models
-      core/                # Config, database, security
-      services/            # Business logic
-    data/                  # Seed data, metro stations
-    frontend/              # PWA frontend
-  scripts/                 # Utility scripts
-  tests/                   # Test suite
-```
-
-## Tech Stack
-
-- **Backend**: Python 3.10 + FastAPI
-- **Database**: SQLite (dev) / PostgreSQL (prod)
-- **Auth**: JWT + OTP (phone-based)
-- **Payments**: Juspay (UPI, cards, wallet)
-- **Frontend**: PWA (HTML/CSS/JS)
 
 ## License
 
