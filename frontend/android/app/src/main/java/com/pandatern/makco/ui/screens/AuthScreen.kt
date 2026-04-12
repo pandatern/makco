@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.pandatern.makco.data.model.*
 import com.pandatern.makco.data.remote.ApiClient
 import com.pandatern.makco.ui.theme.LocalThemeManager
@@ -34,6 +35,30 @@ fun AuthScreen(onAuthSuccess: (token: String) -> Unit) {
     var otpSent by remember { mutableStateOf(false) }
     var attemptsLeft by remember { mutableStateOf(3) }
     val scope = rememberCoroutineScope()
+
+    // Verify OTP function
+    fun verifyOtp(code: String) {
+        if (code.length >= 4 && authId != null && !isLoading) {
+            isLoading = true
+            scope.launch {
+                try {
+                    val resp = ApiClient.instance.verifyAuth(authId!!, VerifyRequest(code))
+                    if (resp.isSuccessful && resp.body() != null) {
+                        onAuthSuccess(resp.body()!!.token)
+                    } else {
+                        attemptsLeft--
+                        error = "Wrong OTP"
+                        if (attemptsLeft <= 0) {
+                            otpSent = false
+                            otp = ""
+                            attemptsLeft = 3
+                        }
+                    }
+                } catch (e: Exception) { error = "Error" }
+                isLoading = false
+            }
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -161,38 +186,43 @@ fun AuthScreen(onAuthSuccess: (token: String) -> Unit) {
                 }
             }
         } else {
-            // OTP input - styled boxes
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                repeat(4) { i ->
-                    BasicTextField(
-                        value = if (i < otp.length) otp[i].toString() else "",
-                        onValueChange = { char ->
-                            if (char.length <= 1 && char.all { it.isDigit() }) {
-                                val newOtp = StringBuilder(otp)
-                                if (newOtp.length <= i) newOtp.append(" ")
-                                if (i < newOtp.length) newOtp[i] = char[0]
-                                otp = newOtp.toString().trim()
-                            }
-                        },
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(64.dp)
-                            .clip(RoundedCornerShape(12.dp))
-                            .border(3.dp, theme.outline, RoundedCornerShape(12.dp))
-                            .background(theme.bg2)
-                            .padding(8.dp),
-                        textStyle = MaterialTheme.typography.headlineMedium.copy(color = theme.t1, fontWeight = FontWeight.Bold),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
-                        cursorBrush = SolidColor(theme.t1),
-                        decorationBox = { innerTextField ->
-                            Box(contentAlignment = Alignment.Center) { innerTextField() }
+            // OTP input - single field with auto-submit
+            BasicTextField(
+                value = otp,
+                onValueChange = { input ->
+                    val digits = input.filter { it.isDigit() }.take(4)
+                    otp = digits
+                    // Auto-verify when 4 digits
+                    if (digits.length == 4 && authId != null && !isLoading) {
+                        verifyOtp(digits)
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(64.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .border(3.dp, theme.outline, RoundedCornerShape(12.dp))
+                    .background(theme.bg2)
+                    .padding(horizontal = 16.dp),
+                textStyle = MaterialTheme.typography.headlineLarge.copy(
+                    color = theme.t1, 
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = androidx.compose.ui.unit.sp(8)
+                ),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
+                cursorBrush = SolidColor(theme.t1),
+                decorationBox = { innerTextField ->
+                    Box(contentAlignment = Alignment.Center) {
+                        if (otp.isEmpty()) {
+                            Text("0000", style = MaterialTheme.typography.headlineLarge, color = theme.t4)
                         }
-                    )
+                        innerTextField()
+                    }
                 }
-            }
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+            Text("Enter 4-digit OTP", style = MaterialTheme.typography.labelLarge, color = theme.t3)
 
             Spacer(modifier = Modifier.height(12.dp))
             Text("$attemptsLeft attempts remaining", style = MaterialTheme.typography.labelLarge, color = theme.t4)
