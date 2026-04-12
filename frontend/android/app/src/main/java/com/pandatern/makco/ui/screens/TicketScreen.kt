@@ -173,19 +173,21 @@ fun TicketScreen(
 
 // Build proper QR string matching Chennai Metro format
 private fun buildQrString(booking: BookingResponse, ticket: Ticket?): String {
+    val t = ticket
     return when {
-        // Priority: Use ticket's verification code if available
-        ticket?.verificationCode != null -> {
-            // Chennai Metro QR format: verification_code|booking_id|station_code
+        // Try all QR data sources in priority order
+        t?.qrString != null -> t.qrString
+        t?.qRCode != null -> t.qRCode
+        t?.qr_code != null -> t.qr_code
+        t?.qr != null -> t.qr
+        t?.verificationCode != null -> {
             val stationCode = booking.stations.firstOrNull()?.code ?: ""
-            "${ticket.verificationCode}|${booking.bookingId}|$stationCode"
+            "${t.verificationCode}|${booking.bookingId}|$stationCode"
         }
-        // Use ticket's qrString if available
-        ticket?.qrString != null -> ticket.qrString
-        // Fallback: booking ID with format
-        booking.bookingId.isNotEmpty() -> {
-            "MAKCO:${booking.bookingId}|${booking.price.toInt()}|${booking.quantity}"
-        }
+        t?.ticketNumber != null -> t.ticketNumber
+        t?.code != null -> t.code
+        t?.bookingId != null -> t.bookingId
+        booking.bookingId.isNotEmpty() -> "MAKCO:${booking.bookingId}|${booking.price.toInt()}|${booking.quantity}"
         else -> ""
     }
 }

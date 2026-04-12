@@ -61,26 +61,32 @@ data class PriceCurrency(
 )
 
 data class Ticket(
-    @SerializedName("id") val id: String,
-    @SerializedName("qrString") val qrString: String?,
-    @SerializedName("verificationCode") val verificationCode: String?,
-    @SerializedName("status") val status: String?,
-    @SerializedName("ticketNumber") val ticketNumber: String?,
-    @SerializedName("issuedAt") val issuedAt: String?,
-    @SerializedName("validTill") val validTill: String?
+    @SerializedName("id") val id: String = "",
+    @SerializedName("qrString") val qrString: String? = null,
+    @SerializedName("verificationCode") val verificationCode: String? = null,
+    @SerializedName("status") val status: String? = null,
+    @SerializedName("ticketNumber") val ticketNumber: String? = null,
+    @SerializedName("issuedAt") val issuedAt: String? = null,
+    @SerializedName("validTill") val validTill: String? = null,
+    @SerializedName("code") val code: String? = null,
+    @SerializedName("qRCode") val qRCode: String? = null,
+    @SerializedName("qr_code") val qr_code: String? = null,
+    @SerializedName("qr") val qr: String? = null,
+    @SerializedName("bookingId") val bookingId: String? = null
 )
 
 data class BookingResponse(
-    @SerializedName("bookingId") val bookingId: String,
-    @SerializedName("status") val status: String,
-    @SerializedName("price") val price: Double,
-    @SerializedName("priceWithCurrency") val priceWithCurrency: PriceCurrency,
-    @SerializedName("stations") val stations: List<Station>,
-    @SerializedName("validTill") val validTill: String,
+    @SerializedName("bookingId") val bookingId: String = "",
+    @SerializedName("status") val status: String = "CONFIRMED",
+    @SerializedName("price") val price: Double = 0.0,
+    @SerializedName("priceWithCurrency") val priceWithCurrency: PriceCurrency? = null,
+    @SerializedName("stations") val stations: List<Station> = emptyList(),
+    @SerializedName("validTill") val validTill: String = "",
     @SerializedName("tickets") val tickets: List<Ticket> = emptyList(),
     @SerializedName("quantity") val quantity: Int = 1,
     @SerializedName("_type") val type: String? = null,
-    @SerializedName("payment") val payment: PaymentOrder? = null
+    @SerializedName("payment") val payment: PaymentOrder? = null,
+    @SerializedName("createdAt") val createdAt: String? = null
 )
 
 data class BookingStatus(
