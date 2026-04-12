@@ -3,6 +3,7 @@
 ## Prerequisites
 
 - Nim 2.0.8+ (or newer)
+- Prologue framework (or httpbeast 0.4.1+)
 - nginx
 - Git
 
@@ -21,6 +22,18 @@ nim c -d:ssl -d:release -o:makco makco.nim
 
 # Or use nginx (already configured)
 # https://api.pandatern.tech/
+```
+
+## Framework
+
+Currently using **Prologue** (0.6.8) because httpbeast 0.4.1 has compatibility issues with Nim 2.0.8.
+
+If upgrading to httpbeast 0.5+, update `makco.nim` to use:
+```nim
+import httpbeast
+# ... handler imports ...
+# ... route definitions using httpbeast API ...
+runHttpBeast(port = SERVER_PORT)
 ```
 
 ## Backend
