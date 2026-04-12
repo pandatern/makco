@@ -171,25 +171,21 @@ fun TicketScreen(
     }
 }
 
-// Build proper QR string matching Chennai Metro format
+// Use QR data directly from API - no transformation
 private fun buildQrString(booking: BookingResponse, ticket: Ticket?): String {
     val t = ticket
-    return when {
-        // Try all QR data sources in priority order
-        t?.qrString != null -> t.qrString
-        t?.qRCode != null -> t.qRCode
-        t?.qr_code != null -> t.qr_code
-        t?.qr != null -> t.qr
-        t?.verificationCode != null -> {
-            val stationCode = booking.stations.firstOrNull()?.code ?: ""
-            "${t.verificationCode}|${booking.bookingId}|$stationCode"
-        }
-        t?.ticketNumber != null -> t.ticketNumber
-        t?.code != null -> t.code
-        t?.bookingId != null -> t.bookingId
-        booking.bookingId.isNotEmpty() -> "MAKCO:${booking.bookingId}|${booking.price.toInt()}|${booking.quantity}"
-        else -> ""
-    }
+    
+    // Direct API data without any transformation
+    t?.qrString?.let { if (it.isNotBlank()) return it }
+    t?.qRCode?.let { if (it.isNotBlank()) return it }
+    t?.qr_code?.let { if (it.isNotBlank()) return it }
+    t?.qr?.let { if (it.isNotBlank()) return it }
+    t?.verificationCode?.let { if (it.isNotBlank()) return it }
+    t?.ticketNumber?.let { if (it.isNotBlank()) return it }
+    t?.code?.let { if (it.isNotBlank()) return it }
+    
+    // Use bookingId as last resort
+    return booking.bookingId
 }
 
 // Generate QR - matching exact original app implementation
