@@ -1,9 +1,11 @@
 import os
 
+proc parseInt*(s: string): int
+
 const
   APP_NAME* = "Makco"
   APP_VERSION* = "1.0.0"
-  SERVER_PORT* = 8443
+  SERVER_PORT* = 8080
   SERVER_HOST* = "0.0.0.0"
 
   # TLS
@@ -39,9 +41,9 @@ const
 
   # Redis (future)
   REDIS_HOST* = getEnv("REDIS_HOST", "127.0.0.1")
-  REDIS_PORT* = parseInt(getEnv("REDIS_PORT", "6379"))
-  REDIS_DB* = parseInt(getEnv("REDIS_DB", "0"))
-  REDIS_ENABLED* = getEnv("REDIS_ENABLED", "false") == "true"
+  REDIS_PORT* = 6379
+  REDIS_DB* = 0
+  REDIS_ENABLED* = false
 
 proc getEnv*(key, default: string): string =
   result = os.getEnv(key)
