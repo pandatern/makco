@@ -13,7 +13,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.layout.statusBarsPadding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.ui.unit.sp
 import com.pandatern.makco.ui.theme.LocalThemeManager
 import com.pandatern.makco.ui.theme.ThemeManager

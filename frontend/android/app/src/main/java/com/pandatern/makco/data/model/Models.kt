@@ -79,7 +79,8 @@ data class BookingResponse(
     @SerializedName("validTill") val validTill: String,
     @SerializedName("tickets") val tickets: List<Ticket> = emptyList(),
     @SerializedName("quantity") val quantity: Int = 1,
-    @SerializedName("_type") val type: String? = null
+    @SerializedName("_type") val type: String? = null,
+    @SerializedName("payment") val payment: PaymentOrder? = null
 )
 
 data class BookingStatus(
