@@ -24,9 +24,15 @@ jobs:
           curl -sL https://nim-lang.org/choosenim/init.sh | bash -s -- -y
           echo "$HOME/.nimble/bin" >> $GITHUB_PATH
 
+      - name: Install Dependencies
+        run: |
+          nimble install -y prologue@0.6.8
+          nimble install -y json
+
       - name: Build Backend
-        working-directory: backend/src
-        run: nim c -d:ssl -d:release -o:makco makco.nim
+        run: |
+          cd backend/src
+          nim c -d:ssl -d:release -o:makco makco.nim
 
       - name: Upload Binary
         uses: actions/upload-artifact@v4
