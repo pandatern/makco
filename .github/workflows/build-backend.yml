@@ -1,0 +1,37 @@
+name: Build Backend
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'backend/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'backend/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Nim
+        uses: jiro4981/setup-nim@v1
+        with:
+          nim-version: '2.2.8'
+
+      - name: Build Backend
+        working-directory: backend/src
+        run: |
+          nim c -d:ssl -d:release -o:makco makco.nim
+
+      - name: Upload Binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: makco-backend
+          path: backend/src/makco
+          retention-days: 30
