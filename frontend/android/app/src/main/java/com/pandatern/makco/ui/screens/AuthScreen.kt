@@ -206,8 +206,7 @@ fun AuthScreen(onAuthSuccess: (token: String) -> Unit) {
                     .padding(horizontal = 16.dp),
                 textStyle = MaterialTheme.typography.headlineLarge.copy(
                     color = theme.t1, 
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = androidx.compose.ui.unit.sp(8)
+                    fontWeight = FontWeight.Bold
                 ),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
                 cursorBrush = SolidColor(theme.t1),
