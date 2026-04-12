@@ -175,7 +175,10 @@ fun TicketScreen(
 private fun buildQrString(booking: BookingResponse, ticket: Ticket?): String {
     val t = ticket
     
-    // Direct API data without any transformation
+    // Try qrCodes array first (like original app)
+    t?.qrCodes?.firstOrNull()?.let { if (it.isNotBlank()) return it }
+    
+    // Then try all other QR data sources in priority order
     t?.qrString?.let { if (it.isNotBlank()) return it }
     t?.qRCode?.let { if (it.isNotBlank()) return it }
     t?.qr_code?.let { if (it.isNotBlank()) return it }

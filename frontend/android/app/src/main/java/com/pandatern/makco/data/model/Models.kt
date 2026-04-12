@@ -63,6 +63,7 @@ data class PriceCurrency(
 data class Ticket(
     @SerializedName("id") val id: String = "",
     @SerializedName("qrString") val qrString: String? = null,
+    @SerializedName("qrCodes") val qrCodes: List<String>? = null,
     @SerializedName("verificationCode") val verificationCode: String? = null,
     @SerializedName("status") val status: String? = null,
     @SerializedName("ticketNumber") val ticketNumber: String? = null,
