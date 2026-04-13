@@ -14,7 +14,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.pandatern.makco.data.model.BookingResponse
+import com.pandatern.makco.data.model.BookingStatus
 import com.pandatern.makco.ui.theme.*
 
 @Composable
