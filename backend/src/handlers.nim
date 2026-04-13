@@ -195,13 +195,14 @@ proc debugRoute*(ctx: Context) {.async.} =
     ctx.jsonResponse(%*{"error": "Unauthorized"}, Http401)
     return
   
-  var debugData = newJObject()
-  debugData["app"] = "Makco"
-  debugData["version"] = "1.0.0"
-  debugData["admin"] = true
-  debugData["features"] = %*{
-    "skip_payment": true,
-    "debug_logs": true
+  let debugData = %*{
+    "app": "Makco",
+    "version": "1.0.0",
+    "admin": true,
+    "features": {
+      "skip_payment": true,
+      "debug_logs": true
+    }
   }
   
   ctx.jsonResponse(debugData)
