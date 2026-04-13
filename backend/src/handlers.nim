@@ -138,10 +138,11 @@ proc confirmBooking*(ctx: Context) {.async.} =
       ctx.jsonResponse(%*{"error": "Missing quoteId"}, Http400)
       return
 
-    # Admin skip payment
+    # Admin skip payment - require BOTH admin token AND debugPayment param
     let isAdmin = token == "admin_token_6374746721" or token.startsWith("admin_")
+    let debugPayment = ctx.getQueryParams("debugPayment", "false") == "true"
     var mockPayment = false
-    if isAdmin:
+    if isAdmin and debugPayment:
       mockPayment = true
       echo "[ADMIN] Skipping payment for quote: ", quoteId
     

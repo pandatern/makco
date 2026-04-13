@@ -65,6 +65,13 @@ interface MakcoApi {
         @Query("city") city: String = "chennai"
     ): Response<BookingStatus>
 
+    @GET("booking/{bookingId}/refresh")
+    suspend fun refreshBookingStatus(
+        @Header("token") token: String,
+        @Path("bookingId") bookingId: String,
+        @Query("city") city: String = "chennai"
+    ): Response<BookingStatus>
+
     @POST("booking/{bookingId}/cancel")
     suspend fun cancelBooking(
         @Header("token") token: String,

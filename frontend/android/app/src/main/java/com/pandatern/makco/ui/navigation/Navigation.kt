@@ -44,7 +44,7 @@ fun MakcoNavHost() {
     var selectedDestination by remember { mutableStateOf<Station?>(null) }
     var quotes by remember { mutableStateOf<List<Quote>>(emptyList()) }
     var bookingId by remember { mutableStateOf<String?>(null) }
-    var currentBooking by remember { mutableStateOf<BookingResponse?>(null) }
+    var currentBooking by remember { mutableStateOf<BookingStatus?>(null) }
     var paymentUrl by remember { mutableStateOf<String?>(null) }
     var isLoading by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
@@ -160,22 +160,24 @@ fun MakcoNavHost() {
                 if (resp.isSuccessful && resp.body() != null) {
                     val booking = resp.body()!!
                     bookingId = booking.bookingId
-                    currentBooking = booking.copy(price = quote.price * quantity)
                     
-                    // Get payment URL from response
-                    paymentUrl = booking.payment?.order?.paymentLinks?.web
-                    
-                    // Cache the booking for ticket history (convert to BookingStatus)
-                    val bookingStatus = BookingStatus(
+                    // Convert to BookingStatus for consistent handling
+                    currentBooking = BookingStatus(
                         bookingId = booking.bookingId,
                         status = booking.status,
                         price = quote.price * quantity,
                         stations = booking.stations,
                         validTill = booking.validTill,
                         tickets = booking.tickets,
-                        quantity = quantity
+                        quantity = quantity,
+                        payment = booking.payment
                     )
-                    CacheManager.addBookingHistory(context, bookingStatus)
+                    
+                    // Get payment URL from response
+                    paymentUrl = booking.payment?.order?.paymentLinks?.web
+                    
+                    // Cache the booking for ticket history
+                    CacheManager.addBookingHistory(context, currentBooking!!)
                     
                     // Always show payment screen (removed debug mode)
                     subScreen = SubScreen.PAYMENT
@@ -337,6 +339,15 @@ fun MakcoNavHost() {
                                 PaymentWebView(
                                     paymentUrl = paymentUrl!!,
                                     onPaymentComplete = {
+                                        // Refresh booking to get QR codes after payment
+                                        bookingId?.let { id ->
+                                            try {
+                                                val refreshResp = ApiClient.instance.refreshBookingStatus(token, id)
+                                                if (refreshResp.isSuccessful && refreshResp.body() != null) {
+                                                    currentBooking = refreshResp.body()!!
+                                                }
+                                            } catch (e: Exception) { /* keep cached on failure */ }
+                                        }
                                         subScreen = SubScreen.TICKET
                                         paymentUrl = null
                                     },
@@ -369,11 +380,10 @@ fun MakcoNavHost() {
                         }
                         SubScreen.TICKET -> {
                             TicketScreen(
-                                booking = currentBooking ?: BookingResponse(
+                                booking = currentBooking ?: BookingStatus(
                                     bookingId = bookingId ?: "",
                                     status = "CONFIRMED",
                                     price = 0.0,
-                                    priceWithCurrency = PriceCurrency(0.0, "INR"),
                                     stations = emptyList(),
                                     validTill = ""
                                 ),

@@ -25,13 +25,13 @@ import com.google.zxing.BarcodeFormat
 import com.google.zxing.EncodeHintType
 import com.google.zxing.qrcode.QRCodeWriter
 import com.pandatern.makco.R
-import com.pandatern.makco.data.model.BookingResponse
+import com.pandatern.makco.data.model.BookingStatus
 import com.pandatern.makco.data.model.Ticket
 import com.pandatern.makco.ui.theme.*
 
 @Composable
 fun TicketScreen(
-    booking: BookingResponse,
+    booking: BookingStatus,
     onBack: () -> Unit
 ) {
     val theme = LocalThemeManager.current
@@ -39,10 +39,11 @@ fun TicketScreen(
     
     // Use QR data from API - prioritize available data
     val qrString: String = buildString {
-        // Try in order: qrString from API, verificationCode, ticketNumber, bookingId
-        ticket?.qrString?.let { append(it); return@buildString }
-        ticket?.verificationCode?.let { append(it); return@buildString }
-        ticket?.ticketNumber?.let { append(it); return@buildString }
+        // Try in order: qrCodes array first, then other fields
+        ticket?.qrCodes?.firstOrNull()?.let { if (it.isNotBlank()) { append(it); return@buildString } }
+        ticket?.qrString?.let { if (it.isNotBlank()) { append(it); return@buildString } }
+        ticket?.verificationCode?.let { if (it.isNotBlank()) { append(it); return@buildString } }
+        ticket?.ticketNumber?.let { if (it.isNotBlank()) { append(it); return@buildString } }
         append(booking.bookingId)
     }
 
@@ -157,7 +158,7 @@ fun TicketScreen(
                     Column(horizontalAlignment = Alignment.End) {
                         Text("TYPE", style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold), color = theme.t3)
                         Spacer(modifier = Modifier.height(4.dp))
-                        Text(booking.type ?: "Single Journey", style = MaterialTheme.typography.bodyMedium, color = theme.t2)
+                        Text(booking.vehicleType ?: "METRO", style = MaterialTheme.typography.bodyMedium, color = theme.t2)
                     }
                 }
             }
@@ -169,26 +170,6 @@ fun TicketScreen(
         Text("Show this QR code at the metro station entry gate", style = MaterialTheme.typography.labelMedium, color = theme.t4, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
         Spacer(modifier = Modifier.height(80.dp))
     }
-}
-
-// Use QR data directly from API - no transformation
-private fun buildQrString(booking: BookingResponse, ticket: Ticket?): String {
-    val t = ticket
-    
-    // Try qrCodes array first (like original app)
-    t?.qrCodes?.firstOrNull()?.let { if (it.isNotBlank()) return it }
-    
-    // Then try all other QR data sources in priority order
-    t?.qrString?.let { if (it.isNotBlank()) return it }
-    t?.qRCode?.let { if (it.isNotBlank()) return it }
-    t?.qr_code?.let { if (it.isNotBlank()) return it }
-    t?.qr?.let { if (it.isNotBlank()) return it }
-    t?.verificationCode?.let { if (it.isNotBlank()) return it }
-    t?.ticketNumber?.let { if (it.isNotBlank()) return it }
-    t?.code?.let { if (it.isNotBlank()) return it }
-    
-    // Use bookingId as last resort
-    return booking.bookingId
 }
 
 // Generate QR - matching exact original app implementation
