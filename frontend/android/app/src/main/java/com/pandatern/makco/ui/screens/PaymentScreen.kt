@@ -19,7 +19,7 @@ import com.pandatern.makco.ui.theme.*
 
 @Composable
 fun PaymentScreen(
-    bookingStatus: BookingResponse?,
+    bookingStatus: BookingStatus?,
     isLoading: Boolean,
     error: String?,
     onPayClick: () -> Unit,

@@ -130,8 +130,8 @@ fun TicketScreen(
                     Column {
                         Text("ROUTE", style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold), color = theme.t3)
                         Spacer(modifier = Modifier.height(8.dp))
-                        booking.stations.firstOrNull()?.let { from ->
-                            booking.stations.lastOrNull()?.let { to ->
+                        booking.stations?.firstOrNull()?.let { from ->
+                            booking.stations?.lastOrNull()?.let { to ->
                                 Text("${from.name}", style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold), color = theme.t1)
                                 Text("to ${to.name}", style = MaterialTheme.typography.bodyMedium, color = theme.t2)
                             }

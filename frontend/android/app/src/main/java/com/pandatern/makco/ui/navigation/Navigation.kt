@@ -341,12 +341,14 @@ fun MakcoNavHost() {
                                     onPaymentComplete = {
                                         // Refresh booking to get QR codes after payment
                                         bookingId?.let { id ->
-                                            try {
-                                                val refreshResp = ApiClient.instance.refreshBookingStatus(token, id)
-                                                if (refreshResp.isSuccessful && refreshResp.body() != null) {
-                                                    currentBooking = refreshResp.body()!!
-                                                }
-                                            } catch (e: Exception) { /* keep cached on failure */ }
+                                            scope.launch {
+                                                try {
+                                                    val refreshResp = ApiClient.instance.refreshBookingStatus(token, id)
+                                                    if (refreshResp.isSuccessful && refreshResp.body() != null) {
+                                                        currentBooking = refreshResp.body()!!
+                                                    }
+                                                } catch (e: Exception) { /* keep cached on failure */ }
+                                            }
                                         }
                                         subScreen = SubScreen.TICKET
                                         paymentUrl = null
