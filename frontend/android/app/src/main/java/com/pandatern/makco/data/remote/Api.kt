@@ -48,13 +48,12 @@ interface MakcoApi {
         @Query("city") city: String = "chennai"
     ): Response<List<Quote>>
 
-    // Booking
+    // Booking - isMockPayment NOT exposed to prevent accidental skipping
     @POST("metro/quote/{quoteId}/confirm")
     suspend fun confirmBooking(
         @Header("token") token: String,
         @Path("quoteId") quoteId: String,
         @Query("city") city: String = "chennai",
-        @Query("isMockPayment") isMockPayment: Boolean = false,  // REAL payment
         @Body request: ConfirmRequest = ConfirmRequest()
     ): Response<BookingResponse>
 
