@@ -12,15 +12,18 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pandatern.makco.data.model.*
 import com.pandatern.makco.data.remote.ApiClient
 import com.pandatern.makco.ui.theme.LocalThemeManager
+import com.pandatern.makco.ui.theme.LightGreen
+import com.pandatern.makco.ui.theme.LightRed
 import kotlinx.coroutines.launch
 
 @Composable
@@ -28,6 +31,7 @@ fun AuthScreen(
     onAuthSuccess: (token: String, userId: String, phone: String) -> Unit
 ) {
     val theme = LocalThemeManager.current
+    val scope = rememberCoroutineScope()
 
     var phone by remember { mutableStateOf("") }
     var otp by remember { mutableStateOf("") }
@@ -36,12 +40,14 @@ fun AuthScreen(
     var error by remember { mutableStateOf<String?>(null) }
     var otpSent by remember { mutableStateOf(false) }
     var attemptsLeft by remember { mutableStateOf(3) }
-    val scope = rememberCoroutineScope()
 
-    // Verify OTP function
+    val actionColor = if (theme.isDark) LightGreen else LightRed
+
+    // Verify OTP
     fun verifyOtp(code: String) {
         if (code.length >= 4 && authId != null && !isLoading) {
             isLoading = true
+            error = null
             scope.launch {
                 try {
                     val resp = ApiClient.instance.verifyAuth(authId!!, VerifyRequest(code))
@@ -50,14 +56,17 @@ fun AuthScreen(
                         onAuthSuccess(body.token, body.userId, phone)
                     } else {
                         attemptsLeft--
-                        error = "Wrong OTP"
+                        error = "Invalid code. $attemptsLeft attempts left."
                         if (attemptsLeft <= 0) {
                             otpSent = false
                             otp = ""
                             attemptsLeft = 3
+                            error = null
                         }
                     }
-                } catch (e: Exception) { error = "Error" }
+                } catch (e: Exception) { 
+                    error = "Connection failed" 
+                }
                 isLoading = false
             }
         }
@@ -67,97 +76,80 @@ fun AuthScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(theme.bg)
-            .padding(24.dp),
+            .padding(horizontal = 32.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(modifier = Modifier.height(80.dp))
 
-        // Logo with gradient background
-        Box(
-            modifier = Modifier
-                .size(100.dp)
-                .clip(RoundedCornerShape(20.dp))
-                .background(
-                    Brush.radialGradient(
-                        colors = listOf(theme.actionSubtle, theme.bg2)
-                    )
-                ),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                "M",
-                style = MaterialTheme.typography.displayLarge.copy(fontWeight = FontWeight.Black),
-                color = theme.t1
-            )
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
+        // Minimal logo
         Text(
-            text = "MAKCO",
-            style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Black),
+            "MAKCO",
+            style = MaterialTheme.typography.headlineLarge.copy(
+                fontWeight = FontWeight.Black,
+                letterSpacing = 8.sp
+            ),
             color = theme.t1
         )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
         Text(
-            text = "CHENNAI METRO",
-            style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.ExtraBold),
+            "Chennai Metro",
+            style = MaterialTheme.typography.bodyMedium,
             color = theme.t3
         )
 
-        Spacer(modifier = Modifier.height(48.dp))
+        Spacer(modifier = Modifier.height(64.dp))
 
-        // Title with clear hierarchy
-        Text(
-            text = if (otpSent) "VERIFY OTP" else "LOGIN",
-            style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Black),
-            color = theme.t1,
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = if (otpSent) "Code sent to +91 ${phone.takeLast(4)}" else "Enter your phone number",
-            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
-            color = theme.t2,
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(32.dp))
-
+        // Phone input
         if (!otpSent) {
-            // Phone input - styled like profile card
+            Text(
+                "Enter your phone",
+                style = MaterialTheme.typography.titleLarge.copy(
+                    fontWeight = FontWeight.SemiBold
+                ),
+                color = theme.t1
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // Phone field
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(64.dp)
-                    .clip(RoundedCornerShape(16.dp))
-                    .border(3.dp, theme.outline, RoundedCornerShape(16.dp))
+                    .height(56.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .border(1.dp, theme.outline, RoundedCornerShape(12.dp))
                     .background(theme.bg2)
-                    .padding(horizontal = 20.dp),
+                    .padding(horizontal = 16.dp),
                 contentAlignment = Alignment.CenterStart
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("+91", style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold), color = theme.t1)
-                    Spacer(modifier = Modifier.width(16.dp))
+                    Text("+91", style = MaterialTheme.typography.titleMedium, color = theme.t2)
+                    Spacer(modifier = Modifier.width(12.dp))
                     BasicTextField(
                         value = phone,
-                        onValueChange = { if (it.length <= 10) phone = it },
+                        onValueChange = { if (it.length <= 10 && it.all { c -> c.isDigit() }) phone = it },
                         modifier = Modifier.weight(1f),
-                        textStyle = MaterialTheme.typography.titleLarge.copy(color = theme.t1, fontWeight = FontWeight.Bold),
+                        textStyle = MaterialTheme.typography.titleMedium.copy(color = theme.t1),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-                        cursorBrush = SolidColor(theme.t1),
-                        decorationBox = { innerTextField ->
+                        cursorBrush = SolidColor(actionColor),
+                        singleLine = true,
+                        decorationBox = { inner ->
                             Box {
-                                if (phone.isEmpty()) Text("Phone number", style = MaterialTheme.typography.titleLarge, color = theme.t4)
-                                innerTextField()
+                                if (phone.isEmpty()) {
+                                    Text("Phone number", style = MaterialTheme.typography.titleMedium, color = theme.t4)
+                                }
+                                inner()
                             }
                         }
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
-            // Continue button with action color
+            // Continue button
             Button(
                 onClick = {
                     if (phone.length >= 10) {
@@ -169,8 +161,12 @@ fun AuthScreen(
                                 if (resp.isSuccessful && resp.body() != null) {
                                     authId = resp.body()!!.authId
                                     otpSent = true
-                                } else error = "Failed to send OTP"
-                            } catch (e: Exception) { error = "Network error" }
+                                } else {
+                                    error = "Failed to send code"
+                                }
+                            } catch (e: Exception) { 
+                                error = "Network error" 
+                            }
                             isLoading = false
                         }
                     }
@@ -178,116 +174,130 @@ fun AuthScreen(
                 enabled = phone.length >= 10 && !isLoading,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(60.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = theme.action, contentColor = theme.bg),
-                shape = RoundedCornerShape(16.dp)
+                    .height(56.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = actionColor,
+                    disabledContainerColor = theme.bg3
+                ),
+                shape = RoundedCornerShape(12.dp)
             ) {
                 if (isLoading) {
-                    CircularProgressIndicator(color = theme.bg, modifier = Modifier.size(24.dp), strokeWidth = 3.dp)
+                    CircularProgressIndicator(
+                        color = Color.White,
+                        modifier = Modifier.size(24.dp),
+                        strokeWidth = 2.dp
+                    )
                 } else {
-                    Text("CONTINUE", style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold))
+                    Text("Continue", style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold))
                 }
             }
         } else {
-            // OTP input - single field with auto-submit
+            // OTP verification
+            Text(
+                "Enter code",
+                style = MaterialTheme.typography.titleLarge.copy(
+                    fontWeight = FontWeight.SemiBold
+                ),
+                color = theme.t1
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                "Sent to +91 ${phone.takeLast(3)}****${phone.takeLast(1)}",
+                style = MaterialTheme.typography.bodyMedium,
+                color = theme.t3
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // OTP field
             BasicTextField(
                 value = otp,
                 onValueChange = { input ->
                     val digits = input.filter { it.isDigit() }.take(4)
                     otp = digits
-                    // Auto-verify when 4 digits
-                    if (digits.length == 4 && authId != null && !isLoading) {
-                        verifyOtp(digits)
-                    }
+                    if (digits.length == 4) verifyOtp(digits)
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(64.dp)
+                    .height(56.dp)
                     .clip(RoundedCornerShape(12.dp))
-                    .border(3.dp, theme.outline, RoundedCornerShape(12.dp))
+                    .border(1.dp, if (error != null) theme.err else theme.outline, RoundedCornerShape(12.dp))
                     .background(theme.bg2)
                     .padding(horizontal = 16.dp),
-                textStyle = MaterialTheme.typography.headlineLarge.copy(
-                    color = theme.t1, 
-                    fontWeight = FontWeight.Bold
+                textStyle = MaterialTheme.typography.headlineSmall.copy(
+                    color = theme.t1,
+                    textAlign = TextAlign.Center
                 ),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
-                cursorBrush = SolidColor(theme.t1),
-                decorationBox = { innerTextField ->
-                    Box(contentAlignment = Alignment.Center) {
+                cursorBrush = SolidColor(actionColor),
+                singleLine = true,
+                decorationBox = { inner ->
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
                         if (otp.isEmpty()) {
-                            Text("0000", style = MaterialTheme.typography.headlineLarge, color = theme.t4)
+                            Text("• • • •", style = MaterialTheme.typography.headlineSmall, color = theme.t4)
                         }
-                        innerTextField()
+                        inner()
                     }
                 }
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
-            Text("Enter 4-digit OTP", style = MaterialTheme.typography.labelLarge, color = theme.t3)
+            // Error message
+            error?.let {
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    it,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = theme.err
+                )
+            }
 
-            Spacer(modifier = Modifier.height(12.dp))
-            Text("$attemptsLeft attempts remaining", style = MaterialTheme.typography.labelLarge, color = theme.t4)
+            Spacer(modifier = Modifier.height(32.dp))
 
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // Verify button with action color
+            // Verify button
             Button(
-                onClick = {
-                    if (otp.length >= 4 && authId != null) {
-                        isLoading = true
-                        scope.launch {
-                            try {
-                                val resp = ApiClient.instance.verifyAuth(authId!!, VerifyRequest(otp))
-                                if (resp.isSuccessful && resp.body() != null) {
-                                    val body = resp.body()!!
-                                    onAuthSuccess(body.token, body.userId, phone)
-                                } else {
-                                    attemptsLeft--
-                                    error = "Wrong OTP"
-                                    if (attemptsLeft <= 0) {
-                                        otpSent = false
-                                        otp = ""
-                                        attemptsLeft = 3
-                                    }
-                                }
-                            } catch (e: Exception) { error = "Error" }
-                            isLoading = false
-                        }
-                    }
-                },
+                onClick = { verifyOtp(otp) },
                 enabled = otp.length >= 4 && !isLoading,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(60.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = theme.action, contentColor = theme.bg),
-                shape = RoundedCornerShape(16.dp)
+                    .height(56.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = actionColor,
+                    disabledContainerColor = theme.bg3
+                ),
+                shape = RoundedCornerShape(12.dp)
             ) {
                 if (isLoading) {
-                    CircularProgressIndicator(color = theme.bg, modifier = Modifier.size(24.dp), strokeWidth = 3.dp)
+                    CircularProgressIndicator(
+                        color = Color.White,
+                        modifier = Modifier.size(24.dp),
+                        strokeWidth = 2.dp
+                    )
                 } else {
-                    Text("VERIFY", style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold))
+                    Text("Verify", style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold))
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
-            TextButton(onClick = { otpSent = false; otp = ""; authId = null; error = null }) {
-                Text("Change number", style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold), color = theme.action)
-            }
-        }
+            Spacer(modifier = Modifier.height(24.dp))
 
-        // Error message - styled card
-        error?.let {
-            Spacer(modifier = Modifier.height(20.dp))
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(theme.err.copy(alpha = 0.15f))
-                    .border(2.dp, theme.err, RoundedCornerShape(12.dp))
-                    .padding(16.dp)
+            // Change number
+            TextButton(
+                onClick = { 
+                    otpSent = false
+                    otp = ""
+                    authId = null
+                    error = null
+                }
             ) {
-                Text(it, color = theme.err, style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold))
+                Text(
+                    "Change number",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = actionColor
+                )
             }
         }
 
@@ -296,8 +306,9 @@ fun AuthScreen(
         // Footer
         Text(
             "By continuing, you agree to our Terms",
-            style = MaterialTheme.typography.labelMedium,
-            color = theme.t4
+            style = MaterialTheme.typography.bodySmall,
+            color = theme.t4,
+            modifier = Modifier.padding(bottom = 32.dp)
         )
     }
 }

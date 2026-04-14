@@ -3,7 +3,6 @@ package com.pandatern.makco.ui.screens
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
@@ -14,9 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -28,7 +25,6 @@ import com.pandatern.makco.ui.theme.LightRed
 import kotlinx.coroutines.launch
 
 data class OnboardingPage(
-    val icon: String,
     val title: String,
     val subtitle: String,
     val description: String,
@@ -37,24 +33,21 @@ data class OnboardingPage(
 
 private val pages = listOf(
     OnboardingPage(
-        icon = "🚇",
-        title = "41 STATIONS",
-        subtitle = "BLUE & GREEN LINES",
-        description = "Every Chennai Metro station at your fingertips. North-South Blue line. East-West Green line.",
+        title = "Metro Made Simple",
+        subtitle = "41 Stations",
+        description = "Navigate Chennai Metro effortlessly. Every station, every line, right in your pocket.",
         accentColor = LightGreen
     ),
     OnboardingPage(
-        icon = "⚡",
-        title = "INSTANT BOOKING",
-        subtitle = "SEARCH • SELECT • PAY",
-        description = "Get fare quotes instantly. Single or return journey. Pay seamless with UPI.",
+        title = "Book in Seconds",
+        subtitle = "Instant Fares",
+        description = "Get instant fare quotes. Choose your journey. Pay seamlessly with UPI.",
         accentColor = LightRed
     ),
     OnboardingPage(
-        icon = "🎫",
-        title = "TAP & RIDE",
-        subtitle = "NO QUEUES • NO CASH",
-        description = "Skip the counter. QR ticket at every gate. Just scan and board.",
+        title = "Skip the Queue",
+        subtitle = "QR Tickets",
+        description = "Your digital ticket works at every gate. Just scan and ride.",
         accentColor = LightGreen
     )
 )
@@ -70,40 +63,33 @@ fun OnboardingScreen(onFinished: () -> Unit) {
         modifier = Modifier
             .fillMaxSize()
             .background(theme.bg)
-            .statusBarsPadding()
     ) {
-        // Header
+        // Top bar
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(24.dp),
+                .padding(24.dp)
+                .statusBarsPadding(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Neo-brutalist logo
-            Box(
-                modifier = Modifier
-                    .size(44.dp)
-                    .shadow(4.dp, RoundedCornerShape(12.dp))
-                    .background(theme.t1, RoundedCornerShape(12.dp)),
-                contentAlignment = Alignment.Center
+            Text(
+                "MAKCO",
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = FontWeight.SemiBold,
+                    letterSpacing = 4.sp
+                ),
+                color = theme.t2
+            )
+            TextButton(
+                onClick = onFinished,
+                contentPadding = PaddingValues(0.dp)
             ) {
                 Text(
-                    "M",
-                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Black),
-                    color = theme.bg
+                    "Skip",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = theme.t4
                 )
-            }
-            
-            // Skip - neo style box
-            Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(8.dp))
-                    .border(2.dp, theme.outline, RoundedCornerShape(8.dp))
-                    .clickable { onFinished() }
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
-            ) {
-                Text("SKIP", style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold), color = theme.t3)
             }
         }
 
@@ -116,45 +102,55 @@ fun OnboardingScreen(onFinished: () -> Unit) {
             val isSelected = page == pagerState.currentPage
             
             val pageAlpha by animateFloatAsState(
-                targetValue = if (isSelected) 1f else 0.5f,
-                animationSpec = tween(200),
+                targetValue = if (isSelected) 1f else 0.4f,
+                animationSpec = tween(400),
                 label = "alpha"
             )
             
-            val pageScale by animateFloatAsState(
-                targetValue = if (isSelected) 1f else 0.9f,
-                animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
+            val pageOffset = (pagerState.currentPage - page) + pagerState.currentPageOffsetFraction
+            val scale by animateFloatAsState(
+                targetValue = 1f - (pageOffset.absoluteValue * 0.1f).coerceIn(0f, 0.1f),
+                animationSpec = tween(300),
                 label = "scale"
             )
 
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 24.dp)
-                    .scale(pageScale)
+                    .padding(horizontal = 40.dp)
+                    .scale(scale)
                     .alpha(pageAlpha),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                // Big bold icon block - NEO BRUTALIST
+                // Elegant dot indicator as visual
                 Box(
                     modifier = Modifier
-                        .size(160.dp)
-                        .shadow(8.dp, RoundedCornerShape(32.dp))
-                        .background(data.accentColor, RoundedCornerShape(32.dp)),
+                        .size(80.dp)
+                        .background(
+                            data.accentColor.copy(alpha = 0.12f),
+                            RoundedCornerShape(40.dp)
+                        ),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(text = data.icon, fontSize = 72.sp)
+                    Box(
+                        modifier = Modifier
+                            .size(8.dp)
+                            .background(
+                                data.accentColor,
+                                RoundedCornerShape(4.dp)
+                            )
+                    )
                 }
 
-                Spacer(modifier = Modifier.height(48.dp))
+                Spacer(modifier = Modifier.height(56.dp))
 
-                // BIG BOLD TITLE
+                // Title - Apple-like
                 Text(
                     text = data.title,
-                    style = MaterialTheme.typography.displaySmall.copy(
-                        fontWeight = FontWeight.Black,
-                        letterSpacing = 2.sp
+                    style = MaterialTheme.typography.headlineMedium.copy(
+                        fontWeight = FontWeight.SemiBold,
+                        height = 36.sp
                     ),
                     color = theme.t1,
                     textAlign = TextAlign.Center
@@ -162,68 +158,62 @@ fun OnboardingScreen(onFinished: () -> Unit) {
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // Subtitle badge
-                Box(
-                    modifier = Modifier
-                        .background(data.accentColor.copy(alpha = 0.2f), RoundedCornerShape(8.dp))
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
-                ) {
-                    Text(
-                        text = data.subtitle,
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            fontWeight = FontWeight.Bold,
-                            letterSpacing = 2.sp
-                        ),
-                        color = data.accentColor
-                    )
-                }
+                // Subtitle
+                Text(
+                    text = data.subtitle,
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.Normal
+                    ),
+                    color = data.accentColor
+                )
 
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
+                // Description
                 Text(
                     text = data.description,
-                    style = MaterialTheme.typography.bodyLarge.copy(lineHeight = 28.sp),
-                    color = theme.t2,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(horizontal = 16.dp)
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        lineHeight = 26.sp
+                    ),
+                    color = theme.t3,
+                    textAlign = TextAlign.Center
                 )
             }
         }
 
-        // Page indicators - NEO BLOCKS
+        // Page indicators - minimal dots
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 32.dp),
+                .padding(vertical = 24.dp),
             horizontalArrangement = Arrangement.Center
         ) {
             repeat(pages.size) { i ->
                 val isSelected = i == pagerState.currentPage
                 val width by animateDpAsState(
-                    targetValue = if (isSelected) 32.dp else 12.dp,
-                    animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
+                    targetValue = if (isSelected) 24.dp else 8.dp,
+                    animationSpec = tween(300),
                     label = "width"
                 )
                 
                 Box(
                     modifier = Modifier
                         .width(width)
-                        .height(12.dp)
-                        .shadow(if (isSelected) 4.dp else 0.dp, RoundedCornerShape(6.dp))
+                        .height(8.dp)
                         .background(
                             if (isSelected) pages[i].accentColor else theme.bg3,
-                            RoundedCornerShape(6.dp)
+                            RoundedCornerShape(4.dp)
                         )
                 )
-                if (i < pages.size - 1) Spacer(modifier = Modifier.width(12.dp))
+                if (i < pages.size - 1) Spacer(modifier = Modifier.width(8.dp))
             }
         }
 
-        // Bottom CTA - NEO BRUTALIST
+        // Continue button - minimal
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 24.dp)
+                .padding(horizontal = 40.dp)
                 .padding(bottom = 48.dp)
         ) {
             val currentPage = pages[pagerState.currentPage]
@@ -238,18 +228,16 @@ fun OnboardingScreen(onFinished: () -> Unit) {
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(64.dp)
-                    .shadow(6.dp, RoundedCornerShape(16.dp)),
+                    .height(56.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = currentPage.accentColor),
-                shape = RoundedCornerShape(16.dp)
+                shape = RoundedCornerShape(28.dp)
             ) {
                 Text(
-                    text = if (pagerState.currentPage < pages.size - 1) "NEXT" else "GET STARTED →",
+                    text = if (pagerState.currentPage < pages.size - 1) "Continue" else "Get Started",
                     style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.Black,
-                        letterSpacing = 2.sp
+                        fontWeight = FontWeight.SemiBold
                     ),
-                    color = if (theme.isDark) Color.Black else Color.White
+                    color = Color.White
                 )
             }
         }
