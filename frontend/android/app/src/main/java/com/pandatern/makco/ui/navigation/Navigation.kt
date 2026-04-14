@@ -190,19 +190,9 @@ fun MakcoNavHost() {
     // Theme recomposition trigger
     val currentTheme = themeManager.currentTheme
 
-    // Init
+    // Init - start with DEBUG screen
     LaunchedEffect(Unit) {
-        // Try secure storage first (survives uninstall)
-        val secureAccount = SecureTokenManager.getCurrentAccount(context)
-        if (secureAccount != null) {
-            token = secureAccount.token
-            loadStations()
-            appScreen = AppScreen.MAIN
-        } else if (SecureTokenManager.hasAccount(context)) {
-            appScreen = AppScreen.AUTH
-        } else {
-            appScreen = AppScreen.ONBOARDING
-        }
+        appScreen = AppScreen.DEBUG
     }
 
     // Force recomposition on theme change
