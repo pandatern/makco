@@ -335,7 +335,12 @@ fun MakcoNavHost() {
                             )
                         }
                         SubScreen.PAYMENT -> {
-                            if (paymentUrl != null) {
+                            // Check if booking is already confirmed (admin flow)
+                            if (currentBooking?.status == "CONFIRMED" && paymentUrl == null) {
+                                // Admin flow - booking confirmed, show ticket directly
+                                subScreen = SubScreen.TICKET
+                            } else if (paymentUrl != null) {
+                                // Normal flow - real payment required
                                 PaymentWebView(
                                     paymentUrl = paymentUrl!!,
                                     onPaymentComplete = {
@@ -354,27 +359,54 @@ fun MakcoNavHost() {
                                         paymentUrl = null
                                     },
                                     onBack = {
-                                        subScreen = SubScreen.BOOKING
+                                        // Go back to payment screen, not booking
                                         paymentUrl = null
                                     }
                                 )
                             } else {
+                                // No payment URL - show payment screen (admin/testing mode)
                                 PaymentScreen(
                                     bookingStatus = currentBooking,
                                     isLoading = isLoading,
                                     error = error,
                                     onPayClick = {
+                                        // Simulate payment success for admin/testing
                                         isLoading = true
                                         scope.launch {
                                             kotlinx.coroutines.delay(1500)
+                                            currentBooking = currentBooking?.copy(status = "CONFIRMED")
                                             subScreen = SubScreen.TICKET
                                             isLoading = false
                                         }
                                     },
-                                    onViewTicket = { subScreen = SubScreen.TICKET },
-                                    onRetry = { subScreen = SubScreen.BOOKING },
+                                    onViewTicket = {
+                                        // Refresh and check status before showing
+                                        bookingId?.let { id ->
+                                            scope.launch {
+                                                try {
+                                                    val resp = ApiClient.instance.refreshBookingStatus(token, id)
+                                                    if (resp.isSuccessful && resp.body() != null) {
+                                                        currentBooking = resp.body()!!
+                                                    }
+                                                } catch (e: Exception) { /* ignore */ }
+                                            }
+                                        }
+                                        subScreen = SubScreen.TICKET
+                                    },
+                                    onRetry = {
+                                        // Retry - reload the payment URL
+                                        currentBooking?.payment?.order?.paymentLinks?.web?.let {
+                                            paymentUrl = it
+                                        }
+                                    },
                                     onBack = {
-                                        subScreen = SubScreen.BOOKING
+                                        // Clear booking and go home
+                                        subScreen = SubScreen.NONE
+                                        currentBooking = null
+                                        bookingId = null
+                                        quotes = emptyList()
+                                        selectedSource = null
+                                        selectedDestination = null
                                         error = null
                                     }
                                 )
