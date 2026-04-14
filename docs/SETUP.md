@@ -2,10 +2,11 @@
 
 ## Prerequisites
 
-- Nim 2.0.8+ (or newer)
-- Prologue framework (or httpbeast 0.4.1+)
+- Nim 2.2.8+
+- Prologue 0.6.8
 - nginx
 - Git
+- choosenim (for Nim version management)
 
 ## Quick Start
 
@@ -17,7 +18,7 @@ cd makco/backend/src
 # Compile (needs SSL for MovingTech API)
 nim c -d:ssl -d:release -o:makco makco.nim
 
-# Run
+# Run locally
 ./makco
 
 # Or use nginx (already configured)
@@ -26,9 +27,11 @@ nim c -d:ssl -d:release -o:makco makco.nim
 
 ## Framework
 
-Currently using **Prologue** (0.6.8). httpbeast 0.4.1 has API incompatibilities with both Nim 2.0.8 and 2.2.8.
-
-Note: httpbeast requires different handler API (uses Option types for path/method). Prologue is simpler and works out of the box.
+Currently using **Prologue** (0.6.8). Alternatives tested:
+- httpbeast 0.4.1 - API incompatibilities with Nim 2.2.8
+- jester 0.6.0 - response handling issues
+- httpx - too low-level like httpbeast
+- GuildenStern - untested
 
 ## Backend
 
@@ -38,6 +41,29 @@ Note: httpbeast requires different handler API (uses Option types for path/metho
 cd backend/src
 nim c -d:ssl -d:release -o:makco makco.nim
 ```
+
+### Run with nginx proxy
+
+```bash
+# Backend runs on port 8080
+# nginx proxies https://api.pandatern.tech -> localhost:8080
+nginx -s reload  # after backend restart
+```
+
+### Admin Token
+
+Payment skips only for exact token: `admin_token_6374746721`
+
+### API Endpoints
+
+- Health: GET /
+- Auth: POST /auth, POST /auth/{authId}/verify
+- Metro: GET /metro/stations, GET /metro/routes
+- Search: POST /metro/search, GET /metro/search/{searchId}/quote
+- Booking: POST /metro/quote/{quoteId}/confirm
+- Status: GET /booking/{bookingId}/status, GET /booking/{bookingId}/refresh
+- Profile: GET /profile
+- Tickets: GET /tickets
 
 ### Run
 
