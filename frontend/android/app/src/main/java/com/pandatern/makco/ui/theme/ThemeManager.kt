@@ -5,7 +5,6 @@ import android.content.SharedPreferences
 import android.content.res.Configuration
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Brush
 
 enum class AppTheme { DARK, LIGHT }
 
@@ -38,65 +37,33 @@ class ThemeManager(context: Context) {
 
     val isDark get() = currentTheme == AppTheme.DARK
 
-    // Premium Backgrounds
+    // Pure monochrome backgrounds
     val bg = if (isDark) DarkBg else LightBg
     val bg2 = if (isDark) DarkBg2 else LightBg2
     val bg3 = if (isDark) DarkBg3 else LightBg3
     val bg4 = if (isDark) DarkBg4 else LightBg4
     val surface = if (isDark) DarkSurface else LightSurface
     
-    // Premium Text
-    val t1 = if (isDark) TextPrimaryDark else TextPrimaryLight
-    val t2 = if (isDark) TextSecondaryDark else TextSecondaryLight
-    val t3 = if (isDark) TextTertiaryDark else TextTertiaryLight
-    val t4 = if (isDark) TextMutedDark else TextMutedLight
+    // Pure contrast text
+    val t1 = if (isDark) Text1Dark else Text1Light
+    val t2 = if (isDark) Text2Dark else Text2Light
+    val t3 = if (isDark) Text3Dark else Text3Light
+    val t4 = if (isDark) Text4Dark else Text4Light
     
     // Dividers & Borders
-    val divider = if (isDark) Color(0xFF2A2A3A) else Color(0xFFE5E5E8)
-    val outline = if (isDark) Color(0xFF3A3A4A) else Color(0xFFD0D0D8)
+    val divider = if (isDark) DarkBg4 else LightBg4
+    val outline = if (isDark) Color(0xFF404040) else Color(0xFFCCCCCC)
     
-    // Premium Accent - Electric Blue
-    val accent = ElectricBlue
-    val accentSubtle = if (isDark) Color(0x200066FF) else Color(0x150066FF)
+    // Neo-Brutalist action colors
+    val action = if (isDark) LightGreen else LightRed
+    val actionSubtle = if (isDark) Color(0x208BC34A) else Color(0x20FF8A80)
     
-    // Action Button - Vibrant Teal (both themes)
-    val action = VibrantTeal
-    val actionSubtle = if (isDark) Color(0x2000D4AA) else Color(0x1000D4AA)
+    // Status
+    val success = Success
+    val error = Error
+    val warning = if (isDark) Color(0xFFFFD54F) else Color(0xFFF59E0B)
     
-    // Status Colors
-    val success = SuccessGreen
-    val warning = WarningAmber
-    val error = ErrorRed
-    val info = InfoBlue
-    
-    // Glass Effect
-    val glass = if (isDark) GlassWhiteDark else GlassWhiteLight
-    val glassBorder = if (isDark) GlassBorderDark else GlassBorderLight
-    
-    // Premium Highlight
-    val highlight = if (isDark) DarkBg3 else LightBg3
-    val highlightBorder = if (isDark) Color(0xFF2A2A3A) else Color(0xFFE0E0E5)
-    
-    // Gradient Brushes
-    val primaryGradient = Brush.linearGradient(
-        colors = listOf(GradientStart, GradientEnd)
-    )
-    
-    val accentGradient = if (isDark) {
-        Brush.linearGradient(
-            colors = listOf(Color(0xFF00D4AA), Color(0xFF00A8CC))
-        )
-    } else {
-        Brush.linearGradient(
-            colors = listOf(Color(0xFF0066FF), Color(0xFF00D4AA))
-        )
-    }
-    
-    val radialGradient = Brush.radialGradient(
-        colors = listOf(accentSubtle, bg)
-    )
-    
-    // Shadow Colors
-    val shadowColor = if (isDark) Color(0xFF000000) else Color(0x40000000)
-    val elevatedShadow = if (isDark) Color(0x80000000) else Color(0x30000000)
+    // Accent (same as action for brutalist)
+    val accent = action
+    val accentSubtle = actionSubtle
 }

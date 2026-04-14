@@ -2,6 +2,7 @@ package com.pandatern.makco.ui.screens
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -9,9 +10,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -24,39 +26,29 @@ import kotlinx.coroutines.delay
 fun SplashScreen(themeManager: ThemeManager, onFinished: () -> Unit) {
     val theme = LocalThemeManager.current
 
-    // Sophisticated animation sequence
-    val logoScale by animateFloatAsState(
+    val scale by animateFloatAsState(
         targetValue = 1f,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessLow
-        ),
-        label = "logoScale"
+        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow),
+        label = "scale"
     )
 
-    val logoAlpha by animateFloatAsState(
+    val alpha by animateFloatAsState(
         targetValue = 1f,
-        animationSpec = tween(600, delayMillis = 200),
-        label = "logoAlpha"
+        animationSpec = tween(400),
+        label = "alpha"
     )
 
-    val contentAlpha by animateFloatAsState(
-        targetValue = 1f,
-        animationSpec = tween(800, delayMillis = 400),
-        label = "contentAlpha"
-    )
-
-    val shimmerProgress by animateFloatAsState(
+    val pulseScale by animateFloatAsState(
         targetValue = 1f,
         animationSpec = infiniteRepeatable(
-            animation = tween(2000, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart
+            animation = tween(800, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
         ),
-        label = "shimmer"
+        label = "pulse"
     )
 
     LaunchedEffect(Unit) {
-        delay(2500)
+        delay(2200)
         onFinished()
     }
 
@@ -67,93 +59,37 @@ fun SplashScreen(themeManager: ThemeManager, onFinished: () -> Unit) {
             .statusBarsPadding(),
         contentAlignment = Alignment.Center
     ) {
-        // Animated gradient background
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .alpha(0.6f)
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            theme.accentSubtle,
-                            theme.bg,
-                            theme.actionSubtle
-                        )
-                    )
-                )
-        )
-
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.alpha(contentAlpha)
+            modifier = Modifier.alpha(alpha)
         ) {
-            // Premium Logo with glow effect
-            Box(contentAlignment = Alignment.Center) {
-                // Outer glow
-                Box(
-                    modifier = Modifier
-                        .size(160.dp)
-                        .scale(logoScale * 1.1f)
-                        .alpha(0.3f)
-                        .background(
-                            Brush.radialGradient(
-                                colors = listOf(theme.action, theme.action.copy(alpha = 0f))
-                            ),
-                            RoundedCornerShape(80.dp)
-                        )
+            // Neo-brutalist logo block
+            Box(
+                modifier = Modifier
+                    .size(120.dp)
+                    .scale(scale)
+                    .shadow(8.dp, RoundedCornerShape(24.dp))
+                    .background(theme.action, RoundedCornerShape(24.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    "M",
+                    style = MaterialTheme.typography.displayLarge.copy(
+                        fontWeight = FontWeight.Black,
+                        fontSize = 64.sp
+                    ),
+                    color = if (theme.isDark) Black else White
                 )
-
-                // Inner glow
-                Box(
-                    modifier = Modifier
-                        .size(130.dp)
-                        .scale(logoScale)
-                        .alpha(logoAlpha * 0.5f)
-                        .background(
-                            Brush.radialGradient(
-                                colors = listOf(theme.action.copy(alpha = 0.4f), theme.action.copy(alpha = 0f))
-                            ),
-                            RoundedCornerShape(65.dp)
-                        )
-                )
-
-                // Main logo container
-                Box(
-                    modifier = Modifier
-                        .size(100.dp)
-                        .scale(logoScale)
-                        .alpha(logoAlpha)
-                        .background(
-                            Brush.linearGradient(
-                                colors = if (theme.isDark) {
-                                    listOf(theme.action, theme.action.copy(alpha = 0.8f))
-                                } else {
-                                    listOf(theme.accent, theme.action)
-                                }
-                            ),
-                            RoundedCornerShape(28.dp)
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        "M",
-                        style = MaterialTheme.typography.displayLarge.copy(
-                            fontWeight = FontWeight.Black,
-                            fontSize = 52.sp
-                        ),
-                        color = if (theme.isDark) theme.bg else theme.bg
-                    )
-                }
             }
 
-            Spacer(modifier = Modifier.height(48.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
-            // Brand name with shimmer effect
+            // Brand name
             Text(
                 "MAKCO",
                 style = MaterialTheme.typography.headlineLarge.copy(
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 8.sp
+                    fontWeight = FontWeight.Black,
+                    letterSpacing = 6.sp
                 ),
                 color = theme.t1
             )
@@ -163,54 +99,35 @@ fun SplashScreen(themeManager: ThemeManager, onFinished: () -> Unit) {
             Text(
                 "CHENNAI METRO",
                 style = MaterialTheme.typography.labelMedium.copy(
-                    fontWeight = FontWeight.Medium,
+                    fontWeight = FontWeight.Bold,
                     letterSpacing = 4.sp
                 ),
                 color = theme.t3
             )
 
-            Spacer(modifier = Modifier.height(56.dp))
+            Spacer(modifier = Modifier.height(48.dp))
 
-            // Premium loading indicator
-            Box(
-                modifier = Modifier
-                    .width(160.dp)
-                    .height(3.dp)
-                    .background(theme.bg3, RoundedCornerShape(2.dp))
+            // Loading blocks
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .fillMaxWidth(0.7f)
-                        .background(
-                            Brush.horizontalGradient(
-                                colors = listOf(
-                                    theme.action,
-                                    theme.action.copy(alpha = 0.5f),
-                                    theme.action
-                                )
-                            ),
-                            RoundedCornerShape(2.dp)
-                        )
-                        .graphicsLayer {
-                            translationX = shimmerProgress * 200f
-                        }
-                )
+                repeat(3) { i ->
+                    val animAlpha by animateFloatAsState(
+                        targetValue = 1f,
+                        animationSpec = infiniteRepeatable(
+                            animation = tween(400, delayMillis = i * 150),
+                            repeatMode = RepeatMode.Reverse
+                        ),
+                        label = "block$i"
+                    )
+                    Box(
+                        modifier = Modifier
+                            .size(12.dp)
+                            .alpha(animAlpha)
+                            .background(theme.action, RoundedCornerShape(2.dp))
+                    )
+                }
             }
-        }
-
-        // Version info at bottom
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(24.dp),
-            contentAlignment = Alignment.BottomCenter
-        ) {
-            Text(
-                "v1.0.0",
-                style = MaterialTheme.typography.labelSmall,
-                color = theme.t4.copy(alpha = 0.5f)
-            )
         }
     }
 }
