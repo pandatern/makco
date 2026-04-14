@@ -211,10 +211,6 @@ fun MakcoNavHost() {
                     SplashScreen(themeManager = themeManager) {
                         appScreen = AppScreen.ONBOARDING
                     }
-                        } else {
-                            appScreen = AppScreen.AUTH
-                        }
-                    }
                 }
                 AppScreen.ONBOARDING -> {
                     OnboardingScreen {
@@ -426,6 +422,5 @@ fun MakcoNavHost() {
                 }
             }
         }
-    }
     }
 }
