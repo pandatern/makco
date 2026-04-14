@@ -61,7 +61,7 @@ fun AuthScreen(
                         }
                     }
                 } catch (e: Exception) { 
-                    error = "Network error. Check your connection." 
+                    error = "Error: ${e.localizedMessage ?: "Unknown connection error"}" 
                 }
                 isLoading = false
             }
@@ -157,7 +157,7 @@ fun AuthScreen(
                                     error = "Failed to send code (${resp.code()})"
                                 }
                             } catch (e: Exception) { 
-                                error = "Network error. Check your connection." 
+                                error = "Error: ${e.localizedMessage ?: "Unknown connection error"}" 
                             }
                             isLoading = false
                         }
