@@ -61,7 +61,7 @@ fun AuthScreen(
                         }
                     }
                 } catch (e: Exception) { 
-                    error = "Error: ${e.message ?: "connection failed"}" 
+                    error = "Network error. Check your connection." 
                 }
                 isLoading = false
             }
@@ -157,7 +157,7 @@ fun AuthScreen(
                                     error = "Failed to send code (${resp.code()})"
                                 }
                             } catch (e: Exception) { 
-                                error = "Connection error: ${e.message ?: "failed"}" 
+                                error = "Network error. Check your connection." 
                             }
                             isLoading = false
                         }
