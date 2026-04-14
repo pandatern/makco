@@ -19,7 +19,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 enum class AppScreen {
-    SPLASH, ONBOARDING, AUTH, MAIN, DEBUG
+    SPLASH, ONBOARDING, AUTH, MAIN
 }
 
 enum class SubScreen {
@@ -190,9 +190,16 @@ fun MakcoNavHost() {
     // Theme recomposition trigger
     val currentTheme = themeManager.currentTheme
 
-    // Init - start with DEBUG screen
+    // Init
     LaunchedEffect(Unit) {
-        appScreen = AppScreen.DEBUG
+        val secureAccount = SecureTokenManager.getCurrentAccount(context)
+        if (secureAccount != null) {
+            token = secureAccount.token
+            loadStations()
+            appScreen = AppScreen.MAIN
+        } else {
+            appScreen = AppScreen.ONBOARDING
+        }
     }
 
     // Force recomposition on theme change
@@ -202,11 +209,8 @@ fun MakcoNavHost() {
             when (appScreen) {
                 AppScreen.SPLASH -> {
                     SplashScreen(themeManager = themeManager) {
-                        val secureAccount = SecureTokenManager.getCurrentAccount(context)
-                        if (secureAccount != null) {
-                            token = secureAccount.token
-                            loadStations()
-                            appScreen = AppScreen.MAIN
+                        appScreen = AppScreen.ONBOARDING
+                    }
                         } else {
                             appScreen = AppScreen.AUTH
                         }
@@ -224,15 +228,7 @@ fun MakcoNavHost() {
                             SecureTokenManager.saveAccount(context, phone, userId, newToken)
                             loadStations()
                             appScreen = AppScreen.MAIN
-                        },
-                        onError = {
-                            appScreen = AppScreen.DEBUG
                         }
-                    )
-                }
-                AppScreen.DEBUG -> {
-                    DebugScreen(
-                        onRetry = { appScreen = AppScreen.AUTH }
                     )
                 }
                 AppScreen.MAIN -> {

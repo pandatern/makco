@@ -1,9 +1,7 @@
 package com.pandatern.makco.data.local
 
 import android.content.Context
-import android.content.SharedPreferences
-import androidx.security.crypto.EncryptedSharedPreferences
-import androidx.security.crypto.MasterKey
+import android.provider.Settings
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
@@ -19,18 +17,10 @@ data class AccountData(
 
 object SecureTokenManager {
     private const val ACCOUNTS_FILE = "accounts.json"
-    private const val DEVICE_ID_FILE = ".device_id"
     private val gson = Gson()
 
     private fun getDeviceId(context: Context): String {
-        val deviceFile = File(context.filesDir, DEVICE_ID_FILE)
-        if (deviceFile.exists()) {
-            return deviceFile.readText().trim()
-        }
-        val newId = java.util.UUID.randomUUID().toString().substring(0, 16) + "-" + 
-                    android.os.Build.SERIAL.hashCode().toString(16)
-        deviceFile.writeText(newId)
-        return newId
+        return Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID) ?: "default"
     }
 
     private fun getAccountsFile(context: Context): File {
@@ -50,20 +40,27 @@ object SecureTokenManager {
     }
 
     fun saveAccount(context: Context, phone: String, userId: String, token: String) {
-        val account = AccountData(
-            phone = phone,
-            userId = userId,
-            token = token,
-            lastLoginAt = System.currentTimeMillis()
-        )
-        val json = gson.toJson(account)
-        val encrypted = encrypt(json, getDeviceId(context))
-        getAccountsFile(context).writeText(encrypted)
+        try {
+            val account = AccountData(
+                phone = phone,
+                userId = userId,
+                token = token,
+                lastLoginAt = System.currentTimeMillis()
+            )
+            val json = gson.toJson(account)
+            val encrypted = encrypt(json, getDeviceId(context))
+            getAccountsFile(context).writeText(encrypted)
+        } catch (e: Exception) {
+            // Ignore write errors
+        }
     }
 
     fun logout(context: Context) {
-        getAccountsFile(context).delete()
-        SecureCacheManager.clearAll(context)
+        try {
+            getAccountsFile(context).delete()
+        } catch (e: Exception) {
+            // Ignore
+        }
     }
 
     fun hasAccount(context: Context): Boolean {
@@ -96,92 +93,120 @@ object SecureCacheManager {
     private val gson = Gson()
 
     fun saveStations(context: Context, stations: List<com.pandatern.makco.data.model.Station>) {
-        val data = mapOf(
-            "stations" to gson.toJson(stations),
-            "stations_time" to System.currentTimeMillis()
-        )
-        saveCache(context, data)
+        try {
+            val data = mapOf(
+                "stations" to gson.toJson(stations),
+                "stations_time" to System.currentTimeMillis()
+            )
+            saveCache(context, data)
+        } catch (e: Exception) { /* Ignore */ }
     }
 
     fun getStations(context: Context): List<com.pandatern.makco.data.model.Station>? {
-        val cache = loadCache(context) ?: return null
-        val stationsJson = cache["stations"] as? String ?: return null
-        val time = (cache["stations_time"] as? Number)?.toLong() ?: 0L
-        if (System.currentTimeMillis() - time > 24 * 60 * 60 * 1000) return null
-        val type = object : TypeToken<List<com.pandatern.makco.data.model.Station>>() {}.type
-        return try { gson.fromJson(stationsJson, type) } catch (_: Exception) { null }
+        return try {
+            val cache = loadCache(context) ?: return null
+            val stationsJson = cache["stations"] as? String ?: return null
+            val time = (cache["stations_time"] as? Number)?.toLong() ?: 0L
+            if (System.currentTimeMillis() - time > 24 * 60 * 60 * 1000) return null
+            val type = object : TypeToken<List<com.pandatern.makco.data.model.Station>>() {}.type
+            gson.fromJson(stationsJson, type)
+        } catch (e: Exception) { null }
     }
 
     fun saveRecentStations(context: Context, stations: List<com.pandatern.makco.data.model.Station>) {
-        val cache = loadCache(context)?.toMutableMap() ?: mutableMapOf()
-        cache["recent_stations"] = gson.toJson(stations)
-        saveCache(context, cache)
+        try {
+            val cache = loadCache(context)?.toMutableMap() ?: mutableMapOf()
+            cache["recent_stations"] = gson.toJson(stations)
+            saveCache(context, cache)
+        } catch (e: Exception) { /* Ignore */ }
     }
 
     fun getRecentStations(context: Context): List<com.pandatern.makco.data.model.Station> {
-        val cache = loadCache(context) ?: return emptyList()
-        val json = cache["recent_stations"] as? String ?: return emptyList()
-        val type = object : TypeToken<List<com.pandatern.makco.data.model.Station>>() {}.type
-        return try { gson.fromJson(json, type) } catch (_: Exception) { emptyList() }
+        return try {
+            val cache = loadCache(context) ?: return emptyList()
+            val json = cache["recent_stations"] as? String ?: return emptyList()
+            val type = object : TypeToken<List<com.pandatern.makco.data.model.Station>>() {}.type
+            gson.fromJson(json, type)
+        } catch (e: Exception) { emptyList() }
     }
 
     fun addRecentStation(context: Context, station: com.pandatern.makco.data.model.Station) {
-        val recent = getRecentStations(context).toMutableList()
-        recent.removeAll { it.code == station.code }
-        recent.add(0, station)
-        if (recent.size > 5) recent.subList(5, recent.size).clear()
-        saveRecentStations(context, recent)
+        try {
+            val recent = getRecentStations(context).toMutableList()
+            recent.removeAll { it.code == station.code }
+            recent.add(0, station)
+            if (recent.size > 5) recent.subList(5, recent.size).clear()
+            saveRecentStations(context, recent)
+        } catch (e: Exception) { /* Ignore */ }
     }
 
     fun addBookingHistory(context: Context, booking: com.pandatern.makco.data.model.BookingStatus) {
-        val history = getBookingHistory(context).toMutableList()
-        history.removeAll { it.bookingId == booking.bookingId }
-        history.add(0, booking)
-        if (history.size > 20) history.subList(20, history.size).clear()
-        saveBookingHistory(context, history)
+        try {
+            val history = getBookingHistory(context).toMutableList()
+            history.removeAll { it.bookingId == booking.bookingId }
+            history.add(0, booking)
+            if (history.size > 20) history.subList(20, history.size).clear()
+            saveBookingHistory(context, history)
+        } catch (e: Exception) { /* Ignore */ }
     }
 
     fun saveBookingHistory(context: Context, bookings: List<com.pandatern.makco.data.model.BookingStatus>) {
-        val cache = loadCache(context)?.toMutableMap() ?: mutableMapOf()
-        cache["booking_history"] = gson.toJson(bookings)
-        saveCache(context, cache)
+        try {
+            val cache = loadCache(context)?.toMutableMap() ?: mutableMapOf()
+            cache["booking_history"] = gson.toJson(bookings)
+            saveCache(context, cache)
+        } catch (e: Exception) { /* Ignore */ }
     }
 
     fun getBookingHistory(context: Context): List<com.pandatern.makco.data.model.BookingStatus> {
-        val cache = loadCache(context) ?: return emptyList()
-        val json = cache["booking_history"] as? String ?: return emptyList()
-        val type = object : TypeToken<List<com.pandatern.makco.data.model.BookingStatus>>() {}.type
-        return try { gson.fromJson(json, type) } catch (_: Exception) { emptyList() }
+        return try {
+            val cache = loadCache(context) ?: return emptyList()
+            val json = cache["booking_history"] as? String ?: return emptyList()
+            val type = object : TypeToken<List<com.pandatern.makco.data.model.BookingStatus>>() {}.type
+            gson.fromJson(json, type)
+        } catch (e: Exception) { emptyList() }
     }
 
     fun saveTickets(context: Context, tickets: List<com.pandatern.makco.data.model.BookingStatus>) {
-        val cache = loadCache(context)?.toMutableMap() ?: mutableMapOf()
-        cache["tickets"] = gson.toJson(tickets)
-        cache["tickets_time"] = System.currentTimeMillis()
-        saveCache(context, cache)
+        try {
+            val cache = loadCache(context)?.toMutableMap() ?: mutableMapOf()
+            cache["tickets"] = gson.toJson(tickets)
+            cache["tickets_time"] = System.currentTimeMillis()
+            saveCache(context, cache)
+        } catch (e: Exception) { /* Ignore */ }
     }
 
     fun getTickets(context: Context): List<com.pandatern.makco.data.model.BookingStatus>? {
-        val cache = loadCache(context) ?: return null
-        val ticketsJson = cache["tickets"] as? String ?: return null
-        val time = (cache["tickets_time"] as? Number)?.toLong() ?: 0L
-        if (System.currentTimeMillis() - time > 24 * 60 * 60 * 1000) return null
-        val type = object : TypeToken<List<com.pandatern.makco.data.model.BookingStatus>>() {}.type
-        return try { gson.fromJson(ticketsJson, type) } catch (_: Exception) { null }
+        return try {
+            val cache = loadCache(context) ?: return null
+            val ticketsJson = cache["tickets"] as? String ?: return null
+            val time = (cache["tickets_time"] as? Number)?.toLong() ?: 0L
+            if (System.currentTimeMillis() - time > 24 * 60 * 60 * 1000) return null
+            val type = object : TypeToken<List<com.pandatern.makco.data.model.BookingStatus>>() {}.type
+            gson.fromJson(ticketsJson, type)
+        } catch (e: Exception) { null }
     }
 
     fun clearAll(context: Context) {
-        File(context.filesDir, CACHE_FILE).delete()
+        try {
+            File(context.filesDir, CACHE_FILE).delete()
+        } catch (e: Exception) { /* Ignore */ }
     }
 
     private fun getCacheFile(context: Context): File {
         return File(context.filesDir, CACHE_FILE)
     }
 
+    private fun getDeviceId(context: Context): String {
+        return Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID) ?: "default"
+    }
+
     private fun saveCache(context: Context, data: Map<String, Any>) {
-        val json = gson.toJson(data)
-        val encrypted = encrypt(json, getDeviceId(context))
-        getCacheFile(context).writeText(encrypted)
+        try {
+            val json = gson.toJson(data)
+            val encrypted = encrypt(json, getDeviceId(context))
+            getCacheFile(context).writeText(encrypted)
+        } catch (e: Exception) { /* Ignore */ }
     }
 
     private fun loadCache(context: Context): Map<String, Any>? {
@@ -191,20 +216,7 @@ object SecureCacheManager {
             val json = decrypt(file.readText(), getDeviceId(context))
             val type = object : TypeToken<Map<String, Any>>() {}.type
             gson.fromJson(json, type)
-        } catch (e: Exception) {
-            null
-        }
-    }
-
-    private fun getDeviceId(context: Context): String {
-        val deviceFile = File(context.filesDir, ".device_id")
-        if (deviceFile.exists()) {
-            return deviceFile.readText().trim()
-        }
-        val newId = java.util.UUID.randomUUID().toString().substring(0, 16) + "-" + 
-                    android.os.Build.SERIAL.hashCode().toString(16)
-        deviceFile.writeText(newId)
-        return newId
+        } catch (e: Exception) { null }
     }
 
     private fun encrypt(data: String, key: String): String {
