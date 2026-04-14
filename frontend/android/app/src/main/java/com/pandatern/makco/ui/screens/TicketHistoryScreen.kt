@@ -23,7 +23,7 @@ import com.pandatern.makco.R
 import com.pandatern.makco.data.model.*
 import com.pandatern.makco.data.remote.ApiClient
 import com.pandatern.makco.ui.theme.*
-import com.pandatern.makco.data.local.CacheManager
+import com.pandatern.makco.data.local.SecureSecureCacheManager
 import android.content.Context
 import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.launch
@@ -51,32 +51,32 @@ fun TicketHistoryScreen(
                 val body = resp.body()
                 tickets = body ?: emptyList()
                 if (tickets.isNotEmpty()) {
-                    CacheManager.saveTickets(context, tickets)
+                    SecureCacheManager.saveTickets(context, tickets)
                 }
             } else {
                 // Try cached API tickets
-                val cached = CacheManager.getTickets(context)
+                val cached = SecureCacheManager.getTickets(context)
                 if (cached != null && cached.isNotEmpty()) {
                     tickets = cached
                 } else {
                     // Fallback to local booking history
-                    tickets = CacheManager.getBookingHistory(context)
+                    tickets = SecureCacheManager.getBookingHistory(context)
                 }
             }
         } catch (e: Exception) {
             // Try cached tickets first
-            val cachedTickets = CacheManager.getTickets(context)
+            val cachedTickets = SecureCacheManager.getTickets(context)
             if (cachedTickets != null && cachedTickets.isNotEmpty()) {
                 tickets = cachedTickets
             } else {
                 // Fallback to local booking history
-                tickets = CacheManager.getBookingHistory(context)
+                tickets = SecureCacheManager.getBookingHistory(context)
             }
         }
         
         // If still empty, show local booking history
         if (tickets.isEmpty()) {
-            tickets = CacheManager.getBookingHistory(context)
+            tickets = SecureCacheManager.getBookingHistory(context)
         }
         
         isLoading = false

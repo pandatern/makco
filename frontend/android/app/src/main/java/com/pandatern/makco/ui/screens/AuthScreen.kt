@@ -24,7 +24,9 @@ import com.pandatern.makco.ui.theme.LocalThemeManager
 import kotlinx.coroutines.launch
 
 @Composable
-fun AuthScreen(onAuthSuccess: (token: String) -> Unit) {
+fun AuthScreen(
+    onAuthSuccess: (token: String, userId: String, phone: String) -> Unit
+) {
     val theme = LocalThemeManager.current
 
     var phone by remember { mutableStateOf("") }
@@ -44,7 +46,8 @@ fun AuthScreen(onAuthSuccess: (token: String) -> Unit) {
                 try {
                     val resp = ApiClient.instance.verifyAuth(authId!!, VerifyRequest(code))
                     if (resp.isSuccessful && resp.body() != null) {
-                        onAuthSuccess(resp.body()!!.token)
+                        val body = resp.body()!!
+                        onAuthSuccess(body.token, body.userId, phone)
                     } else {
                         attemptsLeft--
                         error = "Wrong OTP"
@@ -237,7 +240,8 @@ fun AuthScreen(onAuthSuccess: (token: String) -> Unit) {
                             try {
                                 val resp = ApiClient.instance.verifyAuth(authId!!, VerifyRequest(otp))
                                 if (resp.isSuccessful && resp.body() != null) {
-                                    onAuthSuccess(resp.body()!!.token)
+                                    val body = resp.body()!!
+                                    onAuthSuccess(body.token, body.userId, phone)
                                 } else {
                                     attemptsLeft--
                                     error = "Wrong OTP"

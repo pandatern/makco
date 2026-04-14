@@ -9,8 +9,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import com.pandatern.makco.data.local.TokenManager
-import com.pandatern.makco.data.local.CacheManager
+import com.pandatern.makco.data.local.SecureTokenManager
+import com.pandatern.makco.data.local.SecureCacheManager
 import com.pandatern.makco.data.model.*
 import com.pandatern.makco.data.remote.ApiClient
 import com.pandatern.makco.ui.screens.*
@@ -74,10 +74,10 @@ fun MakcoNavHost() {
                 val resp = ApiClient.instance.getStations(token)
                 if (resp.isSuccessful) {
                     stations = resp.body() ?: emptyList()
-                    CacheManager.saveStations(context, stations)
+                    SecureCacheManager.saveStations(context, stations)
                 }
             } catch (_: Exception) {
-                val cached = CacheManager.getStations(context)
+                val cached = SecureCacheManager.getStations(context)
                 if (cached != null) stations = cached
             }
         }
@@ -177,7 +177,7 @@ fun MakcoNavHost() {
                     paymentUrl = booking.payment?.order?.paymentLinks?.web
                     
                     // Cache the booking for ticket history
-                    CacheManager.addBookingHistory(context, currentBooking!!)
+                    SecureCacheManager.addBookingHistory(context, currentBooking!!)
                     
                     // Always show payment screen (removed debug mode)
                     subScreen = SubScreen.PAYMENT
@@ -192,12 +192,13 @@ fun MakcoNavHost() {
 
     // Init
     LaunchedEffect(Unit) {
-        val saved = TokenManager.getToken(context)
-        if (saved != null && saved.isNotEmpty()) {
-            token = saved
+        // Try secure storage first (survives uninstall)
+        val secureAccount = SecureTokenManager.getCurrentAccount(context)
+        if (secureAccount != null) {
+            token = secureAccount.token
             loadStations()
             appScreen = AppScreen.MAIN
-        } else if (TokenManager.isOnboardingDone(context)) {
+        } else if (SecureTokenManager.hasAccount(context)) {
             appScreen = AppScreen.AUTH
         } else {
             appScreen = AppScreen.ONBOARDING
@@ -211,13 +212,11 @@ fun MakcoNavHost() {
             when (appScreen) {
                 AppScreen.SPLASH -> {
                     SplashScreen(themeManager = themeManager) {
-                        val saved = TokenManager.getToken(context)
-                        if (saved != null && saved.isNotEmpty()) {
-                            token = saved
+                        val secureAccount = SecureTokenManager.getCurrentAccount(context)
+                        if (secureAccount != null) {
+                            token = secureAccount.token
                             loadStations()
                             appScreen = AppScreen.MAIN
-                        } else if (TokenManager.isOnboardingDone(context)) {
-                            appScreen = AppScreen.AUTH
                         } else {
                             appScreen = AppScreen.AUTH
                         }
@@ -225,17 +224,18 @@ fun MakcoNavHost() {
                 }
                 AppScreen.ONBOARDING -> {
                     OnboardingScreen {
-                        TokenManager.setOnboardingDone(context)
                         appScreen = AppScreen.AUTH
                     }
                 }
                 AppScreen.AUTH -> {
-                    AuthScreen { newToken ->
-                        token = newToken
-                        TokenManager.saveToken(context, newToken)
-                        loadStations()
-                        appScreen = AppScreen.MAIN
-                    }
+                    AuthScreen(
+                        onAuthSuccess = { newToken, userId, phone ->
+                            token = newToken
+                            SecureTokenManager.saveAccount(context, phone, userId, newToken)
+                            loadStations()
+                            appScreen = AppScreen.MAIN
+                        }
+                    )
                 }
                 AppScreen.MAIN -> {
                     when (subScreen) {
@@ -268,7 +268,7 @@ fun MakcoNavHost() {
                                     },
                                     onLogout = {
                                         token = ""
-                                        TokenManager.clearToken(context)
+                                        SecureTokenManager.logout(context)
                                         appScreen = AppScreen.AUTH
                                     },
                                     onTicketsClick = { selectedTab = 1 },
@@ -299,7 +299,7 @@ fun MakcoNavHost() {
                                 stations = stations,
                                 onStationSelected = { station ->
                                     selectedSource = station
-                                    CacheManager.addRecentStation(context, station)
+                                    SecureCacheManager.addRecentStation(context, station)
                                     subScreen = SubScreen.NONE
                                 },
                                 onBack = { subScreen = SubScreen.NONE },
@@ -311,7 +311,7 @@ fun MakcoNavHost() {
                                 stations = stations,
                                 onStationSelected = { station ->
                                     selectedDestination = station
-                                    CacheManager.addRecentStation(context, station)
+                                    SecureCacheManager.addRecentStation(context, station)
                                     subScreen = SubScreen.NONE
                                 },
                                 onBack = { subScreen = SubScreen.NONE },

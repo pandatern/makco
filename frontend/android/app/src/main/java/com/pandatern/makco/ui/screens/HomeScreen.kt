@@ -22,7 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.pandatern.makco.R
 import com.pandatern.makco.data.model.*
-import com.pandatern.makco.data.local.CacheManager
+import com.pandatern.makco.data.local.SecureCacheManager
 import com.pandatern.makco.ui.theme.*
 
 @Composable
@@ -35,10 +35,10 @@ fun HomeScreen(
 ) {
     val theme = LocalThemeManager.current
     val ctx = LocalContext.current
-    var recentStations by remember { mutableStateOf(CacheManager.getRecentStations(ctx)) }
+    var recentStations by remember { mutableStateOf(SecureCacheManager.getRecentStations(ctx)) }
 
     LaunchedEffect(selectedSource, selectedDestination) {
-        recentStations = CacheManager.getRecentStations(ctx)
+        recentStations = SecureCacheManager.getRecentStations(ctx)
     }
 
     Column(

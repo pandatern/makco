@@ -20,7 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.pandatern.makco.R
 import com.pandatern.makco.data.model.Station
-import com.pandatern.makco.data.local.CacheManager
+import com.pandatern.makco.data.local.SecureCacheManager
 import com.pandatern.makco.ui.theme.*
 import androidx.compose.ui.platform.LocalContext
 
@@ -34,7 +34,7 @@ fun RecentStationsScreen(
     var recentStations by remember { mutableStateOf<List<Station>>(emptyList()) }
 
     LaunchedEffect(Unit) {
-        recentStations = CacheManager.getRecentStations(context) ?: emptyList()
+        recentStations = SecureCacheManager.getRecentStations(context)
     }
 
     Column(
