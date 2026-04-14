@@ -27,7 +27,8 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun AuthScreen(
-    onAuthSuccess: (token: String, userId: String, phone: String) -> Unit
+    onAuthSuccess: (token: String, userId: String, phone: String) -> Unit,
+    onError: (() -> Unit)? = null
 ) {
     val theme = LocalThemeManager.current
     val scope = rememberCoroutineScope()
@@ -157,7 +158,8 @@ fun AuthScreen(
                                     error = "Failed to send code (${resp.code()})"
                                 }
                             } catch (e: Exception) { 
-                                error = "Network error. Check your connection." 
+                                error = "Network error. Check your connection."
+                                onError?.invoke()
                             }
                             isLoading = false
                         }

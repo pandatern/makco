@@ -19,7 +19,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 enum class AppScreen {
-    SPLASH, ONBOARDING, AUTH, MAIN
+    SPLASH, ONBOARDING, AUTH, MAIN, DEBUG
 }
 
 enum class SubScreen {
@@ -234,7 +234,15 @@ fun MakcoNavHost() {
                             SecureTokenManager.saveAccount(context, phone, userId, newToken)
                             loadStations()
                             appScreen = AppScreen.MAIN
+                        },
+                        onError = {
+                            appScreen = AppScreen.DEBUG
                         }
+                    )
+                }
+                AppScreen.DEBUG -> {
+                    DebugScreen(
+                        onRetry = { appScreen = AppScreen.AUTH }
                     )
                 }
                 AppScreen.MAIN -> {
