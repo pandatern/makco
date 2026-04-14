@@ -46,7 +46,7 @@ fun AuthScreen(
             error = null
             scope.launch {
                 try {
-                    val resp = ApiClient.instance.verifyAuth(authId!!, VerifyRequest(code))
+                    val resp = ApiClient.instance.verifyAuth(authId!!, VerifyRequest(otp = code))
                     if (resp.isSuccessful && resp.body() != null) {
                         val body = resp.body()!!
                         onAuthSuccess(body.token, body.userId, phone)
