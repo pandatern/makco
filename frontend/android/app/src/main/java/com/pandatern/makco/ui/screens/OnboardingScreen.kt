@@ -19,6 +19,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pandatern.makco.ui.theme.LocalThemeManager
+import com.pandatern.makco.ui.theme.lightGreen
+import com.pandatern.makco.ui.theme.lightRed
 import kotlinx.coroutines.launch
 
 data class OnboardingPage(
@@ -110,7 +112,7 @@ fun OnboardingScreen(onFinished: () -> Unit) {
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Gradient accent box
+                // Accent box with hybrid neo-brutalist colors
                 Box(
                     modifier = Modifier
                         .size(120.dp)
@@ -118,7 +120,7 @@ fun OnboardingScreen(onFinished: () -> Unit) {
                         .background(
                             Brush.radialGradient(
                                 colors = listOf(
-                                    theme.actionSubtle,
+                                    if (theme.isDark) lightGreen else lightRed, // Dynamic based on theme
                                     theme.bg2
                                 )
                             )
@@ -150,7 +152,7 @@ fun OnboardingScreen(onFinished: () -> Unit) {
                 Text(
                     text = data.subtitle,
                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                    color = theme.t2,
+                    color = if (theme.isDark) theme.t2 else theme.t3, // Adjusted for better contrast
                     textAlign = TextAlign.Center
                 )
 
@@ -189,7 +191,7 @@ fun OnboardingScreen(onFinished: () -> Unit) {
             }
         }
 
-        // Next button with animation
+        // Next button with hybrid neo-brutalist colors
         Button(
             onClick = {
                 if (pagerState.currentPage < pages.size - 1) {
@@ -199,12 +201,16 @@ fun OnboardingScreen(onFinished: () -> Unit) {
                 }
             },
             modifier = Modifier.fillMaxWidth().height(56.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = theme.t1, contentColor = theme.bg),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = if (theme.isDark) lightGreen else lightRed,
+                contentColor = if (theme.isDark) theme.bg else theme.bg
+            ),
             shape = RoundedCornerShape(12.dp)
         ) {
             Text(
                 text = if (pagerState.currentPage < pages.size - 1) "NEXT" else "GET STARTED",
-                style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold)
+                style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
+                color = if (theme.isDark) theme.bg else theme.bg
             )
         }
 

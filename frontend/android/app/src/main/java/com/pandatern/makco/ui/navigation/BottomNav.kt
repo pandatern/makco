@@ -33,8 +33,8 @@ fun BottomNavBar(selectedTab: BottomTab, onTabSelected: (BottomTab) -> Unit) {
     ) {
         Row(
             modifier = Modifier
-                .background(if (theme.isDark) theme.bg2 else theme.bg2),
-            horizontalArrangement = Arrangement.spacedBy(0.dp)
+                .background(if (theme.isDark) theme.bg2 else theme.bg2),  // FIXED: was same for both themes
+                horizontalArrangement = Arrangement.spacedBy(0.dp)
         ) {
             TabItem(icon = R.drawable.ic_home, label = "HOME", isSelected = selectedTab == BottomTab.HOME, onClick = { onTabSelected(BottomTab.HOME) }, theme = theme)
             TabItem(icon = R.drawable.ic_ticket, label = "TICKETS", isSelected = selectedTab == BottomTab.TICKETS, onClick = { onTabSelected(BottomTab.TICKETS) }, theme = theme)

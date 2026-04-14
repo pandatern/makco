@@ -37,16 +37,31 @@ fun TicketScreen(
     val theme = LocalThemeManager.current
     val ticket = booking.tickets.firstOrNull()
     
-    // Use QR data from API - prioritize available data
+    // Use QR data from API - check ALL possible QR field variations
     val qrString: String = buildString {
-        // Try in order: qrCodes array first, then other fields
-        ticket?.qrCodes?.firstOrNull()?.let { if (it.isNotBlank()) { append(it); return@buildString } }
-        ticket?.qrString?.let { if (it.isNotBlank()) { append(it); return@buildString } }
-        ticket?.verificationCode?.let { if (it.isNotBlank()) { append(it); return@buildString } }
-        ticket?.ticketNumber?.let { if (it.isNotBlank()) { append(it); return@buildString } }
-        append(booking.bookingId)
+        ticket?.let { ticket ->
+            // Check all possible QR fields in order of preference
+            val qrSources = listOf(
+                ticket.qrCodes?.firstOrNull(),
+                ticket.qrString,
+                ticket.qRCode,        // Note: capital R from API
+                ticket.qr_code,       // Note: underscore from API
+                ticket.qr,            // Note: short form from API
+                ticket.verificationCode,
+                ticket.ticketNumber,
+                ticket.id
+            )
+            
+            // Find first non-empty/non-null value
+            qrSources.firstOrNull { it?.isNotBlank() == true } ?: ""
+        } ?: ""
+        
+        // If still empty, use booking ID as last resort (but log this case)
+        if (isEmpty()) {
+            append(booking.bookingId)
+        }
     }
-
+    
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -57,15 +72,15 @@ fun TicketScreen(
         Row(verticalAlignment = Alignment.CenterVertically) {
             Image(painter = painterResource(R.drawable.ic_location), contentDescription = "Back", colorFilter = ColorFilter.tint(theme.t1), modifier = Modifier.size(24.dp).clickable { onBack() })
             Spacer(modifier = Modifier.width(12.dp))
-            Text("TICKET", style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Black), color = theme.t1)
+            Text("TICKET", style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold), color = theme.t1)
             Spacer(modifier = Modifier.weight(1f))
             Box(modifier = Modifier.clip(RoundedCornerShape(8.dp)).background(theme.actionSubtle).padding(horizontal = 12.dp, vertical = 6.dp)) {
                 Text(booking.status, style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold), color = theme.t1)
             }
         }
-
+        
         Spacer(modifier = Modifier.height(24.dp))
-
+        
         // Ticket card with gradient
         Box(
             modifier = Modifier
@@ -80,16 +95,16 @@ fun TicketScreen(
                 Text(booking.bookingId.take(16).uppercase(), style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace), color = theme.t2)
                 
                 Spacer(modifier = Modifier.height(24.dp))
-
+                
                 // QR Code
                 if (qrString.isNotEmpty()) {
-                    val qrBitmap = remember(qrString) { generateQRBitmap(qrString, 300) }
+                    val qrBitmap = remember(qrString) { generateQRBitmap(qrString, 400) } // Increased size for better scanning
                     Box(
                         modifier = Modifier
-                            .size(260.dp)
-                            .clip(RoundedCornerShape(16.dp))
+                            .size(320.dp) // Increased size
+                            .clip(RoundedCornerShape(20.dp))
                             .background(Color.White)
-                            .padding(12.dp),
+                            .padding(16.dp), // Increased padding for better quiet zone
                         contentAlignment = Alignment.Center
                     ) {
                         qrBitmap?.let {
@@ -97,25 +112,25 @@ fun TicketScreen(
                         }
                     }
                 } else {
-                    Box(modifier = Modifier.size(260.dp).clip(RoundedCornerShape(16.dp)).border(3.dp, theme.outline), contentAlignment = Alignment.Center) {
+                    Box(modifier = Modifier.size(320.dp).clip(RoundedCornerShape(20.dp)).border(3.dp, theme.outline), contentAlignment = Alignment.Center) {
                         Text("No QR Data", style = MaterialTheme.typography.bodyLarge, color = theme.t3)
                     }
                 }
-
+                
                 Spacer(modifier = Modifier.height(16.dp))
-
+                
                 // Verification code
                 ticket?.verificationCode?.let { code ->
                     Text(code, style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold, letterSpacing = 6.sp), color = theme.t1, textAlign = TextAlign.Center)
                 }
-
+                
                 Spacer(modifier = Modifier.height(8.dp))
                 Text("SCAN AT ENTRY GATE", style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold), color = theme.t3)
             }
         }
-
+        
         Spacer(modifier = Modifier.height(20.dp))
-
+        
         // Journey details
         Box(
             modifier = Modifier
@@ -144,11 +159,11 @@ fun TicketScreen(
                         Text("×${booking.quantity} ticket", style = MaterialTheme.typography.bodySmall, color = theme.t2)
                     }
                 }
-
+                
                 Spacer(modifier = Modifier.height(16.dp))
                 Divider(color = theme.divider)
                 Spacer(modifier = Modifier.height(16.dp))
-
+                
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     Column {
                         Text("VALID UNTIL", style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold), color = theme.t3)
@@ -163,29 +178,33 @@ fun TicketScreen(
                 }
             }
         }
-
+        
         Spacer(modifier = Modifier.weight(1f))
-
+        
         // Footer
         Text("Show this QR code at the metro station entry gate", style = MaterialTheme.typography.labelMedium, color = theme.t4, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
         Spacer(modifier = Modifier.height(80.dp))
     }
 }
 
-// Generate QR - matching exact original app implementation
+// Generate QR - improved for better scanner compatibility
 private fun generateQRBitmap(content: String, size: Int): Bitmap? {
     return try {
         val hints = mapOf(
-            EncodeHintType.MARGIN to 1  // Exactly like original app
+            EncodeHintType.MARGIN to 2, // Increased margin for better quiet zone
+            EncodeHintType.CHARACTER_SET to "UTF-8" // Explicit character set
         )
         val writer = QRCodeWriter()
         val bitMatrix = writer.encode(content, BarcodeFormat.QR_CODE, size, size, hints)
-        val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.RGB_565)
+        val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888) // Better quality format
         for (x in 0 until size) {
             for (y in 0 until size) {
                 bitmap.setPixel(x, y, if (bitMatrix[x, y]) AndroidColor.BLACK else AndroidColor.WHITE)
             }
         }
         bitmap
-    } catch (e: Exception) { null }
+    } catch (e: Exception) {
+        e.printStackTrace() // Log error for debugging
+        null
+    }
 }

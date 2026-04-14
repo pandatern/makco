@@ -31,12 +31,13 @@ val Text2_Light = Color(0xFF333333)
 val Text3_Light = Color(0xFF666666)
 val Text4_Light = Color(0xFF999999)
 
-// Mono accent - mapped to white in neo-brutalist
-val MetroBlue = Color(0xFFFFFFFF)
-val MetroGreen = Color(0xFFFFFFFF)
-val MetroGold = Color(0xFFFFFFFF)
-val Error = Color(0xFFFFFFFF)
-val Success = Color(0xFFFFFFFF)
+// Action colors - Hybrid neo-brutalist with light green and light red
+val LightGreen = Color(0xFF8BC34A)   // Material Design Light Green
+val LightRed = Color(0xFFFF8A80)     // Material Design Light Red Accent
 
-// For compatibility - Accent
-val Accent = Color(0xFFFFFFFF)
+// For compatibility - Accent (using LightGreen as primary accent)
+val Accent = LightGreen
+
+// Error and Success using the new action colors
+val Error = LightRed
+val Success = LightGreen
