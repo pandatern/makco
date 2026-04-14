@@ -4,6 +4,11 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- Clean M -->
-    <path android:fillColor="#FFFFFF" android:pathData="M26,26h10v56h-10zM42,26h8v34l12,-34h12l12,34v56h-10V44l-12,38h-8l-12,-38v50h-10z"/>
+    <!-- Bold Neo-Brutalist M -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M22,28h12v52h-12z"/>
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M46,28h8v32l16,-32h14l16,32v52h-12V48l-16,36h-8l-16,-36v44h-12z"/>
 </vector>
