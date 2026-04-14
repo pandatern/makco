@@ -60,7 +60,7 @@ class ThemeManager(context: Context) {
     
     // Status
     val success = Success
-    val error = Error
+    val err = Error
     val warning = if (isDark) Color(0xFFFFD54F) else Color(0xFFF59E0B)
     
     // Accent (same as action for brutalist)

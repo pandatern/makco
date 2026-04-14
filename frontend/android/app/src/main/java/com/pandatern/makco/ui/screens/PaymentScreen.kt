@@ -64,12 +64,12 @@ fun PaymentScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(16.dp))
-                        .background(theme.error.copy(alpha = 0.15f))
-                        .border(3.dp, theme.error, RoundedCornerShape(16.dp))
+                        .background(theme.err.copy(alpha = 0.15f))
+                        .border(3.dp, theme.err, RoundedCornerShape(16.dp))
                         .padding(24.dp)
                 ) {
                     Column {
-                        Text("PAYMENT FAILED", style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold), color = theme.error)
+                        Text("PAYMENT FAILED", style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold), color = theme.err)
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(error, style = MaterialTheme.typography.bodyMedium, color = theme.t2)
                     }

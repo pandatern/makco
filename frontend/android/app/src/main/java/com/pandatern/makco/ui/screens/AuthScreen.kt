@@ -283,11 +283,11 @@ fun AuthScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(12.dp))
-                    .background(theme.error.copy(alpha = 0.15f))
-                    .border(2.dp, theme.error, RoundedCornerShape(12.dp))
+                    .background(theme.err.copy(alpha = 0.15f))
+                    .border(2.dp, theme.err, RoundedCornerShape(12.dp))
                     .padding(16.dp)
             ) {
-                Text(it, color = theme.error, style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold))
+                Text(it, color = theme.err, style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold))
             }
         }
 
