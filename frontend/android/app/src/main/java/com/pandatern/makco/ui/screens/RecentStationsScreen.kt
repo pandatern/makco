@@ -13,8 +13,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -41,19 +41,27 @@ fun RecentStationsScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(theme.bg)
-            .padding(horizontal = 24.dp)
+            .padding(horizontal = 20.dp)
     ) {
-        Spacer(modifier = Modifier.height(56.dp))
+        Spacer(modifier = Modifier.height(48.dp))
 
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.clickable { onBack() }
-        ) {
-            Text("←", style = MaterialTheme.typography.headlineMedium, color = theme.t1)
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .shadow(4.dp, RoundedCornerShape(12.dp))
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(theme.bg2)
+                    .border(2.dp, theme.outline, RoundedCornerShape(12.dp))
+                    .clickable { onBack() },
+                contentAlignment = Alignment.Center
+            ) {
+                Text("←", style = MaterialTheme.typography.titleLarge, color = theme.t1)
+            }
             Spacer(modifier = Modifier.width(12.dp))
             Text(
                 "RECENT STATIONS",
-                style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Black),
+                style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Black),
                 color = theme.t1
             )
         }
@@ -70,9 +78,9 @@ fun RecentStationsScreen(
                         modifier = Modifier.size(48.dp)
                     )
                     Spacer(modifier = Modifier.height(16.dp))
-                    Text("NO RECENT STATIONS", style = MaterialTheme.typography.titleMedium, color = theme.t3)
+                    Text("NO RECENT STATIONS", style = MaterialTheme.typography.titleLarge, color = theme.t3)
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text("Your recently used stations will appear here", style = MaterialTheme.typography.bodySmall, color = theme.t4)
+                    Text("Your recently used stations will appear here", style = MaterialTheme.typography.bodyMedium, color = theme.t4)
                 }
             }
         } else {
@@ -83,7 +91,7 @@ fun RecentStationsScreen(
                         theme = theme,
                         onClick = { onStationClick(station) }
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
                 }
             }
         }
@@ -96,37 +104,42 @@ private fun StationListItem(
     theme: ThemeManager,
     onClick: () -> Unit
 ) {
-    Row(
+    Box(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
-            .border(1.dp, theme.outline)
-            .clickable(onClick = onClick)
+            .shadow(6.dp, RoundedCornerShape(16.dp))
+            .clip(RoundedCornerShape(16.dp))
+            .border(3.dp, theme.outline, RoundedCornerShape(16.dp))
             .background(theme.bg2)
-            .padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically
+            .clickable(onClick = onClick)
+            .padding(16.dp)
     ) {
-        Image(
-            painter = painterResource(R.drawable.ic_location),
-            contentDescription = null,
-            colorFilter = ColorFilter.tint(theme.t2),
-            modifier = Modifier.size(20.dp)
-        )
-        Spacer(modifier = Modifier.width(16.dp))
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                station.name,
-                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
-                color = theme.t1
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Image(
+                painter = painterResource(R.drawable.ic_location),
+                contentDescription = null,
+                colorFilter = ColorFilter.tint(theme.action),
+                modifier = Modifier.size(24.dp)
             )
-            station.code.let {
+            Spacer(modifier = Modifier.width(16.dp))
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    it,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = theme.t2
+                    station.name,
+                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+                    color = theme.t1
                 )
+                station.code.let {
+                    Text(
+                        it,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = theme.t3
+                    )
+                }
             }
+            Text("→", style = MaterialTheme.typography.titleLarge, color = theme.t3)
         }
-        Text("→", style = MaterialTheme.typography.titleMedium, color = theme.t3)
     }
 }

@@ -1,8 +1,8 @@
 package com.pandatern.makco.ui.screens
 
-import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -10,8 +10,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.pandatern.makco.data.model.BookingStatus
@@ -28,13 +27,6 @@ fun PaymentScreen(
     onBack: () -> Unit
 ) {
     val theme = LocalThemeManager.current
-    
-    // Button scale animation
-    val buttonScale by animateFloatAsState(
-        targetValue = 1f,
-        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
-        label = "buttonScale"
-    )
 
     Column(
         modifier = Modifier
@@ -42,12 +34,20 @@ fun PaymentScreen(
             .background(theme.bg)
             .padding(20.dp)
     ) {
-        // Header
         Row(verticalAlignment = Alignment.CenterVertically) {
-            TextButton(onClick = onBack) {
-                Text("←", style = MaterialTheme.typography.headlineMedium, color = theme.t1)
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .shadow(4.dp, RoundedCornerShape(12.dp))
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(theme.bg2)
+                    .border(2.dp, theme.outline, RoundedCornerShape(12.dp))
+                    .clickable { onBack() },
+                contentAlignment = Alignment.Center
+            ) {
+                Text("←", style = MaterialTheme.typography.titleLarge, color = theme.t1)
             }
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(12.dp))
             Text("PAYMENT", style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Black), color = theme.t1)
         }
 
@@ -56,13 +56,14 @@ fun PaymentScreen(
         when {
             isLoading -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = theme.t1, strokeWidth = 3.dp)
+                    CircularProgressIndicator(color = theme.action, strokeWidth = 3.dp)
                 }
             }
             error != null -> {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .shadow(8.dp, RoundedCornerShape(16.dp))
                         .clip(RoundedCornerShape(16.dp))
                         .background(theme.err.copy(alpha = 0.15f))
                         .border(3.dp, theme.err, RoundedCornerShape(16.dp))
@@ -71,30 +72,31 @@ fun PaymentScreen(
                     Column {
                         Text("PAYMENT FAILED", style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold), color = theme.err)
                         Spacer(modifier = Modifier.height(8.dp))
-                        Text(error, style = MaterialTheme.typography.bodyMedium, color = theme.t2)
+                        Text(error, style = MaterialTheme.typography.bodyLarge, color = theme.t2)
                     }
                 }
                 Spacer(modifier = Modifier.height(24.dp))
-                Button(
-                    onClick = onRetry,
-                    modifier = Modifier.fillMaxWidth().height(60.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = theme.action, contentColor = theme.bg),
-                    shape = RoundedCornerShape(16.dp)
-                ) {
-                    Text("TRY AGAIN", style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold))
-                }
-            }
-            bookingStatus != null -> {
-                // Booking summary card
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .height(60.dp)
+                        .shadow(8.dp, RoundedCornerShape(16.dp))
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(theme.action)
+                        .border(3.dp, theme.outline, RoundedCornerShape(16.dp))
+                        .clickable { onRetry() },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("TRY AGAIN", style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold), color = if (theme.isDark) Black else White)
+                }
+            }
+            bookingStatus != null -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .shadow(8.dp, RoundedCornerShape(20.dp))
                         .clip(RoundedCornerShape(20.dp))
-                        .background(
-                            Brush.radialGradient(
-                                colors = listOf(theme.actionSubtle, theme.bg2)
-                            )
-                        )
+                        .background(theme.bg2)
                         .border(3.dp, theme.action, RoundedCornerShape(20.dp))
                         .padding(28.dp)
                 ) {
@@ -103,12 +105,12 @@ fun PaymentScreen(
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             bookingStatus.bookingId.take(12).uppercase(),
-                            style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Black),
+                            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Black, letterSpacing = 2.sp),
                             color = theme.t1
                         )
                         
                         Spacer(modifier = Modifier.height(24.dp))
-                        Divider(color = theme.divider)
+                        Box(modifier = Modifier.fillMaxWidth().height(2.dp).background(theme.outline))
                         Spacer(modifier = Modifier.height(24.dp))
                         
                         Text("TOTAL", style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold), color = theme.t3)
@@ -121,45 +123,46 @@ fun PaymentScreen(
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             "${bookingStatus.quantity} Ticket",
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = theme.t2
+                            style = MaterialTheme.typography.bodyLarge, color = theme.t2
                         )
                     }
                 }
 
                 Spacer(modifier = Modifier.height(40.dp))
 
-                // PAY BUTTON - always visible
-                Button(
-                    onClick = onPayClick,
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(64.dp)
-                        .graphicsLayer {
-                            scaleX = buttonScale
-                            scaleY = buttonScale
-                        },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = theme.action,
-                        contentColor = theme.bg
-                    ),
-                    shape = RoundedCornerShape(16.dp)
+                        .shadow(8.dp, RoundedCornerShape(16.dp))
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(theme.action)
+                        .border(3.dp, theme.outline, RoundedCornerShape(16.dp))
+                        .clickable { onPayClick() },
+                    contentAlignment = Alignment.Center
                 ) {
                     Text(
                         "PAY ₹${bookingStatus.price.toInt()}",
-                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                        color = if (theme.isDark) Black else White
                     )
                 }
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                // View ticket link
-                TextButton(
-                    onClick = onViewTicket,
-                    modifier = Modifier.fillMaxWidth()
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp)
+                        .shadow(4.dp, RoundedCornerShape(12.dp))
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(theme.bg2)
+                        .border(2.dp, theme.outline, RoundedCornerShape(12.dp))
+                        .clickable { onViewTicket() },
+                    contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        "Already paid? View ticket →",
+                        "ALREADY PAID? VIEW TICKET →",
                         style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
                         color = theme.t2
                     )

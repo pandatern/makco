@@ -14,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.painterResource
@@ -34,7 +35,6 @@ fun StationPickerScreen(
     var searchQuery by remember { mutableStateOf("") }
     var selectedLine by remember { mutableStateOf<String?>(null) }
 
-    // Filter stations - flexible matching
     val filteredStations = remember(stations, searchQuery, selectedLine) {
         stations.filter { station ->
             val matchesSearch = searchQuery.isEmpty() ||
@@ -55,9 +55,19 @@ fun StationPickerScreen(
     ) {
         Spacer(modifier = Modifier.height(48.dp))
 
-        // Header with title
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Image(painter = painterResource(R.drawable.ic_location), contentDescription = "Back", colorFilter = ColorFilter.tint(theme.t1), modifier = Modifier.size(24.dp).clickable { onBack() })
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .shadow(4.dp, RoundedCornerShape(12.dp))
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(theme.bg2)
+                    .border(2.dp, theme.outline, RoundedCornerShape(12.dp))
+                    .clickable { onBack() },
+                contentAlignment = Alignment.Center
+            ) {
+                Text("←", style = MaterialTheme.typography.titleLarge, color = theme.t1)
+            }
             Spacer(modifier = Modifier.width(12.dp))
             Text(
                 if (isSource) "SELECT SOURCE" else "SELECT DESTINATION", 
@@ -68,13 +78,13 @@ fun StationPickerScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Search box - styled like profile card
         Box(
             modifier = Modifier
                 .fillMaxWidth()
+                .shadow(6.dp, RoundedCornerShape(16.dp))
                 .clip(RoundedCornerShape(16.dp))
-                .border(2.dp, theme.outline, RoundedCornerShape(16.dp))
                 .background(theme.bg2)
+                .border(3.dp, theme.outline, RoundedCornerShape(16.dp))
                 .padding(16.dp)
         ) {
             BasicTextField(
@@ -94,21 +104,21 @@ fun StationPickerScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Line filters - styled buttons
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            listOf("All" to null, "Blue" to "Blue", "Green" to "Green").forEach { (label, line) ->
+            listOf("All" to null, "BLUE" to "Blue", "GREEN" to "Green").forEach { (label, line) ->
                 Box(
                     modifier = Modifier
+                        .shadow(4.dp, RoundedCornerShape(12.dp))
                         .clip(RoundedCornerShape(12.dp))
                         .background(if (selectedLine == line) theme.action else theme.bg2)
-                        .border(2.dp, if (selectedLine == line) theme.action else theme.outline, RoundedCornerShape(12.dp))
+                        .border(3.dp, if (selectedLine == line) theme.action else theme.outline, RoundedCornerShape(12.dp))
                         .clickable { selectedLine = line }
                         .padding(horizontal = 20.dp, vertical = 12.dp)
                 ) {
                     Text(
                         label,
                         style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
-                        color = if (selectedLine == line) theme.bg else theme.t2
+                        color = if (selectedLine == line) (if (theme.isDark) Black else White) else theme.t2
                     )
                 }
             }
@@ -116,18 +126,16 @@ fun StationPickerScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Station list
-        LazyColumn(
-            contentPadding = PaddingValues(bottom = 100.dp)
-        ) {
+        LazyColumn(contentPadding = PaddingValues(bottom = 100.dp)) {
             items(filteredStations) { station ->
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(RoundedCornerShape(12.dp))
-                        .border(1.dp, theme.outline, RoundedCornerShape(12.dp))
-                        .clickable { onStationSelected(station) }
+                        .shadow(6.dp, RoundedCornerShape(16.dp))
+                        .clip(RoundedCornerShape(16.dp))
+                        .border(3.dp, theme.outline, RoundedCornerShape(16.dp))
                         .background(theme.bg2)
+                        .clickable { onStationSelected(station) }
                         .padding(20.dp)
                 ) {
                     Text(station.name, style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold), color = theme.t1)
