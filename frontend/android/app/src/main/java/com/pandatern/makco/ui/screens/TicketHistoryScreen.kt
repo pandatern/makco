@@ -23,7 +23,7 @@ import com.pandatern.makco.R
 import com.pandatern.makco.data.model.*
 import com.pandatern.makco.data.remote.ApiClient
 import com.pandatern.makco.ui.theme.*
-import com.pandatern.makco.data.local.SecureSecureCacheManager
+import com.pandatern.makco.data.local.SecureCacheManager
 import android.content.Context
 import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.launch
