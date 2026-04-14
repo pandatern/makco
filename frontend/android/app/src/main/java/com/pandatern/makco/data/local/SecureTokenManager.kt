@@ -154,6 +154,22 @@ object SecureCacheManager {
         return try { gson.fromJson(json, type) } catch (_: Exception) { emptyList() }
     }
 
+    fun saveTickets(context: Context, tickets: List<com.pandatern.makco.data.model.BookingStatus>) {
+        val cache = loadCache(context)?.toMutableMap() ?: mutableMapOf()
+        cache["tickets"] = gson.toJson(tickets)
+        cache["tickets_time"] = System.currentTimeMillis()
+        saveCache(context, cache)
+    }
+
+    fun getTickets(context: Context): List<com.pandatern.makco.data.model.BookingStatus>? {
+        val cache = loadCache(context) ?: return null
+        val ticketsJson = cache["tickets"] as? String ?: return null
+        val time = (cache["tickets_time"] as? Number)?.toLong() ?: 0L
+        if (System.currentTimeMillis() - time > 24 * 60 * 60 * 1000) return null
+        val type = object : TypeToken<List<com.pandatern.makco.data.model.BookingStatus>>() {}.type
+        return try { gson.fromJson(ticketsJson, type) } catch (_: Exception) { null }
+    }
+
     fun clearAll(context: Context) {
         File(context.filesDir, CACHE_FILE).delete()
     }
