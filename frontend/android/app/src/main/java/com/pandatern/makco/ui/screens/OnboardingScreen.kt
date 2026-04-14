@@ -3,6 +3,7 @@ package com.pandatern.makco.ui.screens
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
@@ -13,43 +14,36 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import kotlin.math.absoluteValue
-import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pandatern.makco.ui.theme.LocalThemeManager
-import com.pandatern.makco.ui.theme.LightGreen
-import com.pandatern.makco.ui.theme.LightRed
+import kotlin.math.absoluteValue
 import kotlinx.coroutines.launch
 
 data class OnboardingPage(
     val title: String,
     val subtitle: String,
-    val description: String,
-    val accentColor: Color
+    val description: String
 )
 
 private val pages = listOf(
     OnboardingPage(
         title = "Metro Made Simple",
         subtitle = "41 Stations",
-        description = "Navigate Chennai Metro effortlessly. Every station, every line, right in your pocket.",
-        accentColor = LightGreen
+        description = "Navigate Chennai Metro effortlessly. Every station, every line, right in your pocket."
     ),
     OnboardingPage(
         title = "Book in Seconds",
         subtitle = "Instant Fares",
-        description = "Get instant fare quotes. Choose your journey. Pay seamlessly with UPI.",
-        accentColor = LightRed
+        description = "Get instant fare quotes. Choose your journey. Pay seamlessly with UPI."
     ),
     OnboardingPage(
         title = "Skip the Queue",
         subtitle = "QR Tickets",
-        description = "Your digital ticket works at every gate. Just scan and ride.",
-        accentColor = LightGreen
+        description = "Your digital ticket works at every gate. Just scan and ride."
     )
 )
 
@@ -124,34 +118,31 @@ fun OnboardingScreen(onFinished: () -> Unit) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                // Elegant dot indicator as visual
+                // Neo-brutalist block
                 Box(
                     modifier = Modifier
-                        .size(80.dp)
-                        .background(
-                            data.accentColor.copy(alpha = 0.12f),
-                            RoundedCornerShape(40.dp)
-                        ),
+                        .size(120.dp)
+                        .clip(RoundedCornerShape(24.dp))
+                        .border(4.dp, theme.t1, RoundedCornerShape(24.dp))
+                        .background(theme.bg2),
                     contentAlignment = Alignment.Center
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .size(8.dp)
-                            .background(
-                                data.accentColor,
-                                RoundedCornerShape(4.dp)
-                            )
+                    Text(
+                        text = "${page + 1}",
+                        style = MaterialTheme.typography.displayLarge.copy(
+                            fontWeight = FontWeight.Black
+                        ),
+                        color = theme.t1
                     )
                 }
 
-                Spacer(modifier = Modifier.height(56.dp))
+                Spacer(modifier = Modifier.height(48.dp))
 
-                // Title - Apple-like
+                // Title
                 Text(
                     text = data.title,
                     style = MaterialTheme.typography.headlineMedium.copy(
-                        fontWeight = FontWeight.SemiBold,
-                        lineHeight = 36.sp
+                        fontWeight = FontWeight.Bold
                     ),
                     color = theme.t1,
                     textAlign = TextAlign.Center
@@ -159,14 +150,21 @@ fun OnboardingScreen(onFinished: () -> Unit) {
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // Subtitle
-                Text(
-                    text = data.subtitle,
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.Normal
-                    ),
-                    color = data.accentColor
-                )
+                // Subtitle - bold box
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(8.dp))
+                        .border(2.dp, theme.t1, RoundedCornerShape(8.dp))
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                ) {
+                    Text(
+                        text = data.subtitle,
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.Bold
+                        ),
+                        color = theme.t1
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(24.dp))
 
@@ -182,7 +180,7 @@ fun OnboardingScreen(onFinished: () -> Unit) {
             }
         }
 
-        // Page indicators - minimal dots
+        // Page indicators - neo blocks
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -192,7 +190,7 @@ fun OnboardingScreen(onFinished: () -> Unit) {
             repeat(pages.size) { i ->
                 val isSelected = i == pagerState.currentPage
                 val width by animateDpAsState(
-                    targetValue = if (isSelected) 24.dp else 8.dp,
+                    targetValue = if (isSelected) 32.dp else 12.dp,
                     animationSpec = tween(300),
                     label = "width"
                 )
@@ -200,25 +198,21 @@ fun OnboardingScreen(onFinished: () -> Unit) {
                 Box(
                     modifier = Modifier
                         .width(width)
-                        .height(8.dp)
-                        .background(
-                            if (isSelected) pages[i].accentColor else theme.bg3,
-                            RoundedCornerShape(4.dp)
-                        )
+                        .height(12.dp)
+                        .clip(RoundedCornerShape(6.dp))
+                        .background(if (isSelected) theme.t1 else theme.bg3)
                 )
-                if (i < pages.size - 1) Spacer(modifier = Modifier.width(8.dp))
+                if (i < pages.size - 1) Spacer(modifier = Modifier.width(12.dp))
             }
         }
 
-        // Continue button - minimal
+        // Continue button - neo style
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 40.dp)
                 .padding(bottom = 48.dp)
         ) {
-            val currentPage = pages[pagerState.currentPage]
-            
             Button(
                 onClick = {
                     if (pagerState.currentPage < pages.size - 1) {
@@ -230,15 +224,17 @@ fun OnboardingScreen(onFinished: () -> Unit) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = currentPage.accentColor),
-                shape = RoundedCornerShape(28.dp)
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = theme.t1,
+                    contentColor = theme.bg
+                ),
+                shape = RoundedCornerShape(12.dp)
             ) {
                 Text(
                     text = if (pagerState.currentPage < pages.size - 1) "Continue" else "Get Started",
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontWeight = FontWeight.SemiBold
-                    ),
-                    color = Color.White
+                    )
                 )
             }
         }

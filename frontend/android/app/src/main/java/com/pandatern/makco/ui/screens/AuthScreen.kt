@@ -1,6 +1,5 @@
 package com.pandatern.makco.ui.screens
 
-import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -22,8 +21,8 @@ import androidx.compose.ui.unit.sp
 import com.pandatern.makco.data.model.*
 import com.pandatern.makco.data.remote.ApiClient
 import com.pandatern.makco.ui.theme.LocalThemeManager
-import com.pandatern.makco.ui.theme.LightGreen
-import com.pandatern.makco.ui.theme.LightRed
+import com.pandatern.makco.ui.theme.Black
+import com.pandatern.makco.ui.theme.White
 import kotlinx.coroutines.launch
 
 @Composable
@@ -41,9 +40,6 @@ fun AuthScreen(
     var otpSent by remember { mutableStateOf(false) }
     var attemptsLeft by remember { mutableStateOf(3) }
 
-    val actionColor = if (theme.isDark) LightGreen else LightRed
-
-    // Verify OTP
     fun verifyOtp(code: String) {
         if (code.length >= 4 && authId != null && !isLoading) {
             isLoading = true
@@ -56,16 +52,16 @@ fun AuthScreen(
                         onAuthSuccess(body.token, body.userId, phone)
                     } else {
                         attemptsLeft--
-                        error = "Invalid code. $attemptsLeft attempts left."
+                        val msg = if (resp.code() == 400) "Invalid code" else "Verification failed"
+                        error = if (attemptsLeft > 0) "$msg ($attemptsLeft left)" else "Too many attempts"
                         if (attemptsLeft <= 0) {
                             otpSent = false
                             otp = ""
                             attemptsLeft = 3
-                            error = null
                         }
                     }
                 } catch (e: Exception) { 
-                    error = "Connection failed" 
+                    error = "Error: ${e.message ?: "connection failed"}" 
                 }
                 isLoading = false
             }
@@ -81,7 +77,6 @@ fun AuthScreen(
     ) {
         Spacer(modifier = Modifier.height(80.dp))
 
-        // Minimal logo
         Text(
             "MAKCO",
             style = MaterialTheme.typography.headlineLarge.copy(
@@ -101,7 +96,6 @@ fun AuthScreen(
 
         Spacer(modifier = Modifier.height(64.dp))
 
-        // Phone input
         if (!otpSent) {
             Text(
                 "Enter your phone",
@@ -113,13 +107,12 @@ fun AuthScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Phone field
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp)
                     .clip(RoundedCornerShape(12.dp))
-                    .border(1.dp, theme.outline, RoundedCornerShape(12.dp))
+                    .border(2.dp, theme.t1, RoundedCornerShape(12.dp))
                     .background(theme.bg2)
                     .padding(horizontal = 16.dp),
                 contentAlignment = Alignment.CenterStart
@@ -133,7 +126,7 @@ fun AuthScreen(
                         modifier = Modifier.weight(1f),
                         textStyle = MaterialTheme.typography.titleMedium.copy(color = theme.t1),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-                        cursorBrush = SolidColor(actionColor),
+                        cursorBrush = SolidColor(theme.t1),
                         singleLine = true,
                         decorationBox = { inner ->
                             Box {
@@ -149,7 +142,6 @@ fun AuthScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Continue button
             Button(
                 onClick = {
                     if (phone.length >= 10) {
@@ -162,10 +154,10 @@ fun AuthScreen(
                                     authId = resp.body()!!.authId
                                     otpSent = true
                                 } else {
-                                    error = "Failed to send code"
+                                    error = "Failed to send code (${resp.code()})"
                                 }
                             } catch (e: Exception) { 
-                                error = "Network error" 
+                                error = "Connection error: ${e.message ?: "failed"}" 
                             }
                             isLoading = false
                         }
@@ -176,14 +168,16 @@ fun AuthScreen(
                     .fillMaxWidth()
                     .height(56.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = actionColor,
-                    disabledContainerColor = theme.bg3
+                    containerColor = theme.t1,
+                    contentColor = theme.bg,
+                    disabledContainerColor = theme.bg3,
+                    disabledContentColor = theme.t4
                 ),
                 shape = RoundedCornerShape(12.dp)
             ) {
                 if (isLoading) {
                     CircularProgressIndicator(
-                        color = Color.White,
+                        color = theme.bg,
                         modifier = Modifier.size(24.dp),
                         strokeWidth = 2.dp
                     )
@@ -192,7 +186,6 @@ fun AuthScreen(
                 }
             }
         } else {
-            // OTP verification
             Text(
                 "Enter code",
                 style = MaterialTheme.typography.titleLarge.copy(
@@ -211,7 +204,6 @@ fun AuthScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // OTP field
             BasicTextField(
                 value = otp,
                 onValueChange = { input ->
@@ -223,7 +215,7 @@ fun AuthScreen(
                     .fillMaxWidth()
                     .height(56.dp)
                     .clip(RoundedCornerShape(12.dp))
-                    .border(1.dp, if (error != null) theme.err else theme.outline, RoundedCornerShape(12.dp))
+                    .border(2.dp, if (error != null) theme.err else theme.t1, RoundedCornerShape(12.dp))
                     .background(theme.bg2)
                     .padding(horizontal = 16.dp),
                 textStyle = MaterialTheme.typography.headlineSmall.copy(
@@ -231,7 +223,7 @@ fun AuthScreen(
                     textAlign = TextAlign.Center
                 ),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
-                cursorBrush = SolidColor(actionColor),
+                cursorBrush = SolidColor(theme.t1),
                 singleLine = true,
                 decorationBox = { inner ->
                     Box(
@@ -246,7 +238,6 @@ fun AuthScreen(
                 }
             )
 
-            // Error message
             error?.let {
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
@@ -258,7 +249,6 @@ fun AuthScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Verify button
             Button(
                 onClick = { verifyOtp(otp) },
                 enabled = otp.length >= 4 && !isLoading,
@@ -266,14 +256,16 @@ fun AuthScreen(
                     .fillMaxWidth()
                     .height(56.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = actionColor,
-                    disabledContainerColor = theme.bg3
+                    containerColor = theme.t1,
+                    contentColor = theme.bg,
+                    disabledContainerColor = theme.bg3,
+                    disabledContentColor = theme.t4
                 ),
                 shape = RoundedCornerShape(12.dp)
             ) {
                 if (isLoading) {
                     CircularProgressIndicator(
-                        color = Color.White,
+                        color = theme.bg,
                         modifier = Modifier.size(24.dp),
                         strokeWidth = 2.dp
                     )
@@ -284,7 +276,6 @@ fun AuthScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Change number
             TextButton(
                 onClick = { 
                     otpSent = false
@@ -296,14 +287,13 @@ fun AuthScreen(
                 Text(
                     "Change number",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = actionColor
+                    color = theme.t1
                 )
             }
         }
 
         Spacer(modifier = Modifier.weight(1f))
 
-        // Footer
         Text(
             "By continuing, you agree to our Terms",
             style = MaterialTheme.typography.bodySmall,

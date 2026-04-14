@@ -5,25 +5,25 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
 private val DarkScheme = darkColorScheme(
-    primary = LightGreen,
-    onPrimary = Black,
+    primary = Color.White,
+    onPrimary = Color.Black,
     background = DarkBg,
-    onBackground = White,
+    onBackground = Color.White,
     surface = DarkSurface,
-    onSurface = White,
-    error = Error,
-    onError = White
+    onSurface = Color.White,
+    error = Color.White,
+    onError = Color.Black
 )
 
 private val LightScheme = lightColorScheme(
-    primary = LightRed,
-    onPrimary = White,
+    primary = Color.Black,
+    onPrimary = Color.White,
     background = LightBg,
-    onBackground = Black,
+    onBackground = Color.Black,
     surface = LightSurface,
-    onSurface = Black,
-    error = Error,
-    onError = White
+    onSurface = Color.Black,
+    error = Color.Black,
+    onError = Color.White
 )
 
 @Composable

@@ -2,18 +2,18 @@ package com.pandatern.makco.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Pure Black & White - Neo Brutalist
+// Pure Neo-Brutalist - ONLY Black & White
 val Black = Color(0xFF000000)
 val White = Color(0xFFFFFFFF)
 
-// Dark theme
+// Dark theme backgrounds
 val DarkBg = Color(0xFF000000)
 val DarkBg2 = Color(0xFF111111)
 val DarkBg3 = Color(0xFF222222)
 val DarkBg4 = Color(0xFF333333)
 val DarkSurface = Color(0xFF111111)
 
-// Light theme
+// Light theme backgrounds
 val LightBg = Color(0xFFFFFFFF)
 val LightBg2 = Color(0xFFF5F5F5)
 val LightBg3 = Color(0xFFEEEEEE)
@@ -31,11 +31,3 @@ val Text1Light = Color(0xFF000000)
 val Text2Light = Color(0xFF333333)
 val Text3Light = Color(0xFF666666)
 val Text4Light = Color(0xFF999999)
-
-// Neo-Brutalist Action Colors ONLY
-val LightGreen = Color(0xFF8BC34A)
-val LightRed = Color(0xFFFF8A80)
-
-// Status
-val Success = LightGreen
-val Error = LightRed

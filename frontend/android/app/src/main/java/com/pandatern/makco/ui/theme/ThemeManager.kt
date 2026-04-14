@@ -50,20 +50,20 @@ class ThemeManager(context: Context) {
     val t3 = if (isDark) Text3Dark else Text3Light
     val t4 = if (isDark) Text4Dark else Text4Light
     
-    // Dividers & Borders
+    // Dividers & Borders - just contrast
     val divider = if (isDark) DarkBg4 else LightBg4
     val outline = if (isDark) Color(0xFF404040) else Color(0xFFCCCCCC)
     
-    // Neo-Brutalist action colors
-    val action = if (isDark) LightGreen else LightRed
-    val actionSubtle = if (isDark) Color(0x208BC34A) else Color(0x20FF8A80)
+    // For neo-brutalist: use text color as action
+    val action = t1
+    val actionSubtle = if (isDark) Color(0x20FFFFFF) else Color(0x20000000)
     
-    // Status
-    val success = Success
-    val err = Error
-    val warning = if (isDark) Color(0xFFFFD54F) else Color(0xFFF59E0B)
+    // Status - just inverted
+    val success = t1
+    val err = t1
+    val warning = t1
     
-    // Accent (same as action for brutalist)
+    // Accent - same as action for brutalist
     val accent = action
     val accentSubtle = actionSubtle
 }
