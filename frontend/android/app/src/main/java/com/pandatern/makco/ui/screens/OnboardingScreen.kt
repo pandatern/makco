@@ -13,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import kotlin.math.absoluteValue
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -150,7 +151,7 @@ fun OnboardingScreen(onFinished: () -> Unit) {
                     text = data.title,
                     style = MaterialTheme.typography.headlineMedium.copy(
                         fontWeight = FontWeight.SemiBold,
-                        height = 36.sp
+                        lineHeight = 36.sp
                     ),
                     color = theme.t1,
                     textAlign = TextAlign.Center
