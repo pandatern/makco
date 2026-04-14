@@ -204,7 +204,7 @@ fun MakcoNavHost() {
 
     // Force recomposition on theme change
     key(currentTheme) {
-    CompositionLocalProvider(LocalThemeManager provides themeManager) {
+        CompositionLocalProvider(LocalThemeManager provides themeManager) {
         Box(modifier = Modifier.fillMaxSize().background(themeManager.bg)) {
             when (appScreen) {
                 AppScreen.SPLASH -> {
