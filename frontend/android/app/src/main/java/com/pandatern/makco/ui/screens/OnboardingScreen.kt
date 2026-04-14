@@ -19,8 +19,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pandatern.makco.ui.theme.LocalThemeManager
-import com.pandatern.makco.ui.theme.lightGreen
-import com.pandatern.makco.ui.theme.lightRed
+import com.pandatern.makco.ui.theme.LightGreen
+import com.pandatern.makco.ui.theme.LightRed
 import kotlinx.coroutines.launch
 
 data class OnboardingPage(
@@ -120,7 +120,7 @@ fun OnboardingScreen(onFinished: () -> Unit) {
                         .background(
                             Brush.radialGradient(
                                 colors = listOf(
-                                    if (theme.isDark) lightGreen else lightRed, // Dynamic based on theme
+                                    if (theme.isDark) LightGreen else LightRed, // Dynamic based on theme
                                     theme.bg2
                                 )
                             )
@@ -202,8 +202,7 @@ fun OnboardingScreen(onFinished: () -> Unit) {
             },
             modifier = Modifier.fillMaxWidth().height(56.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = if (theme.isDark) lightGreen else lightRed,
-                contentColor = if (theme.isDark) theme.bg else theme.bg
+                containerColor = if (theme.isDark) LightGreen else LightRed
             ),
             shape = RoundedCornerShape(12.dp)
         ) {
