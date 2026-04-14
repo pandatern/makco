@@ -111,7 +111,7 @@ fun TicketHistoryScreen(
         when {
             isLoading -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = theme.action, strokeWidth = 3.dp)
+                    CircularProgressIndicator(color = theme.t1, strokeWidth = 3.dp)
                 }
             }
             error != null -> {
@@ -126,7 +126,7 @@ fun TicketHistoryScreen(
                                 .height(48.dp)
                                 .shadow(4.dp, RoundedCornerShape(12.dp))
                                 .clip(RoundedCornerShape(12.dp))
-                                .background(theme.action)
+                                .background(theme.t1)
                                 .border(2.dp, theme.outline, RoundedCornerShape(12.dp))
                                 .clickable { scope.launch { loadTickets() } },
                             contentAlignment = Alignment.Center
@@ -177,13 +177,13 @@ fun TicketCard(ticket: BookingStatus, theme: ThemeManager, onClick: () -> Unit) 
             verticalAlignment = Alignment.CenterVertically
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Image(painter = painterResource(R.drawable.ic_ticket), contentDescription = null, colorFilter = ColorFilter.tint(theme.action), modifier = Modifier.size(24.dp))
+                Image(painter = painterResource(R.drawable.ic_ticket), contentDescription = null, colorFilter = ColorFilter.tint(theme.t1), modifier = Modifier.size(24.dp))
                 Spacer(modifier = Modifier.width(16.dp))
                 Column {
                     Text(ticket.bookingId.take(8).uppercase(), style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, letterSpacing = 1.sp), color = theme.t1)
                     Spacer(modifier = Modifier.height(4.dp))
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Box(modifier = Modifier.size(8.dp).background(theme.action, RoundedCornerShape(4.dp)))
+                        Box(modifier = Modifier.size(8.dp).background(theme.t2, RoundedCornerShape(4.dp)))
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(ticket.status, style = MaterialTheme.typography.bodyMedium, color = theme.t2)
                     }

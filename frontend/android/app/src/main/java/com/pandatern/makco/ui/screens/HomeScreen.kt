@@ -53,7 +53,7 @@ fun HomeScreen(
                     .size(56.dp)
                     .shadow(8.dp, RoundedCornerShape(16.dp))
                     .clip(RoundedCornerShape(16.dp))
-                    .background(theme.action),
+                    .background(theme.t1),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
@@ -99,7 +99,7 @@ fun HomeScreen(
                 .height(60.dp)
                 .shadow(8.dp, RoundedCornerShape(16.dp))
                 .clip(RoundedCornerShape(16.dp))
-                .background(if (isReady) theme.action else theme.bg3)
+                .background(if (isReady) theme.t1 else theme.bg2)
                 .border(3.dp, theme.outline, RoundedCornerShape(16.dp))
                 .clickable(enabled = isReady) { onSearchClick() },
             contentAlignment = Alignment.Center
@@ -134,7 +134,7 @@ fun HomeScreen(
                             modifier = Modifier.fillMaxWidth(),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Image(painter = painterResource(R.drawable.ic_location), contentDescription = null, colorFilter = ColorFilter.tint(theme.action), modifier = Modifier.size(20.dp))
+                            Image(painter = painterResource(R.drawable.ic_location), contentDescription = null, colorFilter = ColorFilter.tint(theme.t1), modifier = Modifier.size(20.dp))
                             Spacer(modifier = Modifier.width(16.dp))
                             Text(station.name, style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold), color = theme.t1)
                             Spacer(modifier = Modifier.weight(1f))
@@ -159,7 +159,7 @@ fun StationSelector(label: String, icon: Int, station: Station?, onClick: () -> 
             .fillMaxWidth()
             .shadow(6.dp, RoundedCornerShape(16.dp))
             .clip(RoundedCornerShape(16.dp))
-            .border(3.dp, if (station != null) theme.action else theme.outline, RoundedCornerShape(16.dp))
+            .border(3.dp, if (station != null) theme.t1 else theme.outline, RoundedCornerShape(16.dp))
             .clickable(onClick = onClick)
             .background(theme.bg2)
             .padding(20.dp)
@@ -168,7 +168,7 @@ fun StationSelector(label: String, icon: Int, station: Station?, onClick: () -> 
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Image(painter = painterResource(icon), contentDescription = null, colorFilter = ColorFilter.tint(theme.action), modifier = Modifier.size(24.dp))
+            Image(painter = painterResource(icon), contentDescription = null, colorFilter = ColorFilter.tint(theme.t1), modifier = Modifier.size(24.dp))
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(label, style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold), color = theme.t3)

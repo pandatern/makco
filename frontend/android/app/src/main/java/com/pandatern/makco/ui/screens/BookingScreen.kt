@@ -73,7 +73,7 @@ fun BookingScreen(
         ) {
             Column {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(modifier = Modifier.size(12.dp).background(theme.t1, RoundedCornerShape(6.dp)))
+                    Box(modifier = Modifier.size(12.dp).background(theme.t2, RoundedCornerShape(6.dp)))
                     Spacer(modifier = Modifier.width(12.dp))
                     Text("FROM", style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold), color = theme.t3)
                 }
@@ -93,7 +93,7 @@ fun BookingScreen(
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(modifier = Modifier.size(12.dp).background(theme.action, RoundedCornerShape(6.dp)))
+                    Box(modifier = Modifier.size(12.dp).background(theme.t2, RoundedCornerShape(6.dp)))
                     Spacer(modifier = Modifier.width(12.dp))
                     Text("TO", style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold), color = theme.t3)
                 }
@@ -110,7 +110,7 @@ fun BookingScreen(
         when {
             isLoading -> {
                 Box(modifier = Modifier.fillMaxWidth().padding(40.dp), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = theme.action, strokeWidth = 3.dp)
+                    CircularProgressIndicator(color = theme.t1, strokeWidth = 3.dp)
                 }
             }
             error != null -> {
@@ -119,11 +119,11 @@ fun BookingScreen(
                         .fillMaxWidth()
                         .shadow(6.dp, RoundedCornerShape(16.dp))
                         .clip(RoundedCornerShape(16.dp))
-                        .background(theme.err.copy(alpha = 0.15f))
-                        .border(3.dp, theme.err, RoundedCornerShape(16.dp))
+                        .background(theme.t4)
+                        .border(3.dp, theme.t1, RoundedCornerShape(16.dp))
                         .padding(20.dp)
                 ) {
-                    Text(error, color = theme.err, style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold))
+                    Text(error, color = theme.t1, style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold))
                 }
                 Spacer(modifier = Modifier.height(16.dp))
                 Box(
@@ -132,7 +132,7 @@ fun BookingScreen(
                         .height(56.dp)
                         .shadow(6.dp, RoundedCornerShape(16.dp))
                         .clip(RoundedCornerShape(16.dp))
-                        .background(theme.action)
+                        .background(theme.t1)
                         .border(3.dp, theme.outline, RoundedCornerShape(16.dp))
                         .clickable { onRetry() },
                     contentAlignment = Alignment.Center
@@ -154,8 +154,8 @@ fun BookingScreen(
                             .fillMaxWidth()
                             .shadow(6.dp, RoundedCornerShape(16.dp))
                             .clip(RoundedCornerShape(16.dp))
-                            .border(3.dp, if (isSelected) theme.action else theme.outline, RoundedCornerShape(16.dp))
-                            .background(if (isSelected) theme.action.copy(alpha = 0.15f) else theme.bg2)
+                            .border(3.dp, if (isSelected) theme.t1 else theme.outline, RoundedCornerShape(16.dp))
+                            .background(if (isSelected) theme.t3 else theme.bg2)
                             .clickable { selectedQuote = quote }
                             .padding(20.dp)
                     ) {
@@ -219,7 +219,7 @@ fun BookingScreen(
                     .height(60.dp)
                     .shadow(8.dp, RoundedCornerShape(16.dp))
                     .clip(RoundedCornerShape(16.dp))
-                    .background(theme.action)
+                    .background(theme.t1)
                     .border(3.dp, theme.outline, RoundedCornerShape(16.dp))
                     .clickable { onConfirm(selectedQuote!!, quantity) },
                 contentAlignment = Alignment.Center

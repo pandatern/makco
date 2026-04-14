@@ -69,12 +69,12 @@ fun ProfileScreen(
                 .shadow(8.dp, RoundedCornerShape(16.dp))
                 .clip(RoundedCornerShape(16.dp))
                 .background(theme.bg2)
-                .border(3.dp, theme.action, RoundedCornerShape(16.dp))
+                .border(3.dp, theme.t1, RoundedCornerShape(16.dp))
                 .padding(24.dp)
         ) {
             if (isLoading) {
                 Box(modifier = Modifier.fillMaxWidth().height(100.dp), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = theme.action, strokeWidth = 3.dp)
+                    CircularProgressIndicator(color = theme.t1, strokeWidth = 3.dp)
                 }
             } else {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -83,7 +83,7 @@ fun ProfileScreen(
                             .size(72.dp)
                             .shadow(6.dp, RoundedCornerShape(36.dp))
                             .clip(RoundedCornerShape(36.dp))
-                            .background(theme.action),
+                            .background(theme.t1),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
@@ -137,7 +137,7 @@ fun ProfileScreen(
                         .height(32.dp)
                         .shadow(4.dp, RoundedCornerShape(16.dp))
                         .clip(RoundedCornerShape(16.dp))
-                        .background(theme.action),
+                        .background(theme.t1),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
@@ -184,14 +184,14 @@ fun ProfileScreen(
                 .shadow(6.dp, RoundedCornerShape(16.dp))
                 .clip(RoundedCornerShape(16.dp))
                 .background(theme.bg2)
-                .border(3.dp, theme.err, RoundedCornerShape(16.dp))
+                .border(3.dp, theme.t1, RoundedCornerShape(16.dp))
                 .clickable { onLogout() },
             contentAlignment = Alignment.Center
         ) {
             Text(
                 "LOGOUT",
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                color = theme.err
+                color = theme.t1
             )
         }
 
@@ -226,7 +226,7 @@ fun MenuItem(
             Image(
                 painter = painterResource(icon),
                 contentDescription = null,
-                colorFilter = ColorFilter.tint(theme.action),
+                colorFilter = ColorFilter.tint(theme.t1),
                 modifier = Modifier.size(24.dp)
             )
             Spacer(modifier = Modifier.width(16.dp))

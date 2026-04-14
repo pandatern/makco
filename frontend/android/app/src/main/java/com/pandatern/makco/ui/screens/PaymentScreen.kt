@@ -57,7 +57,7 @@ fun PaymentScreen(
         when {
             isLoading -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = theme.action, strokeWidth = 3.dp)
+                    CircularProgressIndicator(color = theme.t1, strokeWidth = 3.dp)
                 }
             }
             error != null -> {
@@ -66,12 +66,12 @@ fun PaymentScreen(
                         .fillMaxWidth()
                         .shadow(8.dp, RoundedCornerShape(16.dp))
                         .clip(RoundedCornerShape(16.dp))
-                        .background(theme.err.copy(alpha = 0.15f))
-                        .border(3.dp, theme.err, RoundedCornerShape(16.dp))
+                        .background(theme.t4)
+                        .border(3.dp, theme.t1, RoundedCornerShape(16.dp))
                         .padding(24.dp)
                 ) {
                     Column {
-                        Text("PAYMENT FAILED", style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold), color = theme.err)
+                        Text("PAYMENT FAILED", style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold), color = theme.t1)
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(error, style = MaterialTheme.typography.bodyLarge, color = theme.t2)
                     }
@@ -83,7 +83,7 @@ fun PaymentScreen(
                         .height(60.dp)
                         .shadow(8.dp, RoundedCornerShape(16.dp))
                         .clip(RoundedCornerShape(16.dp))
-                        .background(theme.action)
+                        .background(theme.t1)
                         .border(3.dp, theme.outline, RoundedCornerShape(16.dp))
                         .clickable { onRetry() },
                     contentAlignment = Alignment.Center
@@ -98,7 +98,7 @@ fun PaymentScreen(
                         .shadow(8.dp, RoundedCornerShape(20.dp))
                         .clip(RoundedCornerShape(20.dp))
                         .background(theme.bg2)
-                        .border(3.dp, theme.action, RoundedCornerShape(20.dp))
+                        .border(3.dp, theme.t1, RoundedCornerShape(20.dp))
                         .padding(28.dp)
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -137,7 +137,7 @@ fun PaymentScreen(
                         .height(64.dp)
                         .shadow(8.dp, RoundedCornerShape(16.dp))
                         .clip(RoundedCornerShape(16.dp))
-                        .background(theme.action)
+                        .background(theme.t1)
                         .border(3.dp, theme.outline, RoundedCornerShape(16.dp))
                         .clickable { onPayClick() },
                     contentAlignment = Alignment.Center

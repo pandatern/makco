@@ -121,7 +121,7 @@ private fun StationListItem(
             Image(
                 painter = painterResource(R.drawable.ic_location),
                 contentDescription = null,
-                colorFilter = ColorFilter.tint(theme.action),
+                colorFilter = ColorFilter.tint(theme.t1),
                 modifier = Modifier.size(24.dp)
             )
             Spacer(modifier = Modifier.width(16.dp))

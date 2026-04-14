@@ -110,8 +110,8 @@ fun StationPickerScreen(
                     modifier = Modifier
                         .shadow(4.dp, RoundedCornerShape(12.dp))
                         .clip(RoundedCornerShape(12.dp))
-                        .background(if (selectedLine == line) theme.action else theme.bg2)
-                        .border(3.dp, if (selectedLine == line) theme.action else theme.outline, RoundedCornerShape(12.dp))
+                        .background(if (selectedLine == line) theme.t1 else theme.bg2)
+                        .border(3.dp, if (selectedLine == line) theme.t1 else theme.outline, RoundedCornerShape(12.dp))
                         .clickable { selectedLine = line }
                         .padding(horizontal = 20.dp, vertical = 12.dp)
                 ) {

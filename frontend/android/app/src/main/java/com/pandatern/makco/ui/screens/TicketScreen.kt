@@ -85,7 +85,7 @@ fun TicketScreen(
                 modifier = Modifier
                     .shadow(4.dp, RoundedCornerShape(8.dp))
                     .clip(RoundedCornerShape(8.dp))
-                    .background(theme.action)
+                    .background(theme.t1)
                     .padding(horizontal = 12.dp, vertical = 6.dp)
             ) {
                 Text(booking.status, style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold), color = if (theme.isDark) Black else White)
@@ -100,7 +100,7 @@ fun TicketScreen(
                 .shadow(8.dp, RoundedCornerShape(20.dp))
                 .clip(RoundedCornerShape(20.dp))
                 .background(theme.bg2)
-                .border(3.dp, theme.action, RoundedCornerShape(20.dp))
+                .border(3.dp, theme.t1, RoundedCornerShape(20.dp))
                 .padding(24.dp),
             contentAlignment = Alignment.Center
         ) {
