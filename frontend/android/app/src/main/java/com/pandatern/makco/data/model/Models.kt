@@ -144,7 +144,7 @@ data class VerifyRequest(
 
 data class VerifyResponse(
     @SerializedName("token") val token: String,
-    @SerializedName("userId") val userId: String
+    @SerializedName("userId") val userId: String?
 )
 
 data class SearchRequest(

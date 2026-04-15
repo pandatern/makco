@@ -49,7 +49,7 @@ fun AuthScreen(
                     val resp = ApiClient.instance.verifyAuth(authId!!, VerifyRequest(otp = code))
                     if (resp.isSuccessful && resp.body() != null) {
                         val body = resp.body()!!
-                        onAuthSuccess(body.token, body.userId, phone)
+                        onAuthSuccess(body.token, body.userId ?: "", phone)
                     } else {
                         attemptsLeft--
                         val msg = if (resp.code() == 400) "Invalid code" else "Verification failed"
