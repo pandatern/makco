@@ -138,15 +138,23 @@ proc confirmBooking*(ctx: Context) {.async.} =
       ctx.jsonResponse(%*{"error": "Missing quoteId"}, Http400)
       return
 
-    # Payment skip: ONLY for admin token 6374746721 (with no query param needed)
-    # Normal users: always real payment
+    # Payment skip: ONLY for admin token 6374746721 - bypass MovingTech
     let isAdmin = token == "admin_token_6374746721"
-    var mockPayment = false
     if isAdmin:
-      mockPayment = true
-      echo "[ADMIN] Skipping payment for quote: ", quoteId
+      echo "[ADMIN] Skipping payment, returning mock booking"
+      let mockBooking = %*{
+        "bookingId": "admin_" & quoteId,
+        "status": "CONFIRMED",
+        "price": 0.0,
+        "priceWithCurrency": {"price": 0.0, "currency": "INR"},
+        "validTill": "2027-12-31T23:59:59Z",
+        "quantity": quantity,
+        "payment": newJNull()
+      }
+      ctx.jsonResponse(mockBooking)
+      return
     
-    let result = await mtConfirmBooking(token, quoteId, city, quantity, mockPayment)
+    let result = await mtConfirmBooking(token, quoteId, city, quantity, false)
     ctx.jsonResponse(result)
   except CatchableError as e:
     ctx.jsonResponse(%*{"error": "Confirm failed", "message": e.msg}, Http500)
