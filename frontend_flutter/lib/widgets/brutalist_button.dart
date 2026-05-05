@@ -37,7 +37,6 @@ class _BrutalistButtonState extends State<BrutalistButton> {
         duration: const Duration(milliseconds: 100),
         width: widget.width ?? double.infinity,
         height: 60,
-        transform: _isPressed ? Matrix4.translationValues(3, 3, 0) : Matrix4.identity(),
         decoration: BrutalistStyle.containerDecoration(
           color: isEnabled ? widget.color : BrutalistColors.gray,
           hasShadow: !_isPressed && isEnabled,
