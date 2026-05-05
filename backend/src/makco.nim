@@ -25,7 +25,6 @@ proc main() =
   app.post("/metro/quote/{quoteId}/confirm", confirmBooking)
   app.get("/booking/{bookingId}/status", getBookingStatus)
   app.get("/booking/{bookingId}/refresh", refreshBookingStatus)
-  app.get("/debug", debugRoute)
 
   app.get("/profile", getProfile)
   app.get("/tickets", getTicketBookings)

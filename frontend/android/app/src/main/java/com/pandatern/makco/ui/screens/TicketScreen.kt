@@ -38,24 +38,26 @@ fun TicketScreen(
     val theme = LocalThemeManager.current
     val ticket = booking.tickets.firstOrNull()
     
-    val qrString: String = buildString {
-        ticket?.let { ticket ->
+    val qrString: String = remember(booking) {
+        var foundString = ""
+        ticket?.let { tkt ->
             val qrSources = listOf(
-                ticket.qrCodes?.firstOrNull(),
-                ticket.qrString,
-                ticket.qRCode,
-                ticket.qr_code,
-                ticket.qr,
-                ticket.verificationCode,
-                ticket.ticketNumber,
-                ticket.id
+                tkt.qrCodes?.firstOrNull(),
+                tkt.qrString,
+                tkt.qRCode,
+                tkt.qr_code,
+                tkt.qr,
+                tkt.verificationCode,
+                tkt.ticketNumber,
+                tkt.id
             )
-            
-            qrSources.firstOrNull { it?.isNotBlank() == true } ?: ""
-        } ?: ""
+            foundString = qrSources.firstOrNull { it?.isNotBlank() == true } ?: ""
+        }
         
-        if (isEmpty()) {
-            append(booking.bookingId)
+        if (foundString.isEmpty()) {
+            booking.bookingId
+        } else {
+            foundString
         }
     }
     
@@ -209,8 +211,9 @@ fun TicketScreen(
 private fun generateQRBitmap(content: String, size: Int): Bitmap? {
     return try {
         val hints = mapOf(
-            EncodeHintType.MARGIN to 2,
-            EncodeHintType.CHARACTER_SET to "UTF-8"
+            EncodeHintType.MARGIN to 1,
+            EncodeHintType.CHARACTER_SET to "UTF-8",
+            EncodeHintType.ERROR_CORRECTION to com.google.zxing.qrcode.decoder.ErrorCorrectionLevel.H
         )
         val writer = QRCodeWriter()
         val bitMatrix = writer.encode(content, BarcodeFormat.QR_CODE, size, size, hints)

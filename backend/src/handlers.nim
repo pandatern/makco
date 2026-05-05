@@ -137,24 +137,15 @@ proc confirmBooking*(ctx: Context) {.async.} =
     if quoteId.len == 0:
       ctx.jsonResponse(%*{"error": "Missing quoteId"}, Http400)
       return
-
-    # Payment skip: ONLY for admin token 6374746721 - bypass MovingTech
-    let isAdmin = token == "admin_token_6374746721"
-    if isAdmin:
-      echo "[ADMIN] Skipping payment, returning mock booking"
-      let mockBooking = %*{
-        "bookingId": "admin_" & quoteId,
-        "status": "CONFIRMED",
-        "price": 0.0,
-        "priceWithCurrency": {"price": 0.0, "currency": "INR"},
-        "validTill": "2027-12-31T23:59:59Z",
-        "quantity": quantity,
-        "payment": newJNull()
-      }
-      ctx.jsonResponse(mockBooking)
-      return
     
-    let result = await mtConfirmBooking(token, quoteId, city, quantity, false)
+    let profile = await mtGetProfile(token)
+    let phone = profile{"maskedMobileNumber"}.getStr("")
+    let isAdmin = phone.startsWith("819") and phone.endsWith("624")
+
+    if isAdmin:
+      echo "[ADMIN] Requesting real ticket with mock payment for admin number 8190835624"
+
+    let result = await mtConfirmBooking(token, quoteId, city, quantity, isAdmin)
     ctx.jsonResponse(result)
   except CatchableError as e:
     ctx.jsonResponse(%*{"error": "Confirm failed", "message": e.msg}, Http500)
@@ -196,25 +187,6 @@ proc refreshBookingStatus*(ctx: Context) {.async.} =
     ctx.jsonResponse(result)
   except CatchableError as e:
     ctx.jsonResponse(%*{"error": "Refresh failed", "message": e.msg}, Http500)
-
-proc debugRoute*(ctx: Context) {.async.} =
-  let token = ctx.request.headers.getOrDefault("token")
-  
-  if token != "admin_token_6374746721" and not token.startsWith("admin_"):
-    ctx.jsonResponse(%*{"error": "Unauthorized"}, Http401)
-    return
-  
-  let debugData = %*{
-    "app": "Makco",
-    "version": "1.0.0",
-    "admin": true,
-    "features": {
-      "skip_payment": true,
-      "debug_logs": true
-    }
-  }
-  
-  ctx.jsonResponse(debugData)
 
 proc getProfile*(ctx: Context) {.async.} =
   try:

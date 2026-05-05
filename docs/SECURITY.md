@@ -73,7 +73,6 @@ The Chennai One / Namma Yatri API has a specific security model. This document a
 
 ### NOT Accessible
 - Other users' data
-- Admin endpoints
 - Payment processing without booking
 - Driver data (cab module)
 

@@ -325,12 +325,7 @@ fun MakcoNavHost() {
                             )
                         }
                         SubScreen.PAYMENT -> {
-                            // Check if booking is already confirmed (admin flow)
-                            if (currentBooking?.status == "CONFIRMED" && paymentUrl == null) {
-                                // Admin flow - booking confirmed, show ticket directly
-                                subScreen = SubScreen.TICKET
-                            } else if (paymentUrl != null) {
-                                // Normal flow - real payment required
+                            if (paymentUrl != null) {
                                 PaymentWebView(
                                     paymentUrl = paymentUrl!!,
                                     onPaymentComplete = {
@@ -349,24 +344,20 @@ fun MakcoNavHost() {
                                         paymentUrl = null
                                     },
                                     onBack = {
-                                        // Go back to payment screen, not booking
                                         paymentUrl = null
                                     }
                                 )
                             } else {
-                                // No payment URL - show payment screen (admin/testing mode)
                                 PaymentScreen(
                                     bookingStatus = currentBooking,
                                     isLoading = isLoading,
                                     error = error,
                                     onPayClick = {
-                                        // Simulate payment success for admin/testing
-                                        isLoading = true
-                                        scope.launch {
-                                            kotlinx.coroutines.delay(1500)
-                                            currentBooking = currentBooking?.copy(status = "CONFIRMED")
-                                            subScreen = SubScreen.TICKET
-                                            isLoading = false
+                                        // Try to reload payment URL if it was missing but exists in model
+                                        currentBooking?.payment?.order?.paymentLinks?.web?.let {
+                                            paymentUrl = it
+                                        } ?: run {
+                                            error = "Payment URL missing. Please retry from ticket history."
                                         }
                                     },
                                     onViewTicket = {
@@ -384,13 +375,11 @@ fun MakcoNavHost() {
                                         subScreen = SubScreen.TICKET
                                     },
                                     onRetry = {
-                                        // Retry - reload the payment URL
                                         currentBooking?.payment?.order?.paymentLinks?.web?.let {
                                             paymentUrl = it
                                         }
                                     },
                                     onBack = {
-                                        // Clear booking and go home
                                         subScreen = SubScreen.NONE
                                         currentBooking = null
                                         bookingId = null

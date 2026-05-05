@@ -1,0 +1,53 @@
+name: Build Flutter APK
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.22.x' # Using a recent stable version
+          channel: 'stable'
+
+      - name: Get dependencies
+        working-directory: frontend_flutter
+        run: flutter pub get
+
+      - name: Build APK
+        working-directory: frontend_flutter
+        run: flutter build apk --release
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: makco-flutter-apk
+          path: frontend_flutter/build/app/outputs/flutter-apk/app-release.apk
+          retention-days: 30
+
+      - name: Create Release
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v1
+        with:
+          files: frontend_flutter/build/app/outputs/flutter-apk/app-release.apk
+          tag_name: "v2.0.${{ github.run_number }}"
+          name: "Makco v2.0.${{ github.run_number }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

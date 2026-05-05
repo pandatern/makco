@@ -50,10 +50,6 @@ nim c -d:ssl -d:release -o:makco makco.nim
 nginx -s reload  # after backend restart
 ```
 
-### Admin Token
-
-Payment skips only for exact token: `admin_token_6374746721`
-
 ### API Endpoints
 
 - Health: GET /

@@ -51,7 +51,6 @@ POST /auth
   "authId": "fd52280a-62ad-442c-9358-51c2afae3a5f",
   "authType": "OTP",
   "depotCode": null,
-  "isDepotAdmin": null,
   "isPersonBlocked": false,
   "person": null,
   "token": null

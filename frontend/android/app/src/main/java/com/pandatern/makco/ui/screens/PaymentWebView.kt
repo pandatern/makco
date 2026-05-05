@@ -118,7 +118,7 @@ fun PaymentWebView(
                                 // Handle UPI deep links
                                 if (url.startsWith("upi://") || url.startsWith("tez://") || url.startsWith("phonepe://") || url.startsWith("paytmmp://")) {
                                     try {
-                                        val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, request.url)
+                                        val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(url))
                                         context.startActivity(intent)
                                     } catch (e: Exception) {
                                         errorMsg = "No UPI app found"
