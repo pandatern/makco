@@ -71,7 +71,7 @@ class _AuthScreenState extends State<AuthScreen> {
                     width: 80,
                     height: 80,
                     decoration: BrutalistStyle.containerDecoration(color: BrutalistColors.primary),
-                    alignment: Alignment.Center,
+                    alignment: Alignment.center,
                     child: Text("M", style: BrutalistStyle.heading(color: Colors.white).copyWith(fontSize: 48)),
                   ),
                   const SizedBox(height: 24),

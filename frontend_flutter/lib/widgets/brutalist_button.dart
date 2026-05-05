@@ -42,7 +42,7 @@ class _BrutalistButtonState extends State<BrutalistButton> {
           color: isEnabled ? widget.color : BrutalistColors.gray,
           hasShadow: !_isPressed && isEnabled,
         ),
-        alignment: Alignment.Center,
+        alignment: Alignment.center,
         child: widget.isLoading
             ? const SizedBox(
                 height: 24,
