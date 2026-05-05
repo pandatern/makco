@@ -27,6 +27,10 @@ jobs:
           flutter-version: '3.22.x' # Using a recent stable version
           channel: 'stable'
 
+      - name: Create flutter platform files
+        working-directory: frontend_flutter
+        run: flutter create .
+
       - name: Get dependencies
         working-directory: frontend_flutter
         run: flutter pub get
