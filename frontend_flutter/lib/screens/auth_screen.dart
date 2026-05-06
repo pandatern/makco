@@ -101,7 +101,7 @@ class _AuthScreenState extends State<AuthScreen> {
                   ),
                 ),
                 const SizedBox(height: 32),
-                BrutalistButton(
+                AppleButton(
                   text: "Continue",
                   isLoading: _isLoading,
                   onTap: _sendOtp,
@@ -128,7 +128,7 @@ class _AuthScreenState extends State<AuthScreen> {
                   ),
                 ),
                 const SizedBox(height: 32),
-                BrutalistButton(
+                AppleButton(
                   text: "Verify",
                   isLoading: _isLoading,
                   onTap: _verifyOtp,

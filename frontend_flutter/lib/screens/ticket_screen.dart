@@ -104,9 +104,9 @@ class TicketScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 32),
-              BrutalistButton(
+              AppleButton(
                 text: "Refresh Status",
-                color: AppleColors.white.withOpacity(0), // Make it a text-only feel button or different style
+                color: AppleColors.white,
                 onTap: () => booking.refreshStatus(),
               ),
               const SizedBox(height: 80),

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import '../theme/brutalist_style.dart';
 
-class BrutalistButton extends StatefulWidget {
+class AppleButton extends StatefulWidget {
   final String text;
   final VoidCallback? onTap;
   final Color color;
   final bool isLoading;
 
-  const BrutalistButton({
+  const AppleButton({
     Key? key,
     required this.text,
     this.onTap,
@@ -16,10 +16,10 @@ class BrutalistButton extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _BrutalistButtonState createState() => _BrutalistButtonState();
+  _AppleButtonState createState() => _AppleButtonState();
 }
 
-class _BrutalistButtonState extends State<BrutalistButton> with SingleTickerProviderStateMixin {
+class _AppleButtonState extends State<AppleButton> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
 

@@ -38,22 +38,22 @@ class _HistoryScreenState extends State<HistoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: BrutalistColors.gray,
+      backgroundColor: AppleColors.bg,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text("MY TICKETS", style: BrutalistStyle.title()),
+        title: Text("My Tickets", style: AppleStyle.title()),
       ),
       body: _isLoading 
-        ? const Center(child: CircularProgressIndicator(color: BrutalistColors.black))
+        ? const Center(child: CircularProgressIndicator(color: AppleColors.blue))
         : _error != null 
-          ? Center(child: Text(_error!, style: BrutalistStyle.body(color: BrutalistColors.error)))
+          ? Center(child: Text(_error!, style: AppleStyle.body(color: AppleColors.error)))
           : _tickets == null || _tickets!.isEmpty
-            ? Center(child: Text("No tickets found.", style: BrutalistStyle.body()))
+            ? Center(child: Text("No tickets found.", style: AppleStyle.body()))
             : ListView.builder(
                 padding: const EdgeInsets.all(24),
                 itemCount: _tickets!.length,
@@ -63,23 +63,23 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     padding: const EdgeInsets.only(bottom: 16),
                     child: Container(
                       padding: const EdgeInsets.all(20),
-                      decoration: BrutalistStyle.containerDecoration(),
+                      decoration: AppleStyle.cardDecoration(),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(ticket.bookingId.substring(0,8).toUpperCase(), style: BrutalistStyle.title().copyWith(fontSize: 18)),
+                              Text(ticket.bookingId.substring(0,8).toUpperCase(), style: AppleStyle.title().copyWith(fontSize: 18)),
                               const SizedBox(height: 8),
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                decoration: BoxDecoration(color: BrutalistColors.primary, borderRadius: BorderRadius.circular(4)),
-                                child: Text(ticket.status, style: BrutalistStyle.label(color: Colors.white)),
+                                decoration: BoxDecoration(color: AppleColors.blue, borderRadius: BorderRadius.circular(4)),
+                                child: Text(ticket.status, style: AppleStyle.footnote().copyWith(color: Colors.white, fontWeight: FontWeight.bold)),
                               ),
                             ],
                           ),
-                          Text("₹${ticket.price.toInt()}", style: BrutalistStyle.heading().copyWith(fontSize: 24)),
+                          Text("₹${ticket.price.toInt()}", style: AppleStyle.title().copyWith(fontSize: 24, color: AppleColors.black)),
                         ],
                       ),
                     ),

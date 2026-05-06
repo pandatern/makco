@@ -134,7 +134,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       const SizedBox(height: 24),
                     ],
-                    BrutalistButton(
+                    AppleButton(
                       text: "Find Fares",
                       onTap: (booking.sourceStation != null && booking.destinationStation != null)
                           ? () {

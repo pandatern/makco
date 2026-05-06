@@ -140,7 +140,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 48),
-              child: BrutalistButton(
+              child: AppleButton(
                 text: _currentPage == onboardingPages.length - 1 ? "Get Started" : "Continue",
                 onTap: () {
                   if (_currentPage < onboardingPages.length - 1) {

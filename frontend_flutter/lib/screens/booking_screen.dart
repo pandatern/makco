@@ -157,7 +157,7 @@ class _BookingScreenState extends State<BookingScreen> {
                 ),
               ),
               const SizedBox(height: 24),
-              BrutalistButton(
+              AppleButton(
                 text: "Pay ₹${(_selectedQuote!.price * _quantity).toInt()}",
                 isLoading: booking.isLoading,
                 onTap: _handlePayment,
