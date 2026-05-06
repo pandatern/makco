@@ -50,7 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final booking = Provider.of<BookingProvider>(context);
 
     return Scaffold(
-      backgroundColor: BrutalistColors.gray,
+      backgroundColor: BrutalistColors.bg,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -61,39 +61,39 @@ class _HomeScreenState extends State<HomeScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("MAKCO v2.0", style: BrutalistStyle.heading().copyWith(fontSize: 40)),
-                      Text("METRO TICKETING", style: BrutalistStyle.label(color: BrutalistColors.primary)),
-                    ],
-                  ),
+                  Text("MAKCO", style: BrutalistStyle.heading()),
                   GestureDetector(
                     onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ProfileScreen())),
                     child: Container(
-                      width: 50,
-                      height: 50,
-                      decoration: BrutalistStyle.containerDecoration(radius: 25),
-                      child: const Icon(Icons.person, color: Colors.black),
+                      width: 55,
+                      height: 55,
+                      decoration: BrutalistStyle.box(color: BrutalistColors.accent),
+                      child: const Icon(Icons.person, color: Colors.black, size: 30),
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 48),
+              Container(
+                decoration: BrutalistStyle.box(color: Colors.black),
+                padding: const EdgeInsets.all(16),
+                child: Text("QUICK BOOKING", style: BrutalistStyle.label().copyWith(color: Colors.white)),
+              ),
+              const SizedBox(height: 16),
               _StationSelector(
-                label: "FROM",
+                label: "FROM STATION",
                 station: booking.sourceStation,
                 onTap: () => _showStationPicker(true),
               ),
               const SizedBox(height: 16),
               _StationSelector(
-                label: "TO",
+                label: "TO STATION",
                 station: booking.destinationStation,
                 onTap: () => _showStationPicker(false),
               ),
               const SizedBox(height: 32),
               BrutalistButton(
-                text: "Search Fares",
+                text: "Find Best Fare",
                 onTap: (booking.sourceStation != null && booking.destinationStation != null)
                     ? () {
                         booking.searchFares();
@@ -102,22 +102,28 @@ class _HomeScreenState extends State<HomeScreen> {
                     : null,
               ),
               const SizedBox(height: 48),
-              Text("QUICK ACTIONS", style: BrutalistStyle.title()),
-              const SizedBox(height: 16),
               Row(
                 children: [
-                  _QuickAction(icon: Icons.history, label: "History", onTap: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (_) => const HistoryScreen()));
-                  }),
+                  Expanded(
+                    child: _MenuAction(
+                      icon: Icons.confirmation_number,
+                      label: "Tickets",
+                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const HistoryScreen())),
+                    ),
+                  ),
                   const SizedBox(width: 16),
-                  _QuickAction(icon: Icons.settings, label: "Profile", onTap: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (_) => const ProfileScreen()));
-                  }),
+                  Expanded(
+                    child: _MenuAction(
+                      icon: Icons.map,
+                      label: "Route Map",
+                      onTap: () {},
+                    ),
+                  ),
                 ],
               ),
               const Spacer(),
               Center(
-                child: Text("${booking.stations.length} STATIONS LOADED", style: BrutalistStyle.label(color: Colors.grey)),
+                child: Text("v2.0 • PREMIUM BRUTALIST", style: BrutalistStyle.label().copyWith(color: Colors.grey, fontSize: 10)),
               ),
               const SizedBox(height: 24),
             ],
@@ -140,34 +146,25 @@ class _StationSelector extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BrutalistStyle.containerDecoration(
-          color: station != null ? BrutalistColors.white : BrutalistColors.white.withOpacity(0.5),
+        padding: const EdgeInsets.all(24),
+        decoration: BrutalistStyle.box(
+          color: station != null ? BrutalistColors.white : Colors.white.withOpacity(0.6),
         ),
         child: Row(
           children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: BrutalistColors.black,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Icon(Icons.location_on, color: Colors.white, size: 20),
-            ),
-            const SizedBox(width: 16),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(label, style: BrutalistStyle.label(color: Colors.grey)),
+                Text(label, style: BrutalistStyle.label().copyWith(fontSize: 10, color: Colors.grey[600])),
                 const SizedBox(height: 4),
                 Text(
-                  station?.name ?? "Select Station",
+                  station?.name ?? "TAP TO SELECT",
                   style: BrutalistStyle.title().copyWith(fontSize: 18),
                 ),
               ],
             ),
             const Spacer(),
-            const Icon(Icons.arrow_forward_ios, size: 16),
+            const Icon(Icons.keyboard_arrow_down, size: 28),
           ],
         ),
       ),
@@ -175,28 +172,26 @@ class _StationSelector extends StatelessWidget {
   }
 }
 
-class _QuickAction extends StatelessWidget {
+class _MenuAction extends StatelessWidget {
   final IconData icon;
   final String label;
   final VoidCallback onTap;
 
-  const _QuickAction({required this.icon, required this.label, required this.onTap});
+  const _MenuAction({required this.icon, required this.label, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          decoration: BrutalistStyle.containerDecoration(),
-          child: Column(
-            children: [
-              Icon(icon, size: 24),
-              const SizedBox(height: 8),
-              Text(label.toUpperCase(), style: BrutalistStyle.label()),
-            ],
-          ),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BrutalistStyle.box(),
+        child: Column(
+          children: [
+            Icon(icon, size: 32),
+            const SizedBox(height: 12),
+            Text(label.toUpperCase(), style: BrutalistStyle.label()),
+          ],
         ),
       ),
     );
@@ -221,27 +216,28 @@ class _StationPickerState extends State<StationPicker> {
     final filtered = widget.stations.where((s) => s.name.toLowerCase().contains(query.toLowerCase())).toList();
 
     return Container(
-      height: MediaQuery.of(context).size.height * 0.8,
+      height: MediaQuery.of(context).size.height * 0.85,
       decoration: const BoxDecoration(
-        color: BrutalistColors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
-        border: Border(top: BorderSide(color: Colors.black, width: 4)),
+        color: BrutalistColors.bg,
+        border: Border(top: BorderSide(color: Colors.black, width: 6)),
       ),
       padding: const EdgeInsets.all(24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("PICK STATION", style: BrutalistStyle.heading()),
-          const SizedBox(height: 16),
+          Text("CHOOSE STATION", style: BrutalistStyle.heading().copyWith(fontSize: 32)),
+          const SizedBox(height: 24),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            decoration: BrutalistStyle.containerDecoration(hasShadow: false),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+            decoration: BrutalistStyle.box(hasShadow: false),
             child: TextField(
               onChanged: (v) => setState(() => query = v),
+              style: BrutalistStyle.body(bold: true),
+              autofocus: true,
               decoration: const InputDecoration(
-                hintText: "Search stations...",
+                hintText: "SEARCH...",
                 border: InputBorder.none,
-                icon: Icon(Icons.search, color: Colors.black),
+                icon: Icon(Icons.search, color: Colors.black, size: 28),
               ),
             ),
           ),
@@ -252,13 +248,13 @@ class _StationPickerState extends State<StationPicker> {
               itemBuilder: (ctx, i) {
                 final s = filtered[i];
                 return Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
+                  padding: const EdgeInsets.only(bottom: 16),
                   child: GestureDetector(
                     onTap: () => widget.onSelected(s),
                     child: Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BrutalistStyle.containerDecoration(hasShadow: false, radius: 12),
-                      child: Text(s.name, style: BrutalistStyle.title().copyWith(fontSize: 16)),
+                      padding: const EdgeInsets.all(20),
+                      decoration: BrutalistStyle.box(hasShadow: false),
+                      child: Text(s.name, style: BrutalistStyle.title().copyWith(fontSize: 18)),
                     ),
                   ),
                 );

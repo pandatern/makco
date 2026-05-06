@@ -36,7 +36,7 @@ class _AuthScreenState extends State<AuthScreen> {
         setState(() { _error = "Failed to send OTP"; });
       }
     } catch (e) {
-      setState(() { _error = "Connection error"; });
+      setState(() { _error = "Check internet connection"; });
     }
     setState(() { _isLoading = false; });
   }
@@ -51,110 +51,109 @@ class _AuthScreenState extends State<AuthScreen> {
     if (!success) {
       setState(() { _error = "Invalid OTP"; _isLoading = false; });
     }
-    // AuthProvider will trigger notifyListeners, main.dart will handle navigation
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: BrutalistColors.white,
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 32),
-        child: Column(
-          crossAxisAlignment: Navigator.canPop(context) ? CrossAxisAlignment.start : CrossAxisAlignment.center,
-          children: [
-            const SizedBox(height: 80),
-            Center(
-              child: Column(
-                children: [
-                  Container(
-                    width: 80,
-                    height: 80,
-                    decoration: BrutalistStyle.containerDecoration(color: BrutalistColors.primary),
-                    alignment: Alignment.center,
-                    child: Text("M", style: BrutalistStyle.heading(color: Colors.white).copyWith(fontSize: 48)),
-                  ),
-                  const SizedBox(height: 24),
-                  Text("MAKCO", style: BrutalistStyle.heading(color: BrutalistColors.black).copyWith(letterSpacing: 4)),
-                  Text("CHENNAI METRO", style: BrutalistStyle.label(color: BrutalistColors.darkGray)),
-                ],
-              ),
-            ),
-            const SizedBox(height: 64),
-            Text(_otpSent ? "ENTER CODE" : "ENTER PHONE", style: BrutalistStyle.title()),
-            const SizedBox(height: 16),
-            if (!_otpSent) ...[
+      backgroundColor: BrutalistColors.bg,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 100),
               Container(
-                decoration: BrutalistStyle.containerDecoration(hasShadow: false),
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
+                width: double.infinity,
+                decoration: BrutalistStyle.box(color: BrutalistColors.accent),
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("+91", style: BrutalistStyle.title()),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: TextField(
-                        controller: _phoneController,
-                        keyboardType: TextInputType.phone,
-                        maxLength: 10,
-                        style: BrutalistStyle.title(),
-                        decoration: const InputDecoration(
-                          hintText: "00000 00000",
-                          border: InputBorder.none,
-                          counterText: "",
-                        ),
-                      ),
-                    ),
+                    Text("MAKCO", style: BrutalistStyle.heading().copyWith(fontSize: 50)),
+                    const SizedBox(height: 8),
+                    Text("METRO TICKETING", style: BrutalistStyle.label()),
                   ],
                 ),
               ),
-              const SizedBox(height: 32),
-              BrutalistButton(
-                text: "Send OTP",
-                isLoading: _isLoading,
-                onTap: _sendOtp,
-              ),
-            ] else ...[
-              Container(
-                decoration: BrutalistStyle.containerDecoration(hasShadow: false),
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: TextField(
-                  controller: _otpController,
-                  keyboardType: TextInputType.number,
-                  maxLength: 4,
-                  textAlign: TextAlign.center,
-                  style: BrutalistStyle.heading().copyWith(letterSpacing: 20),
-                  decoration: const InputDecoration(
-                    hintText: "••••",
-                    border: InputBorder.none,
-                    counterText: "",
+              const SizedBox(height: 64),
+              Text(_otpSent ? "VERIFY OTP" : "PHONE LOGIN", style: BrutalistStyle.title()),
+              const SizedBox(height: 16),
+              if (!_otpSent) ...[
+                Container(
+                  decoration: BrutalistStyle.box(hasShadow: false),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  child: Row(
+                    children: [
+                      Text("+91", style: BrutalistStyle.title()),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: TextField(
+                          controller: _phoneController,
+                          keyboardType: TextInputType.phone,
+                          maxLength: 10,
+                          style: BrutalistStyle.title(),
+                          decoration: const InputDecoration(
+                            hintText: "00000 00000",
+                            border: InputBorder.none,
+                            counterText: "",
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  onChanged: (val) {
-                    if (val.length == 4) _verifyOtp();
-                  },
                 ),
-              ),
-              const SizedBox(height: 32),
-              BrutalistButton(
-                text: "Verify",
-                isLoading: _isLoading,
-                onTap: _verifyOtp,
-              ),
-              const SizedBox(height: 16),
-              TextButton(
-                onPressed: () => setState(() => _otpSent = false),
-                child: Text("CHANGE NUMBER", style: BrutalistStyle.label(color: BrutalistColors.primary)),
-              ),
+                const SizedBox(height: 32),
+                BrutalistButton(
+                  text: "Send OTP",
+                  isLoading: _isLoading,
+                  onTap: _sendOtp,
+                ),
+              ] else ...[
+                Container(
+                  decoration: BrutalistStyle.box(hasShadow: false),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  child: TextField(
+                    controller: _otpController,
+                    keyboardType: TextInputType.number,
+                    maxLength: 4,
+                    textAlign: TextAlign.center,
+                    style: BrutalistStyle.heading().copyWith(letterSpacing: 30),
+                    decoration: const InputDecoration(
+                      hintText: "••••",
+                      border: InputBorder.none,
+                      counterText: "",
+                    ),
+                    onChanged: (val) {
+                      if (val.length == 4) _verifyOtp();
+                    },
+                  ),
+                ),
+                const SizedBox(height: 32),
+                BrutalistButton(
+                  text: "Verify & Enter",
+                  isLoading: _isLoading,
+                  onTap: _verifyOtp,
+                ),
+                Center(
+                  child: TextButton(
+                    onPressed: () => setState(() => _otpSent = false),
+                    child: Text("BACK TO PHONE", style: BrutalistStyle.label().copyWith(decoration: TextDecoration.underline)),
+                  ),
+                ),
+              ],
+              if (_error != null) ...[
+                const SizedBox(height: 24),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BrutalistStyle.box(color: BrutalistColors.error, hasShadow: false),
+                  child: Text(_error!, style: BrutalistStyle.body(bold: true).copyWith(color: Colors.white)),
+                ),
+              ],
             ],
-            if (_error != null) ...[
-              const SizedBox(height: 16),
-              Text(_error!, style: BrutalistStyle.body(color: BrutalistColors.error, bold: true)),
-            ],
-            const Spacer(),
-            Center(
-              child: Text("By continuing, you agree to our Terms", style: BrutalistStyle.label(color: Colors.grey)),
-            ),
-            const SizedBox(height: 48),
-          ],
+          ),
         ),
       ),
     );

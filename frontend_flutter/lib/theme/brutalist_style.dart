@@ -1,79 +1,71 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-// Replacing vibrant brutalist with Kotlin's pure monochrome neo-brutalist theme
 class BrutalistColors {
   static const Color white = Color(0xFFFFFFFF);
   static const Color black = Color(0xFF000000);
-  
-  static const Color gray = Color(0xFFFFFFFF); // Backgrounds are usually white
-  static const Color darkGray = Color(0xFF333333);
-  
-  static const Color primary = Color(0xFF000000); // Action is black in light theme
-  static const Color accent = Color(0xFF000000); // Action is black
-  static const Color error = Color(0xFF000000); // Kotlin theme had error = t1 (which is black)
+  static const Color bg = Color(0xFFF0F0F0);
+  static const Color primary = Color(0xFF000000);
+  static const Color accent = Color(0xFFFFD700); // Gold accent for "Premium" touch
+  static const Color error = Color(0xFFFF4545);
 }
 
 class BrutalistStyle {
-  static const double borderWeight = 2.0; // Kotlin used 2.dp or 3.dp
-  static const double borderRadius = 16.0;
+  static const double borderWeight = 3.5;
+  static const double borderRadius = 0.0; // Sharp corners for hardcore brutalism
+  static const Offset shadowOffset = Offset(8, 8);
 
-  static BoxDecoration containerDecoration({
+  static BoxDecoration box({
     Color color = BrutalistColors.white,
-    double radius = borderRadius,
     bool hasShadow = true,
+    Color shadowColor = BrutalistColors.black,
   }) {
     return BoxDecoration(
       color: color,
-      border: Border.all(color: color == BrutalistColors.black ? BrutalistColors.black : const Color(0xFFCCCCCC), width: borderWeight),
-      borderRadius: BorderRadius.circular(radius),
+      border: Border.all(color: BrutalistColors.black, width: borderWeight),
       boxShadow: hasShadow
           ? [
               BoxShadow(
-                color: Colors.black.withOpacity(0.15),
-                offset: const Offset(0, 4), // Soft elevation shadow, not hard offset
-                blurRadius: 8,
+                color: shadowColor,
+                offset: shadowOffset,
+                blurRadius: 0,
               )
             ]
           : [],
     );
   }
 
-  // Pure monochrome SansSerif (Roboto is default SansSerif in Flutter)
-  static TextStyle heading({Color color = BrutalistColors.black}) {
-    return TextStyle(
-      fontFamily: 'Roboto',
-      fontSize: 32,
+  static TextStyle heading() {
+    return GoogleFonts.archivoBlack(
+      fontSize: 42,
+      color: BrutalistColors.black,
+      height: 1.1,
+    );
+  }
+
+  static TextStyle title() {
+    return GoogleFonts.spaceGrotesk(
+      fontSize: 24,
       fontWeight: FontWeight.w900,
-      color: color,
-      letterSpacing: 1,
+      color: BrutalistColors.black,
+      letterSpacing: -0.5,
     );
   }
 
-  static TextStyle title({Color color = BrutalistColors.black}) {
-    return TextStyle(
-      fontFamily: 'Roboto',
-      fontSize: 22,
-      fontWeight: FontWeight.bold,
-      color: color,
-    );
-  }
-
-  static TextStyle body({Color color = BrutalistColors.black, bool bold = false}) {
-    return TextStyle(
-      fontFamily: 'Roboto',
+  static TextStyle body({bool bold = false}) {
+    return GoogleFonts.spaceGrotesk(
       fontSize: 16,
-      fontWeight: bold ? FontWeight.bold : FontWeight.normal,
-      color: color,
+      fontWeight: bold ? FontWeight.w800 : FontWeight.w500,
+      color: BrutalistColors.black,
     );
   }
 
-  static TextStyle label({Color color = BrutalistColors.black}) {
-    return TextStyle(
-      fontFamily: 'Roboto',
-      fontSize: 14,
-      fontWeight: FontWeight.bold,
-      color: color,
-      letterSpacing: 1,
+  static TextStyle label() {
+    return GoogleFonts.spaceGrotesk(
+      fontSize: 13,
+      fontWeight: FontWeight.w900,
+      color: BrutalistColors.black,
+      letterSpacing: 2,
     );
   }
 }
