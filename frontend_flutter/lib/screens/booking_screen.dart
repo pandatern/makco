@@ -37,16 +37,15 @@ class _BookingScreenState extends State<BookingScreen> {
                 Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const TicketScreen()));
               },
               onCancel: () {
-                Navigator.pop(context); // close webview
+                Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text("Payment Cancelled", style: BrutalistStyle.body(color: Colors.white)), backgroundColor: BrutalistColors.error)
+                  const SnackBar(content: Text("Payment Cancelled"), backgroundColor: AppleColors.error)
                 );
               },
             ),
           ),
         );
       } else {
-        // No payment required or already paid
         Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const TicketScreen()));
       }
     }
@@ -57,15 +56,15 @@ class _BookingScreenState extends State<BookingScreen> {
     final booking = Provider.of<BookingProvider>(context);
 
     return Scaffold(
-      backgroundColor: BrutalistColors.white,
+      backgroundColor: AppleColors.bg,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text("CHOOSE TICKET", style: BrutalistStyle.title()),
+        title: Text("Choose Ticket", style: AppleStyle.title()),
       ),
       body: Padding(
         padding: const EdgeInsets.all(24),
@@ -74,34 +73,38 @@ class _BookingScreenState extends State<BookingScreen> {
           children: [
             Container(
               padding: const EdgeInsets.all(20),
-              decoration: BrutalistStyle.containerDecoration(color: BrutalistColors.gray),
+              decoration: AppleStyle.cardDecoration(),
               child: Column(
                 children: [
-                  _StationLeg(label: "FROM", name: booking.sourceStation?.name ?? "..."),
+                  _StationLeg(icon: Icons.circle_outlined, name: booking.sourceStation?.name ?? "..."),
                   const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 8),
-                    child: Divider(color: Colors.black, thickness: 2),
+                    padding: EdgeInsets.only(left: 40, top: 8, bottom: 8),
+                    child: Divider(color: AppleColors.bg, thickness: 1),
                   ),
-                  _StationLeg(label: "TO", name: booking.destinationStation?.name ?? "..."),
+                  _StationLeg(icon: Icons.location_on, iconColor: AppleColors.blue, name: booking.destinationStation?.name ?? "..."),
                 ],
               ),
             ),
             const SizedBox(height: 32),
-            Text("AVAILABLE OPTIONS", style: BrutalistStyle.label()),
-            const SizedBox(height: 16),
+            Text("AVAILABLE FARES", style: AppleStyle.footnote().copyWith(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 12),
             if (booking.isLoading && booking.quotes.isEmpty)
-              const Center(child: CircularProgressIndicator())
+              const Center(child: CircularProgressIndicator(color: AppleColors.blue))
             else if (booking.quotes.isEmpty)
-              Text("No fares found.", style: BrutalistStyle.body())
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Text("No fares found for this route.", style: AppleStyle.body(color: AppleColors.gray)),
+              )
             else
               ...booking.quotes.map((q) => Padding(
                 padding: const EdgeInsets.only(bottom: 12),
                 child: GestureDetector(
                   onTap: () => setState(() => _selectedQuote = q),
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BrutalistStyle.containerDecoration(
-                      color: _selectedQuote?.quoteId == q.quoteId ? BrutalistColors.accent : BrutalistColors.white,
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    padding: const EdgeInsets.all(20),
+                    decoration: AppleStyle.cardDecoration(
+                      color: _selectedQuote?.quoteId == q.quoteId ? AppleColors.blue : AppleColors.white,
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -109,11 +112,23 @@ class _BookingScreenState extends State<BookingScreen> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(q.type == "SingleJourney" ? "SINGLE" : "RETURN", style: BrutalistStyle.title().copyWith(fontSize: 16)),
-                            Text("Valid for today", style: BrutalistStyle.label(color: Colors.grey)),
+                            Text(
+                              q.type == "SingleJourney" ? "Single Journey" : "Return Trip", 
+                              style: AppleStyle.body(bold: true, color: _selectedQuote?.quoteId == q.quoteId ? Colors.white : AppleColors.black)
+                            ),
+                            Text(
+                              "Valid for today only", 
+                              style: AppleStyle.footnote().copyWith(color: _selectedQuote?.quoteId == q.quoteId ? Colors.white.withOpacity(0.8) : AppleColors.gray)
+                            ),
                           ],
                         ),
-                        Text("₹${q.price.toInt()}", style: BrutalistStyle.heading().copyWith(fontSize: 24)),
+                        Text(
+                          "₹${q.price.toInt()}", 
+                          style: AppleStyle.title().copyWith(
+                            fontSize: 24, 
+                            color: _selectedQuote?.quoteId == q.quoteId ? Colors.white : AppleColors.black
+                          )
+                        ),
                       ],
                     ),
                   ),
@@ -121,21 +136,25 @@ class _BookingScreenState extends State<BookingScreen> {
               )).toList(),
             const Spacer(),
             if (_selectedQuote != null) ...[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text("QUANTITY", style: BrutalistStyle.title()),
-                  Container(
-                    decoration: BrutalistStyle.containerDecoration(radius: 12, hasShadow: false),
-                    child: Row(
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: AppleStyle.cardDecoration(),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text("Number of Tickets", style: AppleStyle.body(bold: true)),
+                    Row(
                       children: [
-                        IconButton(onPressed: _quantity > 1 ? () => setState(() => _quantity--) : null, icon: const Icon(Icons.remove)),
-                        Text("$_quantity", style: BrutalistStyle.title()),
-                        IconButton(onPressed: _quantity < 5 ? () => setState(() => _quantity++) : null, icon: const Icon(Icons.add)),
+                        _QtyBtn(icon: Icons.remove, onTap: _quantity > 1 ? () => setState(() => _quantity--) : null),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Text("$_quantity", style: AppleStyle.title()),
+                        ),
+                        _QtyBtn(icon: Icons.add, onTap: _quantity < 5 ? () => setState(() => _quantity++) : null),
                       ],
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
               const SizedBox(height: 24),
               BrutalistButton(
@@ -152,18 +171,40 @@ class _BookingScreenState extends State<BookingScreen> {
 }
 
 class _StationLeg extends StatelessWidget {
-  final String label;
+  final IconData icon;
+  final Color iconColor;
   final String name;
-  const _StationLeg({required this.label, required this.name});
+  const _StationLeg({required this.icon, this.iconColor = Colors.grey, required this.name});
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        SizedBox(width: 50, child: Text(label, style: BrutalistStyle.label(color: Colors.grey))),
-        const SizedBox(width: 16),
-        Expanded(child: Text(name, style: BrutalistStyle.title().copyWith(fontSize: 18), overflow: TextOverflow.ellipsis)),
+        Icon(icon, color: iconColor, size: 20),
+        const SizedBox(width: 20),
+        Expanded(child: Text(name, style: AppleStyle.body(bold: true), overflow: TextOverflow.ellipsis)),
       ],
+    );
+  }
+}
+
+class _QtyBtn extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback? onTap;
+  const _QtyBtn({required this.icon, this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: onTap == null ? AppleColors.bg : AppleColors.blue.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Icon(icon, size: 20, color: onTap == null ? AppleColors.lightGray : AppleColors.blue),
+      ),
     );
   }
 }

@@ -11,15 +11,15 @@ class ProfileScreen extends StatelessWidget {
     final auth = Provider.of<AuthProvider>(context, listen: false);
     
     return Scaffold(
-      backgroundColor: BrutalistColors.white,
+      backgroundColor: AppleColors.bg,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text("PROFILE", style: BrutalistStyle.title()),
+        title: Text("User Profile", style: AppleStyle.title()),
       ),
       body: Padding(
         padding: const EdgeInsets.all(24),
@@ -28,42 +28,80 @@ class ProfileScreen extends StatelessWidget {
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(32),
-              decoration: BrutalistStyle.containerDecoration(color: BrutalistColors.gray),
+              decoration: AppleStyle.cardDecoration(),
               child: Column(
                 children: [
                   Container(
                     width: 80,
                     height: 80,
-                    decoration: BrutalistStyle.containerDecoration(radius: 40, color: BrutalistColors.primary),
+                    decoration: const BoxDecoration(
+                      color: AppleColors.blue,
+                      shape: BoxShape.circle,
+                    ),
                     alignment: Alignment.center,
-                    child: Text("U", style: BrutalistStyle.heading(color: Colors.white)),
+                    child: const Icon(Icons.person, size: 40, color: Colors.white),
                   ),
-                  const SizedBox(height: 16),
-                  Text("USER ACCOUNT", style: BrutalistStyle.title()),
+                  const SizedBox(height: 20),
+                  Text("CHENNAI RIDER", style: AppleStyle.title()),
                   const SizedBox(height: 8),
-                  Text("Active Session", style: BrutalistStyle.label(color: Colors.grey)),
+                  Text("Authorized Member", style: AppleStyle.footnote()),
                 ],
               ),
             ),
             const SizedBox(height: 32),
-            GestureDetector(
-              onTap: () {
-                auth.logout();
-                Navigator.pop(context);
-              },
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 20),
-                decoration: BrutalistStyle.containerDecoration(color: BrutalistColors.error),
-                alignment: Alignment.center,
-                child: Text("LOGOUT", style: BrutalistStyle.title(color: Colors.white)),
-              ),
+            _ProfileItem(
+              icon: Icons.phone_android_outlined,
+              label: "Mobile Number",
+              value: "+91 ••••• ••624",
+            ),
+            const SizedBox(height: 12),
+            _ProfileItem(
+              icon: Icons.verified_user_outlined,
+              label: "Account Status",
+              value: "Verified",
+              valueColor: Colors.green,
             ),
             const Spacer(),
-            Text("MAKCO v2.0", style: BrutalistStyle.label(color: Colors.grey)),
+            Text("MAKCO v2.1.0", style: AppleStyle.footnote()),
             const SizedBox(height: 24),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _ProfileItem extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+  final Color? valueColor;
+
+  const _ProfileItem({
+    required this.icon,
+    required this.label,
+    required this.value,
+    this.valueColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: AppleStyle.cardDecoration(),
+      child: Row(
+        children: [
+          Icon(icon, color: AppleColors.gray, size: 24),
+          const SizedBox(width: 16),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(label, style: AppleStyle.footnote()),
+              const SizedBox(height: 4),
+              Text(value, style: AppleStyle.body(bold: true, color: valueColor ?? AppleColors.black)),
+            ],
+          ),
+        ],
       ),
     );
   }

@@ -8,6 +8,8 @@ import '../models/models.dart';
 import 'booking_screen.dart';
 import 'history_screen.dart';
 import 'profile_screen.dart';
+import 'recent_stations_screen.dart';
+import 'settings_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -52,101 +54,137 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: AppleColors.bg,
       body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text("Makco", style: AppleStyle.largeTitle()),
-                  GestureDetector(
-                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ProfileScreen())),
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: const BoxDecoration(
-                        color: AppleColors.blue,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(Icons.person, color: Colors.white, size: 28),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text("WHERE TO?", style: AppleStyle.footnote().copyWith(fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 12),
-                  Container(
-                    decoration: AppleStyle.cardDecoration(hasShadow: true),
-                    child: Column(
-                      children: [
-                        _StationRow(
-                          icon: Icons.circle_outlined,
-                          label: "From",
-                          value: booking.sourceStation?.name ?? "Select Source",
-                          onTap: () => _showStationPicker(true),
-                          showDivider: true,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text("Makco", style: AppleStyle.largeTitle()),
+                    GestureDetector(
+                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsScreen())),
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: const BoxDecoration(
+                          color: AppleColors.white,
+                          shape: BoxShape.circle,
                         ),
-                        _StationRow(
-                          icon: Icons.location_on,
-                          iconColor: AppleColors.blue,
-                          label: "To",
-                          value: booking.destinationStation?.name ?? "Select Destination",
-                          onTap: () => _showStationPicker(false),
+                        child: const Icon(Icons.settings_outlined, color: AppleColors.black, size: 24),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("WHERE TO?", style: AppleStyle.footnote().copyWith(fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 12),
+                    Container(
+                      decoration: AppleStyle.cardDecoration(hasShadow: true),
+                      child: Column(
+                        children: [
+                          _StationRow(
+                            icon: Icons.circle_outlined,
+                            label: "From",
+                            value: booking.sourceStation?.name ?? "Select Source",
+                            onTap: () => _showStationPicker(true),
+                            showDivider: true,
+                          ),
+                          _StationRow(
+                            icon: Icons.location_on,
+                            iconColor: AppleColors.blue,
+                            label: "To",
+                            value: booking.destinationStation?.name ?? "Select Destination",
+                            onTap: () => _showStationPicker(false),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    if (booking.recentStations.isNotEmpty) ...[
+                      SizedBox(
+                        height: 40,
+                        child: ListView.separated(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: booking.recentStations.length,
+                          separatorBuilder: (_, __) => const SizedBox(width: 8),
+                          itemBuilder: (ctx, i) {
+                            final s = booking.recentStations[i];
+                            return GestureDetector(
+                              onTap: () => booking.selectStations(booking.sourceStation, s),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 16),
+                                decoration: BoxDecoration(
+                                  color: AppleColors.white,
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(color: AppleColors.lightGray.withOpacity(0.5)),
+                                ),
+                                alignment: Alignment.center,
+                                child: Text(s.name, style: AppleStyle.footnote().copyWith(color: AppleColors.black, fontWeight: FontWeight.bold)),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                    ],
+                    BrutalistButton(
+                      text: "Find Fares",
+                      onTap: (booking.sourceStation != null && booking.destinationStation != null)
+                          ? () {
+                              booking.searchFares();
+                              Navigator.push(context, MaterialPageRoute(builder: (_) => const BookingScreen()));
+                            }
+                          : null,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 40),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("MY TRAVEL", style: AppleStyle.footnote().copyWith(fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _AppleActionCard(
+                            icon: Icons.receipt_long_outlined,
+                            label: "Tickets",
+                            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const HistoryScreen())),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: _AppleActionCard(
+                            icon: Icons.history_outlined,
+                            label: "Recents",
+                            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const RecentStationsScreen())),
+                          ),
                         ),
                       ],
                     ),
-                  ),
-                  const SizedBox(height: 32),
-                  BrutalistButton(
-                    text: "Find Fares",
-                    onTap: (booking.sourceStation != null && booking.destinationStation != null)
-                        ? () {
-                            booking.searchFares();
-                            Navigator.push(context, MaterialPageRoute(builder: (_) => const BookingScreen()));
-                          }
-                        : null,
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 48),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: _AppleActionCard(
-                      icon: Icons.receipt_long_outlined,
-                      label: "Tickets",
-                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const HistoryScreen())),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: _AppleActionCard(
-                      icon: Icons.map_outlined,
-                      label: "Route Map",
-                      onTap: () {},
-                    ),
-                  ),
-                ],
+              const SizedBox(height: 40),
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 24),
+                  child: Text("v2.1.0 • Designed for Chennai", style: AppleStyle.footnote()),
+                ),
               ),
-            ),
-            const Spacer(),
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 24),
-                child: Text("Designed for Chennai Metro", style: AppleStyle.footnote()),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

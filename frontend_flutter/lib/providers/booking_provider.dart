@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/models.dart';
 import '../services/api_service.dart';
 
@@ -6,6 +8,7 @@ class BookingProvider extends ChangeNotifier {
   final ApiService _api;
   
   List<Station> stations = [];
+  List<Station> recentStations = [];
   Station? sourceStation;
   Station? destinationStation;
   List<Quote> quotes = [];
@@ -20,6 +23,7 @@ class BookingProvider extends ChangeNotifier {
     notifyListeners();
     try {
       stations = await _api.getStations();
+      await fetchRecentStations();
       error = null;
     } catch (e) {
       error = "Failed to load stations";
@@ -28,9 +32,42 @@ class BookingProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> fetchRecentStations() async {
+    final prefs = await SharedPreferences.getInstance();
+    final List<String> saved = prefs.getStringList('recent_stations') ?? [];
+    recentStations = saved.map((s) => Station.fromJson(jsonDecode(s))).toList();
+    notifyListeners();
+  }
+
+  Future<void> saveStationToRecent(Station station) async {
+    final prefs = await SharedPreferences.getInstance();
+    final List<String> saved = prefs.getStringList('recent_stations') ?? [];
+    
+    // Remove if already exists to move to top
+    saved.removeWhere((s) {
+      final decoded = Station.fromJson(jsonDecode(s));
+      return decoded.code == station.code;
+    });
+    
+    saved.insert(0, jsonEncode({
+      'code': station.code,
+      'name': station.name,
+      'lat': station.lat,
+      'lon': station.lon,
+    }));
+    
+    if (saved.length > 10) saved.removeLast();
+    
+    await prefs.setStringList('recent_stations', saved);
+    recentStations = saved.map((s) => Station.fromJson(jsonDecode(s))).toList();
+    notifyListeners();
+  }
+
   void selectStations(Station? src, Station? dst) {
     sourceStation = src;
     destinationStation = dst;
+    if (src != null) saveStationToRecent(src);
+    if (dst != null) saveStationToRecent(dst);
     notifyListeners();
   }
 
