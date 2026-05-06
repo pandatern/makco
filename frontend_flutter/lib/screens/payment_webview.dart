@@ -80,8 +80,8 @@ class _PaymentWebViewState extends State<PaymentWebView> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text("No UPI app found", style: BrutalistStyle.body(color: Colors.white)),
-            backgroundColor: BrutalistColors.error,
+            content: Text("No UPI app found", style: AppleStyle.body(color: Colors.white)),
+            backgroundColor: AppleColors.error,
           )
         );
       }
@@ -91,28 +91,29 @@ class _PaymentWebViewState extends State<PaymentWebView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: BrutalistColors.gray,
+      backgroundColor: AppleColors.bg,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back_ios, color: AppleColors.black),
           onPressed: widget.onCancel,
         ),
-        title: Text("PAYMENT", style: BrutalistStyle.title()),
+        title: Text("Payment", style: AppleStyle.title()),
       ),
       body: Stack(
         children: [
           Container(
-            decoration: BrutalistStyle.containerDecoration(hasShadow: false),
+            margin: const EdgeInsets.all(16),
+            decoration: AppleStyle.cardDecoration(hasShadow: false),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(BrutalistStyle.borderRadius),
+              borderRadius: BorderRadius.circular(AppleStyle.borderRadius),
               child: WebViewWidget(controller: _controller),
             ),
           ),
           if (_isLoading)
             const Center(
-              child: CircularProgressIndicator(color: BrutalistColors.black),
+              child: CircularProgressIndicator(color: AppleColors.blue),
             ),
         ],
       ),

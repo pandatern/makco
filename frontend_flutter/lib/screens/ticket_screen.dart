@@ -14,7 +14,10 @@ class TicketScreen extends StatelessWidget {
     final status = booking.currentBooking;
 
     if (status == null) {
-      return Scaffold(body: Center(child: Text("No active ticket", style: BrutalistStyle.title())));
+      return Scaffold(
+        backgroundColor: AppleColors.bg,
+        body: Center(child: Text("No active ticket", style: AppleStyle.title())),
+      );
     }
 
     // Fuzzy QR discovery logic preserved from Android, skipping empty strings
@@ -39,15 +42,15 @@ class TicketScreen extends StatelessWidget {
     }
 
     return Scaffold(
-      backgroundColor: BrutalistColors.primary,
+      backgroundColor: AppleColors.bg,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.close, color: Colors.white),
+          icon: const Icon(Icons.close, color: AppleColors.black),
           onPressed: () => Navigator.popUntil(context, (route) => route.isFirst),
         ),
-        title: Text("YOUR TICKET", style: BrutalistStyle.title(color: Colors.white)),
+        title: Text("Your Ticket", style: AppleStyle.title()),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -55,51 +58,55 @@ class TicketScreen extends StatelessWidget {
           child: Column(
             children: [
               Container(
-                decoration: BrutalistStyle.containerDecoration(),
-                padding: const EdgeInsets.all(24),
+                decoration: AppleStyle.cardDecoration(),
+                padding: const EdgeInsets.all(32),
                 child: Column(
                   children: [
                     Text(status.bookingId.substring(0, 8).toUpperCase(), 
-                         style: BrutalistStyle.label(color: Colors.grey)),
-                    const SizedBox(height: 24),
+                         style: AppleStyle.footnote()),
+                    const SizedBox(height: 32),
                     Container(
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        border: Border.all(color: Colors.black, width: 2),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: AppleColors.bg, width: 1),
                       ),
                       child: QrImageView(
                         data: qrData,
                         version: QrVersions.auto,
-                        size: 250.0,
+                        size: 240.0,
                         errorCorrectionLevel: QrErrorCorrectLevel.L,
                       ),
                     ),
-                    const SizedBox(height: 24),
-                    Text("SCAN AT GATE", style: BrutalistStyle.title()),
+                    const SizedBox(height: 32),
+                    Text("SCAN AT GATE", style: AppleStyle.title().copyWith(letterSpacing: 2)),
                     const SizedBox(height: 8),
-                    Text("Keep brightness high for scanning", style: BrutalistStyle.label(color: Colors.grey)),
+                    Text("Increase brightness for faster entry", style: AppleStyle.footnote()),
                   ],
                 ),
               ),
               const SizedBox(height: 24),
               Container(
-                decoration: BrutalistStyle.containerDecoration(color: BrutalistColors.white),
-                padding: const EdgeInsets.all(20),
+                decoration: AppleStyle.cardDecoration(),
+                padding: const EdgeInsets.all(24),
                 child: Column(
                   children: [
-                    _InfoRow(label: "STATUS", value: status.status, color: BrutalistColors.primary),
-                    const Divider(height: 32, thickness: 2, color: Colors.black),
+                    _InfoRow(label: "STATUS", value: status.status, color: AppleColors.blue),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 16),
+                      child: Divider(height: 1, color: AppleColors.bg),
+                    ),
                     _InfoRow(label: "PASSENGERS", value: "${status.quantity} ADULT"),
-                    const SizedBox(height: 16),
-                    _InfoRow(label: "AMOUNT", value: "₹${status.price.toInt()}"),
+                    const SizedBox(height: 12),
+                    _InfoRow(label: "TOTAL FARE", value: "₹${status.price.toInt()}"),
                   ],
                 ),
               ),
               const SizedBox(height: 32),
               BrutalistButton(
                 text: "Refresh Status",
-                color: BrutalistColors.white,
+                color: AppleColors.white.withOpacity(0), // Make it a text-only feel button or different style
                 onTap: () => booking.refreshStatus(),
               ),
               const SizedBox(height: 80),
@@ -122,8 +129,8 @@ class _InfoRow extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: BrutalistStyle.label(color: Colors.grey)),
-        Text(value, style: BrutalistStyle.title(color: color ?? Colors.black).copyWith(fontSize: 16)),
+        Text(label, style: AppleStyle.footnote().copyWith(fontWeight: FontWeight.bold)),
+        Text(value, style: AppleStyle.body(bold: true, color: color ?? AppleColors.black)),
       ],
     );
   }
