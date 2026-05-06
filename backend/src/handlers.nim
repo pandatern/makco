@@ -2,13 +2,11 @@ import json, strutils, asyncdispatch
 import prologue
 import ./api_client
 
-proc jsonResponse(ctx: Context, data: JsonNode, code: HttpCode = Http200) =
-  ctx.response.code = code
-  ctx.response.headers["Content-Type"] = "application/json"
-  ctx.response.body = $(data)
+proc jsonResponse(ctx: Context, data: JsonNode, code: HttpCode = Http200) {.async.} =
+  await ctx.respond(code, $(data), "application/json")
 
 proc health*(ctx: Context) {.async.} =
-  ctx.jsonResponse(%*{
+  await ctx.jsonResponse(%*{
     "status": "ok",
     "app": "Makco",
     "version": "1.0.0"
@@ -21,13 +19,13 @@ proc initAuth*(ctx: Context) {.async.} =
     let countryCode = body{"mobileCountryCode"}.getStr("+91")
 
     if phone.len != 10 or not phone.allCharsInSet({'0'..'9'}):
-      ctx.jsonResponse(%*{"error": "Invalid phone number"}, Http400)
+      await ctx.jsonResponse(%*{"error": "Invalid phone number"}, Http400)
       return
 
     let result = await mtAuth(phone, countryCode)
-    ctx.jsonResponse(result)
+    await ctx.jsonResponse(result)
   except CatchableError as e:
-    ctx.jsonResponse(%*{"error": "Auth failed", "message": e.msg}, Http500)
+    await ctx.jsonResponse(%*{"error": "Auth failed", "message": e.msg}, Http500)
 
 proc verifyAuth*(ctx: Context) {.async.} =
   try:
@@ -37,21 +35,21 @@ proc verifyAuth*(ctx: Context) {.async.} =
     let deviceToken = body{"deviceToken"}.getStr("makco_device")
 
     if authId.len == 0:
-      ctx.jsonResponse(%*{"error": "Missing authId"}, Http400)
+      await ctx.jsonResponse(%*{"error": "Missing authId"}, Http400)
       return
 
     if otp.len != 4:
-      ctx.jsonResponse(%*{"error": "OTP must be 4 digits"}, Http400)
+      await ctx.jsonResponse(%*{"error": "OTP must be 4 digits"}, Http400)
       return
 
     let result = await mtVerifyAuth(authId, otp, deviceToken)
 
     if result.hasKey("errorCode"):
-      ctx.jsonResponse(result, Http400)
+      await ctx.jsonResponse(result, Http400)
     else:
-      ctx.jsonResponse(result)
+      await ctx.jsonResponse(result)
   except CatchableError as e:
-    ctx.jsonResponse(%*{"error": "Verify failed", "message": e.msg}, Http500)
+    await ctx.jsonResponse(%*{"error": "Verify failed", "message": e.msg}, Http500)
 
 proc getStations*(ctx: Context) {.async.} =
   try:
@@ -59,13 +57,13 @@ proc getStations*(ctx: Context) {.async.} =
     let city = ctx.getQueryParams("city", "chennai")
 
     if token.len == 0:
-      ctx.jsonResponse(%*{"errorCode": "MISSING_HEADER", "errorMessage": "Header token is missing"}, Http401)
+      await ctx.jsonResponse(%*{"errorCode": "MISSING_HEADER", "errorMessage": "Header token is missing"}, Http401)
       return
 
     let result = await mtGetStations(token, city)
-    ctx.jsonResponse(result)
+    await ctx.jsonResponse(result)
   except CatchableError as e:
-    ctx.jsonResponse(%*{"error": "Failed to get stations", "message": e.msg}, Http500)
+    await ctx.jsonResponse(%*{"error": "Failed to get stations", "message": e.msg}, Http500)
 
 proc getRoutes*(ctx: Context) {.async.} =
   try:
@@ -73,13 +71,13 @@ proc getRoutes*(ctx: Context) {.async.} =
     let city = ctx.getQueryParams("city", "chennai")
 
     if token.len == 0:
-      ctx.jsonResponse(%*{"errorCode": "MISSING_HEADER", "errorMessage": "Header token is missing"}, Http401)
+      await ctx.jsonResponse(%*{"errorCode": "MISSING_HEADER", "errorMessage": "Header token is missing"}, Http401)
       return
 
     let result = await mtGetRoutes(token, city)
-    ctx.jsonResponse(result)
+    await ctx.jsonResponse(result)
   except CatchableError as e:
-    ctx.jsonResponse(%*{"error": "Failed to get routes", "message": e.msg}, Http500)
+    await ctx.jsonResponse(%*{"error": "Failed to get routes", "message": e.msg}, Http500)
 
 proc searchFare*(ctx: Context) {.async.} =
   try:
@@ -88,7 +86,7 @@ proc searchFare*(ctx: Context) {.async.} =
     let body = ctx.request.body.parseJson
 
     if token.len == 0:
-      ctx.jsonResponse(%*{"errorCode": "MISSING_HEADER", "errorMessage": "Header token is missing"}, Http401)
+      await ctx.jsonResponse(%*{"errorCode": "MISSING_HEADER", "errorMessage": "Header token is missing"}, Http401)
       return
 
     let fromStation = body{"fromStationCode"}.getStr
@@ -96,13 +94,13 @@ proc searchFare*(ctx: Context) {.async.} =
     let quantity = body{"quantity"}.getInt(1)
 
     if fromStation.len == 0 or toStation.len == 0:
-      ctx.jsonResponse(%*{"error": "Missing station codes"}, Http400)
+      await ctx.jsonResponse(%*{"error": "Missing station codes"}, Http400)
       return
 
     let result = await mtSearchFare(token, city, fromStation, toStation, quantity)
-    ctx.jsonResponse(result)
+    await ctx.jsonResponse(result)
   except CatchableError as e:
-    ctx.jsonResponse(%*{"error": "Search failed", "message": e.msg}, Http500)
+    await ctx.jsonResponse(%*{"error": "Search failed", "message": e.msg}, Http500)
 
 proc getQuote*(ctx: Context) {.async.} =
   try:
@@ -111,17 +109,17 @@ proc getQuote*(ctx: Context) {.async.} =
     let city = ctx.getQueryParams("city", "chennai")
 
     if token.len == 0:
-      ctx.jsonResponse(%*{"errorCode": "MISSING_HEADER", "errorMessage": "Header token is missing"}, Http401)
+      await ctx.jsonResponse(%*{"errorCode": "MISSING_HEADER", "errorMessage": "Header token is missing"}, Http401)
       return
 
     if searchId.len == 0:
-      ctx.jsonResponse(%*{"error": "Missing searchId"}, Http400)
+      await ctx.jsonResponse(%*{"error": "Missing searchId"}, Http400)
       return
 
     let result = await mtGetQuote(token, searchId, city)
-    ctx.jsonResponse(result)
+    await ctx.jsonResponse(result)
   except CatchableError as e:
-    ctx.jsonResponse(%*{"error": "Quote failed", "message": e.msg}, Http500)
+    await ctx.jsonResponse(%*{"error": "Quote failed", "message": e.msg}, Http500)
 
 proc confirmBooking*(ctx: Context) {.async.} =
   try:
@@ -132,11 +130,11 @@ proc confirmBooking*(ctx: Context) {.async.} =
     let quantity = body{"quantity"}.getInt(1)
 
     if token.len == 0:
-      ctx.jsonResponse(%*{"errorCode": "MISSING_HEADER", "errorMessage": "Header token is missing"}, Http401)
+      await ctx.jsonResponse(%*{"errorCode": "MISSING_HEADER", "errorMessage": "Header token is missing"}, Http401)
       return
 
     if quoteId.len == 0:
-      ctx.jsonResponse(%*{"error": "Missing quoteId"}, Http400)
+      await ctx.jsonResponse(%*{"error": "Missing quoteId"}, Http400)
       return
     
     let profile = await mtGetProfile(token)
@@ -147,9 +145,9 @@ proc confirmBooking*(ctx: Context) {.async.} =
       echo "[ADMIN] Requesting real ticket with mock payment for admin number 8190835624"
 
     let result = await mtConfirmBooking(token, quoteId, city, quantity, isAdmin)
-    ctx.jsonResponse(result)
+    await ctx.jsonResponse(result)
   except CatchableError as e:
-    ctx.jsonResponse(%*{"error": "Confirm failed", "message": e.msg}, Http500)
+    await ctx.jsonResponse(%*{"error": "Confirm failed", "message": e.msg}, Http500)
 
 proc getBookingStatus*(ctx: Context) {.async.} =
   try:
@@ -158,17 +156,17 @@ proc getBookingStatus*(ctx: Context) {.async.} =
     let city = ctx.getQueryParams("city", "chennai")
 
     if token.len == 0:
-      ctx.jsonResponse(%*{"errorCode": "MISSING_HEADER", "errorMessage": "Header token is missing"}, Http401)
+      await ctx.jsonResponse(%*{"errorCode": "MISSING_HEADER", "errorMessage": "Header token is missing"}, Http401)
       return
 
     if bookingId.len == 0:
-      ctx.jsonResponse(%*{"error": "Missing bookingId"}, Http400)
+      await ctx.jsonResponse(%*{"error": "Missing bookingId"}, Http400)
       return
 
     let result = await mtGetBookingStatus(token, bookingId, city)
-    ctx.jsonResponse(result)
+    await ctx.jsonResponse(result)
   except CatchableError as e:
-    ctx.jsonResponse(%*{"error": "Status failed", "message": e.msg}, Http500)
+    await ctx.jsonResponse(%*{"error": "Status failed", "message": e.msg}, Http500)
 
 proc refreshBookingStatus*(ctx: Context) {.async.} =
   try:
@@ -177,30 +175,30 @@ proc refreshBookingStatus*(ctx: Context) {.async.} =
     let city = ctx.getQueryParams("city", "chennai")
 
     if token.len == 0:
-      ctx.jsonResponse(%*{"errorCode": "MISSING_HEADER", "errorMessage": "Header token is missing"}, Http401)
+      await ctx.jsonResponse(%*{"errorCode": "MISSING_HEADER", "errorMessage": "Header token is missing"}, Http401)
       return
 
     if bookingId.len == 0:
-      ctx.jsonResponse(%*{"error": "Missing bookingId"}, Http400)
+      await ctx.jsonResponse(%*{"error": "Missing bookingId"}, Http400)
       return
 
     let result = await mtGetBookingStatus(token, bookingId, city)
-    ctx.jsonResponse(result)
+    await ctx.jsonResponse(result)
   except CatchableError as e:
-    ctx.jsonResponse(%*{"error": "Refresh failed", "message": e.msg}, Http500)
+    await ctx.jsonResponse(%*{"error": "Refresh failed", "message": e.msg}, Http500)
 
 proc getProfile*(ctx: Context) {.async.} =
   try:
     let token = ctx.request.headers.getOrDefault("token")
 
     if token.len == 0:
-      ctx.jsonResponse(%*{"errorCode": "MISSING_HEADER", "errorMessage": "Header token is missing"}, Http401)
+      await ctx.jsonResponse(%*{"errorCode": "MISSING_HEADER", "errorMessage": "Header token is missing"}, Http401)
       return
 
     let result = await mtGetProfile(token)
-    ctx.jsonResponse(result)
+    await ctx.jsonResponse(result)
   except CatchableError as e:
-    ctx.jsonResponse(%*{"error": "Profile failed", "message": e.msg}, Http500)
+    await ctx.jsonResponse(%*{"error": "Profile failed", "message": e.msg}, Http500)
 
 proc getTicketBookings*(ctx: Context) {.async.} =
   try:
@@ -208,10 +206,10 @@ proc getTicketBookings*(ctx: Context) {.async.} =
     let city = ctx.getQueryParams("city", "chennai")
 
     if token.len == 0:
-      ctx.jsonResponse(%*{"errorCode": "MISSING_HEADER", "errorMessage": "Header token is missing"}, Http401)
+      await ctx.jsonResponse(%*{"errorCode": "MISSING_HEADER", "errorMessage": "Header token is missing"}, Http401)
       return
 
     let result = await mtGetTicketBookings(token, city)
-    ctx.jsonResponse(result)
+    await ctx.jsonResponse(result)
   except CatchableError as e:
-    ctx.jsonResponse(%*{"error": "Tickets failed", "message": e.msg}, Http500)
+    await ctx.jsonResponse(%*{"error": "Tickets failed", "message": e.msg}, Http500)
