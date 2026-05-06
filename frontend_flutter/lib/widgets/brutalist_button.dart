@@ -11,7 +11,7 @@ class BrutalistButton extends StatefulWidget {
     Key? key,
     required this.text,
     this.onTap,
-    this.color = BrutalistColors.accent,
+    this.color = AppleColors.blue,
     this.isLoading = false,
   }) : super(key: key);
 
@@ -30,7 +30,7 @@ class _BrutalistButtonState extends State<BrutalistButton> with SingleTickerProv
       vsync: this,
       duration: const Duration(milliseconds: 100),
     );
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.96).animate(_controller);
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.97).animate(_controller);
   }
 
   @override
@@ -50,20 +50,23 @@ class _BrutalistButtonState extends State<BrutalistButton> with SingleTickerProv
       onTap: isEnabled ? widget.onTap : null,
       child: ScaleTransition(
         scale: _scaleAnimation,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 100),
+        child: Container(
           width: double.infinity,
-          height: 65,
-          decoration: BrutalistStyle.box(
-            color: isEnabled ? widget.color : Colors.grey[300]!,
-            hasShadow: isEnabled,
+          height: 56,
+          decoration: BoxDecoration(
+            color: isEnabled ? widget.color : AppleColors.lightGray,
+            borderRadius: BorderRadius.circular(16),
           ),
           alignment: Alignment.center,
           child: widget.isLoading
-              ? const CircularProgressIndicator(color: Colors.black, strokeWidth: 4)
+              ? const SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
+                )
               : Text(
-                  widget.text.toUpperCase(),
-                  style: BrutalistStyle.title().copyWith(fontSize: 20),
+                  widget.text,
+                  style: AppleStyle.body(bold: true, color: Colors.white).copyWith(fontSize: 18),
                 ),
         ),
       ),

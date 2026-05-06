@@ -50,121 +50,102 @@ class _HomeScreenState extends State<HomeScreen> {
     final booking = Provider.of<BookingProvider>(context);
 
     return Scaffold(
-      backgroundColor: BrutalistColors.bg,
+      backgroundColor: AppleColors.bg,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 32),
-              Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("MAKCO", style: BrutalistStyle.heading()),
+                  Text("Makco", style: AppleStyle.largeTitle()),
                   GestureDetector(
                     onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ProfileScreen())),
                     child: Container(
-                      width: 55,
-                      height: 55,
-                      decoration: BrutalistStyle.box(color: BrutalistColors.accent),
-                      child: const Icon(Icons.person, color: Colors.black, size: 30),
+                      padding: const EdgeInsets.all(8),
+                      decoration: const BoxDecoration(
+                        color: AppleColors.blue,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.person, color: Colors.white, size: 28),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 48),
-              Container(
-                decoration: BrutalistStyle.box(color: Colors.black),
-                padding: const EdgeInsets.all(16),
-                child: Text("QUICK BOOKING", style: BrutalistStyle.label().copyWith(color: Colors.white)),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("WHERE TO?", style: AppleStyle.footnote().copyWith(fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 12),
+                  Container(
+                    decoration: AppleStyle.cardDecoration(hasShadow: true),
+                    child: Column(
+                      children: [
+                        _StationRow(
+                          icon: Icons.circle_outlined,
+                          label: "From",
+                          value: booking.sourceStation?.name ?? "Select Source",
+                          onTap: () => _showStationPicker(true),
+                          showDivider: true,
+                        ),
+                        _StationRow(
+                          icon: Icons.location_on,
+                          iconColor: AppleColors.blue,
+                          label: "To",
+                          value: booking.destinationStation?.name ?? "Select Destination",
+                          onTap: () => _showStationPicker(false),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+                  BrutalistButton(
+                    text: "Find Fares",
+                    onTap: (booking.sourceStation != null && booking.destinationStation != null)
+                        ? () {
+                            booking.searchFares();
+                            Navigator.push(context, MaterialPageRoute(builder: (_) => const BookingScreen()));
+                          }
+                        : null,
+                  ),
+                ],
               ),
-              const SizedBox(height: 16),
-              _StationSelector(
-                label: "FROM STATION",
-                station: booking.sourceStation,
-                onTap: () => _showStationPicker(true),
-              ),
-              const SizedBox(height: 16),
-              _StationSelector(
-                label: "TO STATION",
-                station: booking.destinationStation,
-                onTap: () => _showStationPicker(false),
-              ),
-              const SizedBox(height: 32),
-              BrutalistButton(
-                text: "Find Best Fare",
-                onTap: (booking.sourceStation != null && booking.destinationStation != null)
-                    ? () {
-                        booking.searchFares();
-                        Navigator.push(context, MaterialPageRoute(builder: (_) => const BookingScreen()));
-                      }
-                    : null,
-              ),
-              const SizedBox(height: 48),
-              Row(
+            ),
+            const SizedBox(height: 48),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Row(
                 children: [
                   Expanded(
-                    child: _MenuAction(
-                      icon: Icons.confirmation_number,
+                    child: _AppleActionCard(
+                      icon: Icons.receipt_long_outlined,
                       label: "Tickets",
                       onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const HistoryScreen())),
                     ),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
-                    child: _MenuAction(
-                      icon: Icons.map,
+                    child: _AppleActionCard(
+                      icon: Icons.map_outlined,
                       label: "Route Map",
                       onTap: () {},
                     ),
                   ),
                 ],
               ),
-              const Spacer(),
-              Center(
-                child: Text("v2.0 • PREMIUM BRUTALIST", style: BrutalistStyle.label().copyWith(color: Colors.grey, fontSize: 10)),
-              ),
-              const SizedBox(height: 24),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _StationSelector extends StatelessWidget {
-  final String label;
-  final Station? station;
-  final VoidCallback onTap;
-
-  const _StationSelector({required this.label, this.station, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(24),
-        decoration: BrutalistStyle.box(
-          color: station != null ? BrutalistColors.white : Colors.white.withOpacity(0.6),
-        ),
-        child: Row(
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(label, style: BrutalistStyle.label().copyWith(fontSize: 10, color: Colors.grey[600])),
-                const SizedBox(height: 4),
-                Text(
-                  station?.name ?? "TAP TO SELECT",
-                  style: BrutalistStyle.title().copyWith(fontSize: 18),
-                ),
-              ],
             ),
             const Spacer(),
-            const Icon(Icons.keyboard_arrow_down, size: 28),
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 24),
+                child: Text("Designed for Chennai Metro", style: AppleStyle.footnote()),
+              ),
+            ),
           ],
         ),
       ),
@@ -172,12 +153,65 @@ class _StationSelector extends StatelessWidget {
   }
 }
 
-class _MenuAction extends StatelessWidget {
+class _StationRow extends StatelessWidget {
+  final IconData icon;
+  final Color iconColor;
+  final String label;
+  final String value;
+  final VoidCallback onTap;
+  final bool showDivider;
+
+  const _StationRow({
+    required this.icon,
+    this.iconColor = Colors.grey,
+    required this.label,
+    required this.value,
+    required this.onTap,
+    this.showDivider = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Icon(icon, color: iconColor, size: 24),
+                const SizedBox(width: 16),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(label, style: AppleStyle.footnote()),
+                    const SizedBox(height: 4),
+                    Text(value, style: AppleStyle.body(bold: true)),
+                  ],
+                ),
+                const Spacer(),
+                const Icon(Icons.chevron_right, color: AppleColors.lightGray),
+              ],
+            ),
+            if (showDivider) 
+              const Padding(
+                padding: EdgeInsets.only(top: 20, left: 40),
+                child: Divider(height: 1, color: AppleColors.bg),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _AppleActionCard extends StatelessWidget {
   final IconData icon;
   final String label;
   final VoidCallback onTap;
 
-  const _MenuAction({required this.icon, required this.label, required this.onTap});
+  const _AppleActionCard({required this.icon, required this.label, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -185,12 +219,13 @@ class _MenuAction extends StatelessWidget {
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(20),
-        decoration: BrutalistStyle.box(),
+        decoration: AppleStyle.cardDecoration(hasShadow: true),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(icon, size: 32),
-            const SizedBox(height: 12),
-            Text(label.toUpperCase(), style: BrutalistStyle.label()),
+            Icon(icon, color: AppleColors.blue, size: 32),
+            const SizedBox(height: 16),
+            Text(label, style: AppleStyle.body(bold: true)),
           ],
         ),
       ),
@@ -216,47 +251,61 @@ class _StationPickerState extends State<StationPicker> {
     final filtered = widget.stations.where((s) => s.name.toLowerCase().contains(query.toLowerCase())).toList();
 
     return Container(
-      height: MediaQuery.of(context).size.height * 0.85,
+      height: MediaQuery.of(context).size.height * 0.9,
       decoration: const BoxDecoration(
-        color: BrutalistColors.bg,
-        border: Border(top: BorderSide(color: Colors.black, width: 6)),
+        color: AppleColors.bg,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      padding: const EdgeInsets.all(24),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("CHOOSE STATION", style: BrutalistStyle.heading().copyWith(fontSize: 32)),
-          const SizedBox(height: 24),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
-            decoration: BrutalistStyle.box(hasShadow: false),
-            child: TextField(
-              onChanged: (v) => setState(() => query = v),
-              style: BrutalistStyle.body(bold: true),
-              autofocus: true,
-              decoration: const InputDecoration(
-                hintText: "SEARCH...",
-                border: InputBorder.none,
-                icon: Icon(Icons.search, color: Colors.black, size: 28),
+          const SizedBox(height: 12),
+          Container(width: 40, height: 6, decoration: BoxDecoration(color: AppleColors.lightGray, borderRadius: BorderRadius.circular(3))),
+          Padding(
+            padding: const EdgeInsets.all(24),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("Select Station", style: AppleStyle.title()),
+                GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: const BoxDecoration(color: AppleColors.lightGray, shape: BoxShape.circle),
+                    child: const Icon(Icons.close, size: 20, color: Colors.white),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              decoration: BoxDecoration(color: AppleColors.white, borderRadius: BorderRadius.circular(12)),
+              child: TextField(
+                onChanged: (v) => setState(() => query = v),
+                autofocus: true,
+                decoration: const InputDecoration(
+                  hintText: "Search stations",
+                  border: InputBorder.none,
+                  icon: Icon(Icons.search, color: AppleColors.gray),
+                ),
               ),
             ),
           ),
           const SizedBox(height: 24),
           Expanded(
-            child: ListView.builder(
+            child: ListView.separated(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
               itemCount: filtered.length,
+              separatorBuilder: (_, __) => const Divider(height: 1, color: AppleColors.bg),
               itemBuilder: (ctx, i) {
                 final s = filtered[i];
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  child: GestureDetector(
-                    onTap: () => widget.onSelected(s),
-                    child: Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: BrutalistStyle.box(hasShadow: false),
-                      child: Text(s.name, style: BrutalistStyle.title().copyWith(fontSize: 18)),
-                    ),
-                  ),
+                return ListTile(
+                  contentPadding: const EdgeInsets.symmetric(vertical: 8),
+                  title: Text(s.name, style: AppleStyle.body()),
+                  trailing: const Icon(Icons.chevron_right, color: AppleColors.lightGray),
+                  onTap: () => widget.onSelected(s),
                 );
               },
             ),

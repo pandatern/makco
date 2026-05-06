@@ -1,71 +1,72 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class BrutalistColors {
+class AppleColors {
   static const Color white = Color(0xFFFFFFFF);
   static const Color black = Color(0xFF000000);
-  static const Color bg = Color(0xFFF0F0F0);
-  static const Color primary = Color(0xFF000000);
-  static const Color accent = Color(0xFFFFD700); // Gold accent for "Premium" touch
-  static const Color error = Color(0xFFFF4545);
+  static const Color bg = Color(0xFFF2F2F7); // iOS System Background
+  static const Color surface = Color(0xFFFFFFFF);
+  static const Color blue = Color(0xFF007AFF); // iOS Blue
+  static const Color gray = Color(0xFF8E8E93); // iOS Gray
+  static const Color lightGray = Color(0xFFD1D1D6);
+  static const Color error = Color(0xFFFF3B30); // iOS Red
 }
 
-class BrutalistStyle {
-  static const double borderWeight = 3.5;
-  static const double borderRadius = 0.0; // Sharp corners for hardcore brutalism
-  static const Offset shadowOffset = Offset(8, 8);
+class AppleStyle {
+  static const double borderRadius = 20.0;
+  static const double squircleRadius = 24.0;
 
-  static BoxDecoration box({
-    Color color = BrutalistColors.white,
+  static BoxDecoration cardDecoration({
+    Color color = AppleColors.surface,
+    double radius = borderRadius,
     bool hasShadow = true,
-    Color shadowColor = BrutalistColors.black,
   }) {
     return BoxDecoration(
       color: color,
-      border: Border.all(color: BrutalistColors.black, width: borderWeight),
+      borderRadius: BorderRadius.circular(radius),
       boxShadow: hasShadow
           ? [
               BoxShadow(
-                color: shadowColor,
-                offset: shadowOffset,
-                blurRadius: 0,
+                color: Colors.black.withOpacity(0.05),
+                offset: const Offset(0, 4),
+                blurRadius: 12,
               )
             ]
           : [],
     );
   }
 
-  static TextStyle heading() {
-    return GoogleFonts.archivoBlack(
-      fontSize: 42,
-      color: BrutalistColors.black,
-      height: 1.1,
-    );
-  }
-
-  static TextStyle title() {
-    return GoogleFonts.spaceGrotesk(
-      fontSize: 24,
-      fontWeight: FontWeight.w900,
-      color: BrutalistColors.black,
+  static TextStyle largeTitle() {
+    return GoogleFonts.inter(
+      fontSize: 34,
+      fontWeight: FontWeight.w700,
+      color: AppleColors.black,
       letterSpacing: -0.5,
     );
   }
 
-  static TextStyle body({bool bold = false}) {
-    return GoogleFonts.spaceGrotesk(
-      fontSize: 16,
-      fontWeight: bold ? FontWeight.w800 : FontWeight.w500,
-      color: BrutalistColors.black,
+  static TextStyle title() {
+    return GoogleFonts.inter(
+      fontSize: 20,
+      fontWeight: FontWeight.w600,
+      color: AppleColors.black,
+      letterSpacing: -0.3,
     );
   }
 
-  static TextStyle label() {
-    return GoogleFonts.spaceGrotesk(
+  static TextStyle body({bool bold = false, Color color = AppleColors.black}) {
+    return GoogleFonts.inter(
+      fontSize: 17,
+      fontWeight: bold ? FontWeight.w600 : FontWeight.w400,
+      color: color,
+    );
+  }
+
+  static TextStyle footnote() {
+    return GoogleFonts.inter(
       fontSize: 13,
-      fontWeight: FontWeight.w900,
-      color: BrutalistColors.black,
-      letterSpacing: 2,
+      fontWeight: FontWeight.w400,
+      color: AppleColors.gray,
     );
   }
 }

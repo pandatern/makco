@@ -36,7 +36,7 @@ class _AuthScreenState extends State<AuthScreen> {
         setState(() { _error = "Failed to send OTP"; });
       }
     } catch (e) {
-      setState(() { _error = "Check internet connection"; });
+      setState(() { _error = "Connection error"; });
     }
     setState(() { _isLoading = false; });
   }
@@ -49,53 +49,49 @@ class _AuthScreenState extends State<AuthScreen> {
     final success = await auth.verifyOtp(_authId!, _otpController.text);
     
     if (!success) {
-      setState(() { _error = "Invalid OTP"; _isLoading = false; });
+      setState(() { _error = "Invalid code. Please try again."; _isLoading = false; });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: BrutalistColors.bg,
-      body: SingleChildScrollView(
+      backgroundColor: AppleColors.bg,
+      body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 100),
-              Container(
-                width: double.infinity,
-                decoration: BrutalistStyle.box(color: BrutalistColors.accent),
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("MAKCO", style: BrutalistStyle.heading().copyWith(fontSize: 50)),
-                    const SizedBox(height: 8),
-                    Text("METRO TICKETING", style: BrutalistStyle.label()),
-                  ],
-                ),
+              const SizedBox(height: 60),
+              Text(
+                _otpSent ? "Verification" : "Welcome",
+                style: AppleStyle.largeTitle(),
               ),
-              const SizedBox(height: 64),
-              Text(_otpSent ? "VERIFY OTP" : "PHONE LOGIN", style: BrutalistStyle.title()),
-              const SizedBox(height: 16),
+              const SizedBox(height: 8),
+              Text(
+                _otpSent 
+                  ? "Enter the 4-digit code sent to you." 
+                  : "Sign in with your phone number to continue.",
+                style: AppleStyle.body(color: AppleColors.gray),
+              ),
+              const SizedBox(height: 48),
               if (!_otpSent) ...[
                 Container(
-                  decoration: BrutalistStyle.box(hasShadow: false),
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  decoration: AppleStyle.cardDecoration(hasShadow: false),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                   child: Row(
                     children: [
-                      Text("+91", style: BrutalistStyle.title()),
-                      const SizedBox(width: 16),
+                      Text("+91", style: AppleStyle.body(bold: true)),
+                      const SizedBox(width: 12),
                       Expanded(
                         child: TextField(
                           controller: _phoneController,
                           keyboardType: TextInputType.phone,
                           maxLength: 10,
-                          style: BrutalistStyle.title(),
+                          style: AppleStyle.body(bold: true),
                           decoration: const InputDecoration(
-                            hintText: "00000 00000",
+                            hintText: "Phone Number",
                             border: InputBorder.none,
                             counterText: "",
                           ),
@@ -106,20 +102,21 @@ class _AuthScreenState extends State<AuthScreen> {
                 ),
                 const SizedBox(height: 32),
                 BrutalistButton(
-                  text: "Send OTP",
+                  text: "Continue",
                   isLoading: _isLoading,
                   onTap: _sendOtp,
                 ),
               ] else ...[
                 Container(
-                  decoration: BrutalistStyle.box(hasShadow: false),
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  decoration: AppleStyle.cardDecoration(hasShadow: false),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                   child: TextField(
                     controller: _otpController,
                     keyboardType: TextInputType.number,
                     maxLength: 4,
                     textAlign: TextAlign.center,
-                    style: BrutalistStyle.heading().copyWith(letterSpacing: 30),
+                    style: AppleStyle.largeTitle().copyWith(letterSpacing: 24),
+                    autofocus: true,
                     decoration: const InputDecoration(
                       hintText: "••••",
                       border: InputBorder.none,
@@ -132,24 +129,24 @@ class _AuthScreenState extends State<AuthScreen> {
                 ),
                 const SizedBox(height: 32),
                 BrutalistButton(
-                  text: "Verify & Enter",
+                  text: "Verify",
                   isLoading: _isLoading,
                   onTap: _verifyOtp,
                 ),
                 Center(
                   child: TextButton(
                     onPressed: () => setState(() => _otpSent = false),
-                    child: Text("BACK TO PHONE", style: BrutalistStyle.label().copyWith(decoration: TextDecoration.underline)),
+                    child: Text("Change Phone Number", style: AppleStyle.body(color: AppleColors.blue)),
                   ),
                 ),
               ],
               if (_error != null) ...[
-                const SizedBox(height: 24),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(16),
-                  decoration: BrutalistStyle.box(color: BrutalistColors.error, hasShadow: false),
-                  child: Text(_error!, style: BrutalistStyle.body(bold: true).copyWith(color: Colors.white)),
+                const SizedBox(height: 16),
+                Center(
+                  child: Text(
+                    _error!,
+                    style: AppleStyle.body(color: AppleColors.error),
+                  ),
                 ),
               ],
             ],
