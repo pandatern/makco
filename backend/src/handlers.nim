@@ -4,6 +4,7 @@ import ./api_client
 
 proc jsonResponse(ctx: Context, data: JsonNode, code: HttpCode = Http200) =
   ctx.response.code = code
+  ctx.response.headers["Content-Type"] = "application/json"
   ctx.response.body = $(data)
 
 proc health*(ctx: Context) {.async.} =
