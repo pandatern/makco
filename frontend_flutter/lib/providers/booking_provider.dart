@@ -83,9 +83,9 @@ class BookingProvider extends ChangeNotifier {
       final searchId = response['searchId'];
       
       if (searchId != null) {
-        // Simple polling logic: 3 attempts
-        for (int i = 0; i < 3; i++) {
-          await Future.delayed(const Duration(seconds: 2));
+        // Optimized polling: shorter delay, 4 attempts
+        for (int i = 0; i < 4; i++) {
+          await Future.delayed(const Duration(milliseconds: 800));
           final q = await _api.getQuotes(searchId);
           if (q.isNotEmpty) {
             quotes = q;
