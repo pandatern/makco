@@ -109,13 +109,16 @@ proc mtGetQuote*(token, searchId, city: string): Future[JsonNode] {.async.} =
 
 
 proc mtConfirmBooking*(token, quoteId, city: string, quantity: int, mockPayment: bool = false): Future[JsonNode] {.async.} =
-  let body = %*{"quantity": quantity}
+  let body = %*{
+    "quantity": quantity,
+    "isMockPayment": mockPayment
+  }
   result = await makeRequest(
     BASE_URL & "/frfs/quote/" & quoteId & "/confirm",
     HttpPost,
     token = token,
     body = body,
-    params = @[("city", city), ("vehicleType", VEHICLE_TYPE), ("isMockPayment", $mockPayment)]
+    params = @[("city", city), ("vehicleType", VEHICLE_TYPE)]
   )
 
 

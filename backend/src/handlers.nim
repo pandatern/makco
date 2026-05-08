@@ -139,12 +139,15 @@ proc confirmBooking*(ctx: Context) {.async.} =
     
     let profile = await mtGetProfile(token)
     let phone = profile{"maskedMobileNumber"}.getStr("")
-    # Flexible check: must contain the start and end of the admin number
-    let isAdmin = (phone.contains("819") and phone.endsWith("624")) or phone == "8190835624"
+    # Strict check for admin number 8190835624
+    # Masked format is typically "819...624"
+    let isAdmin = phone == "8190835624" or phone == "819...624"
 
     if isAdmin:
-      echo "[ADMIN] Verified admin number. Masked: ", phone
+      echo "[ADMIN] Verified admin number: ", phone
       echo "[ADMIN] Requesting real ticket with mock payment"
+    else:
+      echo "[USER] Normal user: ", phone
 
     let result = await mtConfirmBooking(token, quoteId, city, quantity, isAdmin)
     await ctx.jsonResponse(result)

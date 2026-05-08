@@ -24,6 +24,12 @@ class _BookingScreenState extends State<BookingScreen> {
     
     final status = booking.currentBooking;
     if (status != null) {
+      if (status.status == "CONFIRMED") {
+        // Skip straight to ticket
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const TicketScreen()));
+        return;
+      }
+
       final paymentUrl = status.payment?['paymentOrder']?['payment_links']?['web'];
       
       if (paymentUrl != null) {
@@ -46,7 +52,13 @@ class _BookingScreenState extends State<BookingScreen> {
           ),
         );
       } else {
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const TicketScreen()));
+        // Status is PENDING but no payment URL - this is an error for normal users
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Payment session not available. Status: ${status.status}"),
+            backgroundColor: AppleColors.error,
+          )
+        );
       }
     }
   }
