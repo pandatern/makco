@@ -9,6 +9,7 @@ class AuthProvider extends ChangeNotifier {
   bool _isAuthenticated = false;
 
   String? get token => _token;
+  String? get phone => _phone;
   bool get isAuthenticated => _isAuthenticated;
   ApiService get apiService => _apiService;
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../theme/brutalist_style.dart';
+import 'history_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -32,31 +33,35 @@ class SettingsScreen extends StatelessWidget {
                 _SettingsItem(
                   icon: Icons.person_outline,
                   title: "Personal Details",
-                  subtitle: "Name, phone number",
-                  onTap: () {},
+                  subtitle: auth.phone ?? "Sign in to see details",
+                  onTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("Phone: ${auth.phone}", style: AppleStyle.body(color: Colors.white)), backgroundColor: AppleColors.black)
+                    );
+                  },
                 ),
                 _SettingsItem(
-                  icon: Icons.payment_outlined,
-                  title: "Payment Methods",
-                  subtitle: "UPI, cards, wallets",
-                  onTap: () {},
+                  icon: Icons.history,
+                  title: "Booking History",
+                  subtitle: "View all your past tickets",
+                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const HistoryScreen())),
                 ),
               ],
             ),
             const SizedBox(height: 32),
             _SettingsSection(
-              title: "PREFERENCES",
+              title: "SUPPORT",
               items: [
                 _SettingsItem(
-                  icon: Icons.notifications_none,
-                  title: "Notifications",
-                  subtitle: "Alerts, ticket updates",
+                  icon: Icons.help_outline,
+                  title: "Help & FAQ",
+                  subtitle: "How to use the app",
                   onTap: () {},
                 ),
                 _SettingsItem(
-                  icon: Icons.language,
-                  title: "Language",
-                  subtitle: "English",
+                  icon: Icons.privacy_tip_outlined,
+                  title: "Privacy Policy",
+                  subtitle: "Data protection rules",
                   onTap: () {},
                 ),
               ],
@@ -79,7 +84,7 @@ class SettingsScreen extends StatelessWidget {
             Center(
               child: Column(
                 children: [
-                  Text("MAKCO v2.1.0", style: AppleStyle.footnote().copyWith(fontWeight: FontWeight.bold)),
+                  Text("MAKCO v2.1.3", style: AppleStyle.footnote().copyWith(fontWeight: FontWeight.bold)),
                   const SizedBox(height: 4),
                   Text("© 2026 PANDATERN", style: AppleStyle.footnote()),
                 ],

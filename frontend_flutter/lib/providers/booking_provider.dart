@@ -106,6 +106,16 @@ class BookingProvider extends ChangeNotifier {
     notifyListeners();
     try {
       currentBooking = await _api.confirmBooking(quote.quoteId, quantity: quantity);
+      
+      // If status is not CONFIRMED, poll for 5 seconds
+      if (currentBooking != null && currentBooking!.status != "CONFIRMED") {
+        for (int i = 0; i < 5; i++) {
+          await Future.delayed(const Duration(seconds: 1));
+          final latest = await _api.getBookingStatus(currentBooking!.bookingId);
+          currentBooking = latest;
+          if (latest.status == "CONFIRMED") break;
+        }
+      }
       error = null;
     } catch (e) {
       error = "Booking failed";
