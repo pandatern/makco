@@ -107,14 +107,19 @@ class BookingProvider extends ChangeNotifier {
     try {
       currentBooking = await _api.confirmBooking(quote.quoteId, quantity: quantity);
       
-      // If status is not CONFIRMED, poll for 5 seconds
-      if (currentBooking != null && currentBooking!.status != "CONFIRMED") {
-        for (int i = 0; i < 5; i++) {
-          await Future.delayed(const Duration(seconds: 1));
-          final latest = await _api.getBookingStatus(currentBooking!.bookingId);
-          currentBooking = latest;
-          if (latest.status == "CONFIRMED") break;
-        }
+      // Poll until status is CONFIRMED (admin) OR payment object is ready (user)
+      // 8 attempts, 1s delay = 8 second window
+      for (int i = 0; i < 8; i++) {
+        final hasPayment = currentBooking?.payment != null && 
+                           currentBooking?.payment?['paymentOrder'] != null;
+        final isConfirmed = currentBooking?.status == "CONFIRMED";
+
+        if (isConfirmed || hasPayment) break;
+
+        await Future.delayed(const Duration(seconds: 1));
+        final latest = await _api.getBookingStatus(currentBooking!.bookingId);
+        currentBooking = latest;
+        notifyListeners();
       }
       error = null;
     } catch (e) {

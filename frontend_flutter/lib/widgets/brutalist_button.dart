@@ -54,20 +54,19 @@ class _AppleButtonState extends State<AppleButton> with SingleTickerProviderStat
           width: double.infinity,
           height: 56,
           decoration: BoxDecoration(
-            color: isEnabled ? (widget.color ?? Colors.white) : Colors.grey[100],
-            borderRadius: BorderRadius.circular(12),
-            border: isEnabled ? Border.all(color: Colors.black, width: 2) : null,
+            color: isEnabled ? (widget.color ?? AppleColors.blue) : AppleColors.lightGray,
+            borderRadius: BorderRadius.circular(16),
           ),
           alignment: Alignment.center,
           child: widget.isLoading
               ? const SizedBox(
                   width: 24,
                   height: 24,
-                  child: CircularProgressIndicator(color: Colors.black, strokeWidth: 2.5),
+                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
                 )
               : Text(
                   widget.text,
-                  style: AppleStyle.body(bold: true, color: Colors.black).copyWith(fontSize: 18),
+                  style: AppleStyle.body(bold: true, color: Colors.white).copyWith(fontSize: 18),
                 ),
         ),
       ),

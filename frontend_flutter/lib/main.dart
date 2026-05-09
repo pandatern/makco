@@ -64,7 +64,7 @@ class _MakcoAppState extends State<MakcoApp> {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
-        scaffoldBackgroundColor: Colors.white,
+        scaffoldBackgroundColor: const Color(0xFFF2F2F7),
       ),
       home: _showSplash 
         ? SplashScreen(onFinished: () => setState(() => _showSplash = false))

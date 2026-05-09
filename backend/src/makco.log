@@ -1,6 +1,5 @@
 DEBUG Prologue is serving at http://0.0.0.0:8080 
 DEBUG Starting 2 threads
 DEBUG Listening on port 8080
-[ADMIN] Requesting real ticket with mock payment for admin number 8190835624
 fatal.nim(53)            sysFatal
 Error: unhandled exception: httpx.nim(381, 9) `not (bodyLen > trueLen)`  [AssertionDefect]
