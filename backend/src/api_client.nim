@@ -118,7 +118,7 @@ proc mtConfirmBooking*(token, quoteId, city: string, quantity: int, mockPayment:
     HttpPost,
     token = token,
     body = body,
-    params = @[("city", city), ("vehicleType", VEHICLE_TYPE)]
+    params = @[("city", city), ("vehicleType", VEHICLE_TYPE), ("isMockPayment", $mockPayment)]
   )
 
 

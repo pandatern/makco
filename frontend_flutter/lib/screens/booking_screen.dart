@@ -24,8 +24,8 @@ class _BookingScreenState extends State<BookingScreen> {
     
     final status = booking.currentBooking;
     if (status != null) {
-      if (status.status == "CONFIRMED") {
-        // Skip straight to ticket
+      // Strictly skip for Admin
+      if (status.isAdmin || status.status == "CONFIRMED") {
         Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const TicketScreen()));
         return;
       }

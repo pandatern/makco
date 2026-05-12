@@ -97,6 +97,7 @@ class BookingStatus {
   final int quantity;
   final String? vehicleType;
   final Map<String, dynamic>? payment;
+  final bool isAdmin;
 
   BookingStatus({
     required this.bookingId,
@@ -108,6 +109,7 @@ class BookingStatus {
     required this.quantity,
     this.vehicleType,
     this.payment,
+    this.isAdmin = false,
   });
 
   factory BookingStatus.fromJson(Map<String, dynamic> json) {
@@ -125,6 +127,7 @@ class BookingStatus {
       quantity: json['quantity'] ?? 1,
       vehicleType: json['vehicleType'],
       payment: json['payment'],
+      isAdmin: json['isAdmin'] ?? false,
     );
   }
 }

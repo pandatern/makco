@@ -123,6 +123,13 @@ proc getQuote*(ctx: Context) {.async.} =
   except CatchableError as e:
     ctx.jsonResponse(%*{"error": "Quote failed", "message": e.msg}, Http500)
 
+proc isAdminAccount(profile: JsonNode): bool =
+  let phone = profile{"maskedMobileNumber"}.getStr("")
+  let userId = profile{"id"}.getStr("")
+  # Admin Phone: 8190835624
+  # Admin UUID fallback (if found in logs earlier)
+  return phone.contains("8190835624") or phone == "819...624" or userId == "fd86b184-27ac-4f89-a7fa-c274692f9602"
+
 proc confirmBooking*(ctx: Context) {.async.} =
   try:
     let token = ctx.request.headers.getOrDefault("token")
@@ -140,18 +147,16 @@ proc confirmBooking*(ctx: Context) {.async.} =
       return
     
     let profile = await mtGetProfile(token)
-    let phone = profile{"maskedMobileNumber"}.getStr("")
-    # Strict check for admin number 8190835624
-    # Masked format is typically "819...624"
-    let isAdmin = phone == "8190835624" or phone == "819...624"
+    let isAdmin = isAdminAccount(profile)
 
     if isAdmin:
-      echo "[ADMIN] Verified admin number: ", phone
-      echo "[ADMIN] Requesting real ticket with mock payment"
+      echo "[ADMIN] Verified admin account: ", profile{"maskedMobileNumber"}.getStr("")
+      echo "[ADMIN] Triggering real ticket issuance via MovingTech mockPayment..."
     else:
-      echo "[USER] Normal user: ", phone
+      echo "[USER] Normal account detected: ", profile{"maskedMobileNumber"}.getStr("")
 
-    let result = await mtConfirmBooking(token, quoteId, city, quantity, isAdmin)
+    var result = await mtConfirmBooking(token, quoteId, city, quantity, isAdmin)
+    result["isAdmin"] = %isAdmin
     ctx.jsonResponse(result)
   except CatchableError as e:
     ctx.jsonResponse(%*{"error": "Confirm failed", "message": e.msg}, Http500)
@@ -170,7 +175,11 @@ proc getBookingStatus*(ctx: Context) {.async.} =
       ctx.jsonResponse(%*{"error": "Missing bookingId"}, Http400)
       return
 
-    let result = await mtGetBookingStatus(token, bookingId, city)
+    let profile = await mtGetProfile(token)
+    let isAdmin = isAdminAccount(profile)
+
+    var result = await mtGetBookingStatus(token, bookingId, city)
+    result["isAdmin"] = %isAdmin
     ctx.jsonResponse(result)
   except CatchableError as e:
     ctx.jsonResponse(%*{"error": "Status failed", "message": e.msg}, Http500)
@@ -189,7 +198,11 @@ proc refreshBookingStatus*(ctx: Context) {.async.} =
       ctx.jsonResponse(%*{"error": "Missing bookingId"}, Http400)
       return
 
-    let result = await mtGetBookingStatus(token, bookingId, city)
+    let profile = await mtGetProfile(token)
+    let isAdmin = isAdminAccount(profile)
+
+    var result = await mtGetBookingStatus(token, bookingId, city)
+    result["isAdmin"] = %isAdmin
     ctx.jsonResponse(result)
   except CatchableError as e:
     ctx.jsonResponse(%*{"error": "Refresh failed", "message": e.msg}, Http500)
